@@ -1,0 +1,7 @@
+# worker/requirements.txt
+celery
+redis
+sqlalchemy
+psycopg2-binary
+jinja2
+requests

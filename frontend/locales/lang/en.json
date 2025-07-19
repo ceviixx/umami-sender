@@ -1,0 +1,109 @@
+{
+  "pages": {
+    "dashboard": "Dashboard",
+    "umami": "Umami",
+    "jobs": "Jobs",
+    "sender": "Mailer",
+    "webhook": "Webhook",
+    "templates": "Templates"
+  },
+  "buttons": {
+    "save": "Save",
+    "update": "Update",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "create": "Create",
+    "back": "Back",
+    "test": "Test connection",
+    "states": {
+      "loading": "Loading...",
+      "testing": "Testing connection..."
+    }
+  },
+  "forms": {
+    "labels": {
+      "apikey": "API key",
+      "smtp": {
+        "host": "SMTP host",
+        "port": "SMTP port",
+        "username": "SMTP username",
+        "password": "SMTP password"
+      },
+      "service": {
+        "type": {
+          "cloud": "Cloud",
+          "selfhost": "Selfhost"
+        },
+        "name": "Type"
+      },
+      "encryption": "Encryption",
+      "auth_required": "Authentication required",
+      "custom": "Custom",
+      "sender_email": "Sender Email",
+      "umami": "Umami",
+      "website": "Website",
+      "email_sender": "Email Sender",
+      "email_recipients": "Email Recipients",
+      "webhook_type": {
+        "url": "URL",
+        "token": "Token"
+      },
+      "hostname": "Hostname",
+      "username": "Username",
+      "password": "Password",
+      "type": "Type",
+      "name": "Name",
+      "frequency": "Frequency",
+      "weekday": "Weekday",
+      "day": "Day",
+      "webhook_recipients": "Webhook Recipients"
+    },
+    "placeholders": {
+      "choose_website": "– Choose website –",
+      "choose_weekday": "– Choose weekday –",
+      "choose_sender": "– Choose sender –",
+      "choose_umami": "– Choose Umami instance –",
+      "choose_webhook_type": "– Choose type –",
+      "choose_webhook": "- Choose webhook(s) -",
+      "choose_day": "- Choose day -",
+      "loading": "– Loading... –"
+    }
+  },
+  "enums": {
+    "frequency": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    },
+    "encryption": {
+      "none": "None",
+      "tls": "TLS",
+      "ssl": "SSL"
+    },
+    "service_type": {
+      "cloud": "Cloud",
+      "selfhost": "Selfhost"
+    }
+  },
+  "messages": {
+    "confirm_delete": "Confirm deletion",
+    "no_webhooks": "No webhooks configured"
+  },
+  "weekdays": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  "ui": {
+    "context_menu": "Menu",
+    "edit": "Edit",
+    "create": "Create",
+    "webhook": "Webhook",
+    "mail": "Mail"
+  }
+}

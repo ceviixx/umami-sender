@@ -1,0 +1,61 @@
+# Node.js / Next.js / Frontend
+node_modules/
+.next/
+out/
+build/
+.yarn/
+.pnp*
+*.tsbuildinfo
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.DS_Store
+*.pem
+.env*
+.vercel
+next-env.d.ts
+
+# Python / Backend / Worker
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.egg-info/
+dist/
+build/
+*.log
+.env
+*.env
+*.coverage
+*.mako.py
+*.sqlite
+*.bak
+*.swp
+*.swo
+
+# Alembic
+alembic/versions/*.pyc
+alembic/versions/*.pyo
+alembic/versions/*.pyd
+
+# Docker
+*.pid
+
+# Sonstige
+*.DS_Store
+*.idea/
+*.vscode/
+*.swp
+*.swo
+*.bak
+*.tmp
+*.log
+
+# Ignore system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

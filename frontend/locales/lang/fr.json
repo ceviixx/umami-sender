@@ -1,0 +1,109 @@
+{
+  "pages": {
+    "dashboard": "",
+    "umami": "",
+    "jobs": "",
+    "sender": "",
+    "webhook": "",
+    "templates": ""
+  },
+  "buttons": {
+    "save": "",
+    "update": "",
+    "edit": "",
+    "delete": "",
+    "cancel": "",
+    "create": "",
+    "back": "",
+    "test": "",
+    "states": {
+      "loading": "",
+      "testing": ""
+    }
+  },
+  "forms": {
+    "labels": {
+      "apikey": "",
+      "smtp": {
+        "host": "",
+        "port": "",
+        "username": "",
+        "password": ""
+      },
+      "service": {
+        "type": {
+          "cloud": "",
+          "selfhost": ""
+        },
+        "name": ""
+      },
+      "encryption": "",
+      "auth_required": "",
+      "custom": "",
+      "sender_email": "",
+      "umami": "",
+      "website": "",
+      "email_sender": "",
+      "email_recipients": "",
+      "webhook_type": {
+        "url": "",
+        "token": ""
+      },
+      "hostname": "",
+      "username": "",
+      "password": "",
+      "type": "",
+      "name": "",
+      "frequency": "",
+      "weekday": "",
+      "day": "",
+      "webhook_recipients": ""
+    },
+    "placeholders": {
+      "choose_website": "",
+      "choose_weekday": "",
+      "choose_sender": "",
+      "choose_umami": "",
+      "choose_webhook_type": "",
+      "choose_webhook": "",
+      "choose_day": "",
+      "loading": ""
+    }
+  },
+  "enums": {
+    "frequency": {
+      "daily": "",
+      "weekly": "",
+      "monthly": ""
+    },
+    "encryption": {
+      "none": "",
+      "tls": "",
+      "ssl": ""
+    },
+    "service_type": {
+      "cloud": "",
+      "selfhost": ""
+    }
+  },
+  "messages": {
+    "confirm_delete": "",
+    "no_webhooks": ""
+  },
+  "weekdays": {
+    "monday": "",
+    "tuesday": "",
+    "wednesday": "",
+    "thursday": "",
+    "friday": "",
+    "saturday": "",
+    "sunday": ""
+  },
+  "ui": {
+    "context_menu": "",
+    "edit": "",
+    "create": "",
+    "webhook": "",
+    "mail": ""
+  }
+}

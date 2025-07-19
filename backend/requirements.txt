@@ -1,0 +1,12 @@
+# backend/requirements.txt
+fastapi
+uvicorn[standard]
+sqlalchemy
+asyncpg
+psycopg2-binary
+pydantic
+jinja2
+python-dotenv
+alembic
+email-validator
+requests
