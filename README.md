@@ -41,7 +41,7 @@ Perfect for teams, client projects, or personal dashboards.
 
 ## 🖼 Screenshots
 
-| Dashboard | Mailer Setup | Webhook Configuration |
+| Dashboard | Mailer | Webhook |
 |----------|---------------|------------------------|
 | ![](docs/screenshots/01_dashboard.png) | ![](docs/screenshots/04_mailer.png) | ![](docs/screenshots/05_webhook.png) |
 

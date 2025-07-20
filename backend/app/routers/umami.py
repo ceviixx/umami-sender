@@ -41,29 +41,41 @@ def add_instance(data: UmamiInstanceCreate, db: Session = Depends(get_db)):
 
     # 🧪 Self-Hosted: Login + Bearer-Token speichern
     elif data.type == "self_hosted":
-        if not (data.hostname and data.username and data.password):
+        hostname = data.hostname
+        username = data.username
+        password = data.password
+
+        if not (hostname and username and password):
             raise HTTPException(status_code=400, detail="Hostname, Benutzername und Passwort erforderlich.")
 
         try:
-            login_url = f"{data.hostname}/api/auth/login"
+            login_url = f"{hostname}/api/auth/login"
             res = requests.post(
-            login_url,
-            headers={"Content-Type": "application/json"},
-            json={
-                "username": data.username,
-                "password": data.password
-            },
-            timeout=5
-        )
+                login_url,
+                headers={
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "username": username,
+                    "password": password or "",
+                },
+                timeout=5
+            )
             res.raise_for_status()
             token = res.json().get("token")
             if not token:
                 raise HTTPException(status_code=400, detail="Login erfolgreich, aber kein Token erhalten.")
 
-            # Test mit /me
-            me_url = f"{data.hostname}/api/auth/verify"
-            me_res = requests.get(me_url, headers={"Authorization": f"Bearer {token}"}, timeout=5)
-            me_res.raise_for_status()
+            verify_url = f"{hostname}/api/auth/verify"
+            verify_res = requests.post(
+                verify_url, 
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json"
+                },
+                timeout=5
+            )
+            verify_res.raise_for_status()
 
         except requests.RequestException as e:
             status = getattr(e.response, "status_code", "unbekannt")
@@ -147,7 +159,7 @@ def update_instance(instance_id: int, data: UmamiInstanceUpdate, db: Session = D
     elif instance_type == "self_hosted":
         hostname = update_data.get("hostname", instance.hostname)
         username = update_data.get("username", instance.username)
-        password = update_data.get("password", None)  # Passwort muss evtl. neu gesetzt werden
+        password = update_data.get("password", None) 
 
         if not (hostname and username and (password or instance.password_hash)):
             raise HTTPException(status_code=400, detail="Hostname, Benutzername und Passwort erforderlich.")
@@ -156,10 +168,12 @@ def update_instance(instance_id: int, data: UmamiInstanceUpdate, db: Session = D
             login_url = f"{hostname}/api/auth/login"
             res = requests.post(
                 login_url,
-                headers={"Content-Type": "application/json"},
+                headers={
+                    "Content-Type": "application/json"
+                },
                 json={
                     "username": username,
-                    "password": password or "",  # leerer String zum Triggern von Fehlern
+                    "password": password or "",
                 },
                 timeout=5
             )
@@ -168,9 +182,16 @@ def update_instance(instance_id: int, data: UmamiInstanceUpdate, db: Session = D
             if not token:
                 raise HTTPException(status_code=400, detail="Login erfolgreich, aber kein Token erhalten.")
 
-            me_url = f"{hostname}/api/auth/verify"
-            me_res = requests.get(me_url, headers={"Authorization": f"Bearer {token}"}, timeout=5)
-            me_res.raise_for_status()
+            verify_url = f"{hostname}/api/auth/verify"
+            verify_res = requests.post(
+                verify_url, 
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json"
+                },
+                timeout=5
+            )
+            verify_res.raise_for_status()
 
         except requests.RequestException as e:
             status = getattr(e.response, "status_code", "unbekannt")
@@ -190,7 +211,7 @@ def update_instance(instance_id: int, data: UmamiInstanceUpdate, db: Session = D
         if password:
             update_data["password_hash"] = sha256(password.encode()).hexdigest()
         else:
-            update_data.pop("password_hash", None)  # nicht überschreiben, wenn leer
+            update_data.pop("password_hash", None)
         update_data["api_key"] = None
 
     else:
@@ -227,7 +248,7 @@ def get_websites_for_instance(instance_id: int, db: Session = Depends(get_db)):
         base_url = os.getenv("CLOUD_HOSTNAME", "https://api.umami.is/v1")
         headers = {"x-umami-api-key": instance.api_key}
     else:
-        base_url = instance.hostname
+        base_url = instance.hostname + "/api"
         headers = {"Authorization": f"Bearer {instance.bearer_token}"}
 
     try:

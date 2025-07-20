@@ -55,7 +55,9 @@ export default function SettingsPage() {
             <li key={instance.id} className="border rounded p-3 flex justify-between bg-white">
               <div>
                 <div className="font-semibold">{instance.name}</div>
-                <div className="text-sm text-gray-600">{instance.type}</div>
+                <div className="text-sm text-gray-600">
+                  {instance.type === 'cloud' ? locale.enums.service_type.cloud : locale.enums.service_type.selfhost}
+                </div>
               </div>
 
               <ContextMenu

@@ -18,7 +18,7 @@ export default function Sidebar() {
 
   const links = [
     { href: '/', label: locale.pages.dashboard, icon: <Squares2X2Icon className="text-primary-600 w-5 h-5" /> },
-    { href: '/umami-config', label: locale.pages.umami, icon: <ChartBarIcon className="text-primary-600 w-5 h-5" /> },
+    { href: '/umami', label: locale.pages.umami, icon: <ChartBarIcon className="text-primary-600 w-5 h-5" /> },
     { href: '/jobs', label: locale.pages.jobs, icon: <BriefcaseIcon className="text-primary-600 w-5 h-5" /> },
 
     { href: '/senders', label: locale.pages.sender, icon: <PaperAirplaneIcon className="text-primary-600 w-5 h-5" /> },

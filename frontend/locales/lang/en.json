@@ -72,9 +72,12 @@
   },
   "enums": {
     "frequency": {
+      "unknown": "Unknown",
+      "hourly": "Hourly",
       "daily": "Daily",
       "weekly": "Weekly",
-      "monthly": "Monthly"
+      "monthly": "Monthly",
+      "yearly": "Yearly"
     },
     "encryption": {
       "none": "None",

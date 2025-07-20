@@ -40,6 +40,14 @@ export default function MailerPage() {
     }
   }
 
+  const frequencyMap = {
+    hourly: locale.enums.frequency.hourly,
+    daily: locale.enums.frequency.daily,
+    weekly: locale.enums.frequency.weekly,
+    monthly: locale.enums.frequency.monthly,
+    yearly: locale.enums.frequency.yearly
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
@@ -66,7 +74,7 @@ export default function MailerPage() {
                 <div>
                   <div className="font-semibold">{job.name}</div>
                   <div className="text-gray-600 text-sm">
-                    {locale.forms.labels.frequency}: {job.frequency === 'daily' ? locale.enums.frequency.daily : locale.enums.frequency.weekly } | {locale.forms.labels.type} {job.report_type}
+                    {locale.forms.labels.frequency}: {frequencyMap[job.frequency] || 'Unknown'} | {locale.forms.labels.type} {job.report_type}
                   </div>
                   
                 </div>
