@@ -1,0 +1,21 @@
+from pydantic import BaseModel
+from typing import Optional, Any
+
+class MailTemplateBase(BaseModel):
+    type: str
+    sender_type: str
+    description: Optional[str] = None
+    html: Optional[str] = None
+    json: Optional[Any] = None
+
+class MailTemplateCreate(MailTemplateBase):
+    pass
+
+class MailTemplateUpdate(MailTemplateBase):
+    pass
+
+class MailTemplateOut(MailTemplateBase):
+    id: int
+
+    class Config:
+        orm_mode = True

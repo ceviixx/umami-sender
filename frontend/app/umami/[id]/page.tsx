@@ -4,7 +4,10 @@ import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { UmamiInstance } from '@/types'
-import { fetchInstance, updateInstance } from '@/lib/api'
+import { 
+  fetchUmami, 
+  updateUmami 
+} from '@/lib/api/umami'
 import SelectBox from '@/components/SelectBox'
 import PageHeader from '@/components/PageHeader'
 import FormButtons from '@/components/FormButtons'
@@ -16,7 +19,7 @@ export default function InstanceDetails() {
   const { locale } = useI18n()
 
   const params = useParams()
-  const id = params.id
+  const id = Number(params.id)
 
   const [form, setForm] = useState<UmamiInstance | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -25,7 +28,7 @@ export default function InstanceDetails() {
   useEffect(() => {
     if (!id) return
 
-    fetchInstance(id)
+    fetchUmami(id)
       .then(setForm)
       .catch(() => setError('Fehler beim Laden der Instanz'))
   }, [id])
@@ -43,7 +46,7 @@ export default function InstanceDetails() {
     setError(null)
 
     try {
-      await updateInstance(id, form)
+      await updateUmami(id, form)
       showSuccess('Umami-Instanz erfolgreich aktualisiert')
     } catch (err: any) {
       const message = err?.response?.data?.detail || err?.message || 'Fehler beim Speichern'

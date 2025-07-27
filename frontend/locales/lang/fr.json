@@ -3,7 +3,7 @@
     "dashboard": "",
     "umami": "",
     "jobs": "",
-    "sender": "",
+    "mailer": "",
     "webhook": "",
     "templates": ""
   },
@@ -54,23 +54,42 @@
       "password": "",
       "type": "",
       "name": "",
+      "description": "",
       "frequency": "",
       "weekday": "",
       "day": "",
-      "webhook_recipients": ""
+      "webhook_recipients": "",
+      "report": "",
+      "execution_time": ""
     },
     "placeholders": {
       "choose_website": "",
       "choose_weekday": "",
       "choose_sender": "",
+      "choose_sender_type": "",
       "choose_umami": "",
       "choose_webhook_type": "",
       "choose_webhook": "",
       "choose_day": "",
+      "choose_report": "",
       "loading": ""
+    },
+    "errors": {
+      "max_items": ""
     }
   },
   "enums": {
+    "template_insert_placeholder": {
+      "job_name": "",
+      "period": "",
+      "pageviews": "",
+      "visits": "",
+      "visitors": "",
+      "bounce_rate": "",
+      "visit_duration": "",
+      "top_pageviews": "",
+      "top_referrer": ""
+    },
     "frequency": {
       "unknown": "",
       "hourly": "",
@@ -87,6 +106,28 @@
     "service_type": {
       "cloud": "",
       "selfhost": ""
+    },
+    "metrics": {
+      "stats": "",
+      "url": "",
+      "referrer": "",
+      "channel": "",
+      "browser": "",
+      "os": "",
+      "device": "",
+      "country": "",
+      "region": "",
+      "city": "",
+      "language": "",
+      "screen": "",
+      "event": "",
+      "query": "",
+      "host": "",
+      "tag": ""
+    },
+    "job_content_type": {
+      "summary": "",
+      "report": ""
     }
   },
   "messages": {
@@ -107,6 +148,11 @@
     "edit": "",
     "create": "",
     "webhook": "",
-    "mail": ""
+    "mail": "",
+    "setup": "",
+    "general": "",
+    "config": "",
+    "recipients": "",
+    "overview": ""
   }
 }

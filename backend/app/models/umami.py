@@ -27,8 +27,8 @@ class Umami(Base, TimestampMixin):
     bearer_token = Column(String, nullable=True)
 
     # Beziehung zu MailerJobs
-    mailer_jobs = relationship("MailerJob", back_populates="host", cascade="all, delete-orphan")
+    mailer_jobs = relationship("Job", back_populates="host", cascade="all, delete-orphan")
 
 
 # Wichtig: Importieren, damit SQLAlchemy die Beziehung kennt
-from app.models.mailer import MailerJob
+from app.models.jobs import Job

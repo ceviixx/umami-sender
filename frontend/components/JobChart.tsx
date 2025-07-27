@@ -66,6 +66,9 @@ const JobLineChart = ({ jobData }) => {
     },
     y: {
       beginAtZero: true,
+      suggestedMax: Math.max(
+        ...jobData.map((d) => Math.max(d.success, d.failed, d.skipped))
+      ) + 1,
       ticks: {
         stepSize: 1,
         callback: function (value) {

@@ -1,10 +1,9 @@
 import requests
 from datetime import datetime, timedelta
-from app.models.umami import UmamiType
-from app.models.mailer import MailerJob, Frequency
+from app.models.umami import UmamiType, Umami
+from app.models.jobs import Job, Frequency
 
-def fetch_website_summary(instance, job: MailerJob):
-
+def fetch_website_summary(instance: Umami, job: Job):
     end = datetime.utcnow()
     if job.frequency == Frequency.daily:
         start = end - timedelta(hours=24)
@@ -16,32 +15,34 @@ def fetch_website_summary(instance, job: MailerJob):
     startAt = int(start.timestamp() * 1000)
     endAt = int(end.timestamp() * 1000)
 
-    stats = fetch_website_stats(instance, job.website_id, startAt=startAt, endAt=endAt)
-    metrics_url = fetch_website_metrics(instance, job.website_id, startAt=startAt, endAt=endAt, metric_type='url')
-    metrics_referrer = fetch_website_metrics(instance, job.website_id, startAt=startAt, endAt=endAt, metric_type='referrer')
-
-    pageviews = stats.get("pageviews", {}).get("value", "-")
-    visitors = stats.get("visitors", {}).get("value", "-")
-    visits = stats.get("visits", {}).get("value", "-")
-    bounces = stats.get("bounces", {}).get("value", "-")
-    bounces = calculateBounceRate(visits, bounces)
-    totaltime = stats.get("totaltime", {}).get("value", "-")
-    totaltime = calculateTotaltime(totaltime)
-
-    returnObject = {
-        "stats": {
+    if "stats" in job.summary_items:
+        stats = fetch_website_stats(instance, job.website_id, startAt=startAt, endAt=endAt)
+        pageviews = stats.get("pageviews", {}).get("value", "-")
+        visitors = stats.get("visitors", {}).get("value", "-")
+        visits = stats.get("visits", {}).get("value", "-")
+        bounces = stats.get("bounces", {}).get("value", "-")
+        bounces = calculateBounceRate(visits, bounces)
+        totaltime = stats.get("totaltime", {}).get("value", "-")
+        totaltime = calculateTotaltime(totaltime)
+        stats = {
             "pageviews": pageviews,
             "visitors": visitors,
             "visits": visits,
             "bounces": bounces,
             "totaltime": totaltime
-        },
-        "pageviews": metrics_url,
-        "referrers": metrics_referrer,
+        }
+    else:
+        stats = {}
+
+    metrics = collect_metrics(instance, job, startAt, endAt)
+
+    returnObject = {
+        "stats": stats,
+        "metrics": metrics
     }
     return returnObject
 
-def fetch_website_stats(instance, website_id, startAt, endAt):
+def fetch_website_stats(instance: Umami, website_id: str, startAt, endAt):
     headers = {}
 
     if instance.type == UmamiType.cloud:
@@ -55,7 +56,7 @@ def fetch_website_stats(instance, website_id, startAt, endAt):
     response = requests.get(url, headers=headers)
     return response.json()
 
-def fetch_website_metrics(instance, website_id, startAt, endAt, metric_type="pageviews"):
+def fetch_website_metrics(instance: Umami, website_id: str, startAt, endAt, metric_type="pageviews"):
     headers = {}
 
     if instance.type == UmamiType.cloud:
@@ -67,9 +68,19 @@ def fetch_website_metrics(instance, website_id, startAt, endAt, metric_type="pag
 
     url = f"{hostname}/websites/{website_id}/metrics?startAt={startAt}&endAt={endAt}&type={metric_type}"
     response = requests.get(url, headers=headers)
-    return response.json()
+    if response.status_code == 200:
+        data = response.json()
+        return data[:5]
+    else:
+        return []
 
-
+def collect_metrics(instance, job, startAt, endAt):
+    return {
+        key: fetch_website_metrics(instance, job.website_id, startAt=startAt, endAt=endAt, metric_type=key)
+        if key in job.summary_items else []
+        for key in job.summary_items
+        if key != "stats"
+    }
 
 
 def parseTime(totaltime):
@@ -103,9 +114,53 @@ def calculateTotaltime(totaltime):
 
     return " ".join(parts) if parts else "0s"
 
-
 def calculateBounceRate(visits, bounces):
     if visits == 0:
         return "0%"
     bounce_rate = (bounces / visits) * 100
     return f"{round(bounce_rate)}%"
+
+
+
+
+def fetch_report_summary(instance: Umami, job: Job):
+    info = fetchReportInfo(instance, job.report_id)
+    type = info.get("type")
+    parameters = info.get("parameters")
+    parameters["timezone"] = job.timezone
+    content = runReport(instance, type, parameters)
+    returnObject = {
+        "type": type,
+        "result": content
+    }
+    return returnObject
+
+
+def fetchReportInfo(instance: Umami, report_id: str):
+    headers = {}
+
+
+    if instance.type == UmamiType.cloud:
+        hostname = "https://api.umami.is/v1"
+        headers['x-umami-api-key'] = instance.api_key
+    else:
+        hostname = instance.hostname + "/api"
+        headers['Authorization'] = f"Bearer {instance.bearer_token}"
+
+    url = f"{hostname}/reports/{report_id}"
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+def runReport(instance, type, parameters):
+    headers = {}
+
+    if instance.type == UmamiType.cloud:
+        hostname = "https://api.umami.is/v1"
+        headers['x-umami-api-key'] = instance.api_key
+    else:
+        hostname = instance.hostname + "/api"
+        headers['Authorization'] = f"Bearer {instance.bearer_token}"
+
+    url = f"{hostname}/reports/{type}"
+    response = requests.post(url, headers=headers, json=parameters)
+    return response.json()

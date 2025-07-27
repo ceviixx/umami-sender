@@ -3,7 +3,7 @@
     "dashboard": "Dashboard",
     "umami": "Umami",
     "jobs": "Jobs",
-    "sender": "Mailer",
+    "mailer": "Mailer",
     "webhook": "Webhook",
     "templates": "Vorlagen"
   },
@@ -54,23 +54,42 @@
       "password": "Passwort",
       "type": "Typ",
       "name": "Name",
+      "description": "Beschreibung",
       "frequency": "Häufigkeit",
       "weekday": "Wochentag",
       "day": "Tag",
-      "webhook_recipients": "Webhook Empfänger"
+      "webhook_recipients": "Webhook Empfänger",
+      "report": "Bericht",
+      "execution_time": "Ausführungszeit"
     },
     "placeholders": {
       "choose_website": "– Website wählen –",
       "choose_weekday": "– Wochentag wählen –",
       "choose_sender": "– Absender wählen –",
+      "choose_sender_type": "- Sender wählen -",
       "choose_umami": "– Umami-Instanz wählen –",
       "choose_webhook_type": "– Typ wählen –",
       "choose_webhook": "- Webhook(s) wählen -",
       "choose_day": "- Tag wählen -",
+      "choose_report": "- Bericht wählen -",
       "loading": "– Laden... –"
+    },
+    "errors": {
+      "max_items": "Maximal {max} Elemente erlaubt"
     }
   },
   "enums": {
+    "template_insert_placeholder": {
+      "job_name": "Job-Name",
+      "period": "Zeitraum",
+      "pageviews": "Seitenaufrufe",
+      "visits": "Besuche",
+      "visitors": "Besucher",
+      "bounce_rate": "Absprungrate",
+      "visit_duration": "Besuchszeit",
+      "top_pageviews": "Top-Seitenaufrufe",
+      "top_referrer": "Top-Referrer"
+    },
     "frequency": {
       "unknown": "Unbekannt",
       "hourly": "Stündlich",
@@ -87,6 +106,28 @@
     "service_type": {
       "cloud": "Cloud",
       "selfhost": "Selfhost"
+    },
+    "metrics": {
+      "stats": "Statistiken",
+      "url": "Seiten",
+      "referrer": "Verweisquellen",
+      "channel": "Kanäle",
+      "browser": "Browser",
+      "os": "Betriebssystem",
+      "device": "Geräte",
+      "country": "Länder",
+      "region": "Regionen",
+      "city": "Städte",
+      "language": "Sprachen",
+      "screen": "Bildschirmgrößen",
+      "event": "Ereignisse",
+      "query": "Abfrageparameter",
+      "host": "Hosts",
+      "tag": "Tags"
+    },
+    "job_content_type": {
+      "summary": "Zusammenfassung",
+      "report": "Bericht"
     }
   },
   "messages": {
@@ -107,6 +148,11 @@
     "edit": "Bearbeiten",
     "create": "Erstellen",
     "webhook": "Webhook",
-    "mail": "Mail"
+    "mail": "Mail",
+    "setup": "Einrichten",
+    "general": "Allgemein",
+    "config": "Konfiguration",
+    "recipients": "Empfänger",
+    "overview": "Übersicht"
   }
 }

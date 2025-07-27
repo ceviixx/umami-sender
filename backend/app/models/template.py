@@ -12,5 +12,4 @@ class MailTemplate(Base):
     sender_type = Column(Text, nullable=False, default='email')
     description = Column(String, nullable=True)
     html = Column(Text, nullable=True)
-    json = Column(JSON, nullable=True)
-    
+    json = Column(Text, nullable=True)

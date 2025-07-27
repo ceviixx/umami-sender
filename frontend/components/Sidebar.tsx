@@ -9,7 +9,8 @@ import {
   ChartBarIcon,
   BriefcaseIcon,
   PaperAirplaneIcon,
-  PuzzlePieceIcon
+  PuzzlePieceIcon,
+  DocumentIcon
 } from '@heroicons/react/20/solid'
 
 export default function Sidebar() {
@@ -21,8 +22,10 @@ export default function Sidebar() {
     { href: '/umami', label: locale.pages.umami, icon: <ChartBarIcon className="text-primary-600 w-5 h-5" /> },
     { href: '/jobs', label: locale.pages.jobs, icon: <BriefcaseIcon className="text-primary-600 w-5 h-5" /> },
 
-    { href: '/senders', label: locale.pages.sender, icon: <PaperAirplaneIcon className="text-primary-600 w-5 h-5" /> },
+    { href: '/mailers', label: locale.pages.mailer, icon: <PaperAirplaneIcon className="text-primary-600 w-5 h-5" /> },
     { href: '/webhooks', label: locale.pages.webhook, icon: <PuzzlePieceIcon className="text-primary-600 w-5 h-5" /> },
+
+    { href: '/templates', label: locale.pages.templates, icon: <DocumentIcon className="text-primary-600 w-5 h-5" /> },
   ]
 
   return (

@@ -3,16 +3,16 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import {
-  fetchMailJobs,
-  deleteMailerJob,
-} from '@/lib/api'
+  fetchJobs,
+  deleteJob,
+} from '@/lib/api/jobs'
 import { MailerJob } from '@/types'
 import ConfirmDelete from '@/components/ConfirmDelete'
 import EmptyState from '@/components/EmptyState'
 import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
-import { ListItem } from '@/components/ListItem'
+
 import { 
   PaperAirplaneIcon,
   PuzzlePieceIcon
@@ -26,7 +26,7 @@ export default function MailerPage() {
   const { locale } = useI18n()
 
   useEffect(() => {
-    fetchMailJobs()
+    fetchJobs()
       .then(setJobs)
       .finally(() => setLoading(false))
   }, [])
@@ -34,7 +34,7 @@ export default function MailerPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const handleDelete = async () => {
     if (deleteId !== null) {
-      await deleteMailerJob(deleteId)
+      await deleteJob(deleteId)
       setDeleteId(null)
       setJobs(prev => prev.filter(w => w.id !== deleteId))
     }

@@ -6,7 +6,7 @@ import { EllipsisHorizontalIcon } from '@heroicons/react/20/solid';
 
 type Props = {
   onEdit: () => void
-  onDelete: () => void
+  onDelete?: () => void  // onDelete ist jetzt optional
 }
 
 export default function ContextMenu({ onEdit, onDelete }: Props) {
@@ -48,17 +48,19 @@ export default function ContextMenu({ onEdit, onDelete }: Props) {
                 {locale.buttons.edit}
               </button>
             </li>
-            <li>
-              <button
-                onClick={() => {
-                  setOpen(false)
-                  onDelete()
-                }}
-                className="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 font-semibold"
-              >
-                {locale.buttons.delete}
-              </button>
-            </li>
+            {onDelete && (  // Hier prüfen, ob onDelete gesetzt wurde
+              <li>
+                <button
+                  onClick={() => {
+                    setOpen(false)
+                    onDelete()
+                  }}
+                  className="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 font-semibold"
+                >
+                  {locale.buttons.delete}
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       )}

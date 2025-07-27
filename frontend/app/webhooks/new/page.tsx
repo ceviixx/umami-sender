@@ -3,7 +3,10 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { createWebhookRecipient, testWebook } from '@/lib/api'
+import { 
+  createWebhook, 
+  testWebhook 
+} from '@/lib/api/webhook'
 import SelectBox from '@/components/SelectBox'
 import PageHeader from '@/components/PageHeader'
 import FormButtons from '@/components/FormButtons'
@@ -24,7 +27,7 @@ export default function NewWebhookPage() {
     e.preventDefault()
 
     try {
-      await createWebhookRecipient(form)
+      await createWebhook(form)
       showSuccess('Webhook recipient created successfully')
       router.push('/webhooks')
     } catch (error: any) {
@@ -40,11 +43,10 @@ export default function NewWebhookPage() {
         const payload = {
           ...form
         }
-        await testWebook(payload)
+        await testWebhook(payload)
         showSuccess('Test success!')
         console.log(payload)
       } catch (e: any) {
-        // setTestResult(`❌ Error: ${e.message || 'Connection failure.'}`)
         showError(`Error: ${e.message || 'Connection failure.'}`)
       } finally {
         setTesting(false)
@@ -70,7 +72,7 @@ export default function NewWebhookPage() {
           onChange={(value) => setForm({ ...form, type: value })}
           options={[
             { value: 'DISCORD', label: 'Discord' },
-            { value: 'MS_TEAMS', label: 'Microsoft Teams' },
+            // { value: 'MS_TEAMS', label: 'Microsoft Teams' },
             { value: 'SLACK', label: 'Slack' },
             { value: 'CUSTOM', label: locale.forms.labels.custom },
           ]}

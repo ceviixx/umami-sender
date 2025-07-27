@@ -3,7 +3,11 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { fetchWebhookRecipient, testWebook, updateWebhookRecipient } from '@/lib/api'
+import { 
+  fetchWebhook, 
+  updateWebhook, 
+  testWebhook 
+} from '@/lib/api/webhook'
 import { WebhookRecipient } from '@/types'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import SelectBox from '@/components/SelectBox'
@@ -11,6 +15,7 @@ import PageHeader from '@/components/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
+import test from "node:test";
 
 export default function EditWebhookPage() {
   const { id } = useParams()
@@ -21,7 +26,7 @@ export default function EditWebhookPage() {
 
   useEffect(() => {
     if (id) {
-      fetchWebhookRecipient(Number(id)).then(setForm)
+      fetchWebhook(Number(id)).then(setForm)
     }
   }, [id])
 
@@ -36,11 +41,10 @@ export default function EditWebhookPage() {
     if (!form) return
 
     try {
-      await updateWebhookRecipient(form.id, {
+      await updateWebhook(form.id, {
         name: form.name,
         url: form.url,
       })
-
       showSuccess('Updated')
     } catch (error: any) {
       const message = error?.response?.data?.detail || error?.message || 'Failed to update webhook'
@@ -54,11 +58,10 @@ export default function EditWebhookPage() {
       const payload = {
         ...form
       }
-      await testWebook(payload)
+      await testWebhook(payload)
       showSuccess('Test success!')
       console.log(payload)
     } catch (e: any) {
-      // setTestResult(`❌ Error: ${e.message || 'Connection failure.'}`)
       showError(`Error: ${e.message || 'Connection failure.'}`)
     } finally {
       setTesting(false)

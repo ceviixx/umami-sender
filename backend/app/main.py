@@ -1,70 +1,66 @@
 from fastapi import FastAPI
-from app.api import senders
-# from app.api import umami
 from app.api import mailer
+from app.api import job
 from app.api import webhooks
 from app.api import stats
-from app.api import statslog
-
+from app.api import template
 from app.routers import umami
-
 from fastapi.middleware.cors import CORSMiddleware
+from app.utils.responses import send_status_response
 
 app = FastAPI(root_path='/api')
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # oder dein Frontend-Host
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(stats.router)
-app.include_router(statslog.router)
-app.include_router(senders.router)
-app.include_router(umami.router)
 app.include_router(mailer.router)
+app.include_router(umami.router)
+app.include_router(job.router)
 app.include_router(webhooks.router)
+app.include_router(template.router)
 
 @app.get("/")
 def root():
-    return {"message": "UmamiSender API is running"}
-
-
+    return send_status_response(
+        code="OK",
+        message="API is healthy and running.",
+        status=200,
+        detail="The UmamiSender API root endpoint responded successfully."
+    )
 
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
 
 @app.exception_handler(IntegrityError)
 async def integrity_error_handler(request: Request, exc: IntegrityError):
-    return JSONResponse(
-        status_code=400,
-        content={
-            "detail": "Database integrity error",
-            "error": str(exc.orig)
-        }
+    return send_status_response(
+        code="INTEGRITY_ERROR",
+        message="A database integrity constraint was violated.",
+        status=400,
+        detail=str(exc.orig)
     )
 
 @app.exception_handler(DataError)
 async def data_error_handler(request: Request, exc: DataError):
-    return JSONResponse(
-        status_code=400,
-        content={
-            "detail": "Invalid data format",
-            "error": str(exc.orig)
-        }
+    return send_status_response(
+        code="DATA_ERROR",
+        message="The provided data has an invalid format or value.",
+        status=400,
+        detail=str(exc.orig)
     )
 
 @app.exception_handler(SQLAlchemyError)
 async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
-    return JSONResponse(
-        status_code=500,
-        content={
-            "detail": "Unhandled database error",
-            "error": str(exc.orig)
-        }
+    return send_status_response(
+        code="DATABASE_ERROR",
+        message="An unexpected database error occurred.",
+        status=500,
+        detail=str(exc)
     )
