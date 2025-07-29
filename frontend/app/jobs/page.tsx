@@ -74,7 +74,8 @@ export default function MailerPage() {
                 <div>
                   <div className="font-semibold">{job.name}</div>
                   <div className="text-gray-600 text-sm">
-                    {locale.forms.labels.frequency}: {frequencyMap[job.frequency] || 'Unknown'} | {locale.forms.labels.type} {job.report_type}
+                    {locale.forms.labels.frequency}: {frequencyMap[job.frequency] || 'Unknown'} | {locale.forms.labels.type}: {locale.enums.job_content_type[job.report_type as 'summary' | 'report'] || job.report_type}
+
                   </div>
                   
                 </div>

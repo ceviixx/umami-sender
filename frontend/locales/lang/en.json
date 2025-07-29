@@ -105,7 +105,8 @@
     },
     "service_type": {
       "cloud": "Cloud",
-      "selfhost": "Selfhost"
+      "selfhost": "Selfhost",
+      "self_hosted": "Selfhost"
     },
     "metrics": {
       "stats": "Stats",

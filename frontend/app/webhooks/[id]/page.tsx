@@ -68,8 +68,6 @@ export default function EditWebhookPage() {
     }
   }
 
-  // if (loading) { return <LoadingSpinner /> }
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
@@ -81,14 +79,14 @@ export default function EditWebhookPage() {
         <TextInput
           label={locale.forms.labels.name}
           name="name"
-          value={form?.name}
+          value={String(form?.name)}
           onChange={handleChange}
           placeholder={locale.forms.labels.name}
         />
         <TextInput
           label={form?.type === 'CUSTOM' ? locale.forms.labels.webhook_type.url : locale.forms.labels.webhook_type.token}
           name="url"
-          value={form?.url}
+          value={String(form?.url)}
           onChange={handleChange}
           placeholder={form?.type === 'CUSTOM' ? 'https://example.com/webhook' : 'xxxxxxxxxxxxxxxxxx'}
         />

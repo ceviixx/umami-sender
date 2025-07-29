@@ -8,12 +8,24 @@ import {
   LineElement,
   Tooltip,
   Legend,
+  ChartOptions,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-const JobLineChart = ({ jobData }) => {
+type JobEntry = {
+  date: string;    // adjust if you use Date objects or something else
+  success: number;
+  failed: number;
+  skipped: number;
+};
+
+type JobLineChartProps = {
+  jobData: JobEntry[];
+};
+
+const JobLineChart = ({ jobData }: JobLineChartProps) => {
   const labels = jobData.map((entry) => entry.date);
 
   const data = {
@@ -46,44 +58,42 @@ const JobLineChart = ({ jobData }) => {
     ],
   };
 
-  const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      display: false,
-    },
-    tooltip: {
-      mode: 'index',
-      intersect: false,
-    },
-  },
-  scales: {
-    x: {
-      title: {
+  // Explicit type for options
+  const options: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: {
+      legend: {
         display: false,
-        text: 'Date',
+      },
+      tooltip: {
+        mode: 'index' as const,  // <-- here we use 'as const' to tell TypeScript this is a valid literal
+        intersect: false,
       },
     },
-    y: {
-      beginAtZero: true,
-      suggestedMax: Math.max(
-        ...jobData.map((d) => Math.max(d.success, d.failed, d.skipped))
-      ) + 1,
-      ticks: {
-        stepSize: 1,
-        callback: function (value) {
-          return Number.isInteger(value) ? value : null;
+    scales: {
+      x: {
+        title: {
+          display: false,
+          text: 'Date',
         },
       },
-      title: {
-        display: false,
-        text: 'Count',
+      y: {
+        beginAtZero: true,
+        suggestedMax:
+          Math.max(...jobData.map((d) => Math.max(d.success, d.failed, d.skipped))) + 1,
+        ticks: {
+          stepSize: 1,
+          callback: function (value: number | string) {
+            return Number.isInteger(Number(value)) ? value : null;
+          },
+        },
+        title: {
+          display: false,
+          text: 'Count',
+        },
       },
     },
-  },
-};
-
-
+  };
 
   return <Line data={data} options={options} />;
 };

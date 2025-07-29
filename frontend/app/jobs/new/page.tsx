@@ -121,40 +121,48 @@ export default function Jobs_New() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> | { name: string, value: any }
   ) => {
+    let name: string;
+    let value: any;
+
     if ('target' in e) {
-      const { name, value } = e.target;
-      setForm((prev) => ({ ...prev, [name]: value }));
+      name = e.target.name;
+      value = e.target.value;
     } else {
-      const { name, value } = e;
-
-      setForm((prev) => {
-        const updated = { ...prev };
-
-        if (name === 'summary_items') {
-          // Wert ist hier vermutlich ein Array
-          if (value.length > 10) return prev; // Auswahl ignorieren, wenn mehr als 10
-          updated.summary_items = value;
-          return updated;
-        }
-
-        updated[name] = value;
-
-        // Typwechsel-Logik
-        if (name === 'report_type') {
-          if (value === 'report') {
-            updated.summary_items = [];
-          } else if (value === 'summary') {
-            updated.report_id = null;
-          }
-        }
-
-        if (name === 'frequency') {
-          updated.day = 0;
-        }
-
-        return updated;
-      });
+      name = e.name;
+      value = e.value;
     }
+
+    const numericFields = ['host_id', 'sender_id', 'day'];
+    if (numericFields.includes(name)) {
+      value = value !== null && value !== '' ? Number(value) : null;
+    }
+
+    const stringFields = ['name', 'frequency', 'report_type', 'execution_time', 'website_id', 'report_id'];
+    if (stringFields.includes(name)) {
+      value = value ?? '';
+    }
+
+    setForm((prev) => {
+      const updated = { ...prev, [name]: value };
+
+      if (name === 'report_type') {
+        if (value === 'report') {
+          updated.summary_items = [];
+        } else if (value === 'summary') {
+          updated.report_id = null;
+        }
+      }
+
+      if (name === 'frequency') {
+        updated.day = 0;
+      }
+
+      if (name === 'summary_items') {
+        if (Array.isArray(value) && value.length > 10) return prev;
+      }
+
+      return updated;
+    });
   };
 
 
@@ -448,7 +456,12 @@ export default function Jobs_New() {
                 <SelectBox
                   label={locale.forms.labels.email_sender}
                   value={form.sender_id}
-                  onChange={(value) => setForm(prev => ({ ...prev, sender_id: value }))}
+                  onChange={(value) =>
+                    setForm(prev => ({
+                      ...prev,
+                      sender_id: value ? Number(value) : null
+                    }))
+                  }
                   options={senders.map(s => ({ value: String(s.id), label: s.name }))}
                   placeholder={locale.forms.placeholders.choose_sender}
                   canClear={true}

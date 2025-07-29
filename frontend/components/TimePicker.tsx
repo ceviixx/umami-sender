@@ -20,11 +20,11 @@ const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange }) => {
 
   const [hour, minute] = value.split(':');
 
-  const handleHourChange = (newHour: string) => {
+  const handleHourChange = (newHour: string | null) => {
     onChange(`${newHour}:${minute}`);
   };
 
-  const handleMinuteChange = (newMinute: string) => {
+  const handleMinuteChange = (newMinute: string | null) => {
     onChange(`${hour}:${newMinute}`);
   };
 

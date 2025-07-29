@@ -15,6 +15,12 @@
   <a href="https://github.com/ceviixx/UmamiSender/actions">
     <img src="https://img.shields.io/github/actions/workflow/status/ceviixx/UmamiSender/ci.yml" alt="CI Status" />
   </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/node-20.19.x-brightgreen" alt="node" />
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/Next.js-14.2.30-blue" alt="next.js" />
+  </a>
 </p>
 
 ---
@@ -121,11 +127,4 @@ Pull requests, suggestions, and bug reports are very welcome!
 
 ## 💬 Community
 
-Got questions or feedback?  
-Join the community on Discord:
-
-<p align="leading">
-  <a href="https://discord.gg/tX4XQT7cG7">
-    <img src="https://img.shields.io/badge/Discord-Join-blue?style=for-the-badge&logo=discord&logoColor=white" height="28" />
-  </a>
-</p>
+Got questions or feedback? Create issue or PR on GitHub

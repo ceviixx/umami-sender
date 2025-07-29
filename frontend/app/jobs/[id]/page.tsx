@@ -457,7 +457,12 @@ export default function Jobs_Edit({ params }: { params: { id: number } }) {
                 <SelectBox
                   label={locale.forms.labels.email_sender}
                   value={form.sender_id}
-                  onChange={(value) => setForm(prev => ({ ...prev, sender_id: value }))}
+                  onChange={(value) =>
+                    setForm(prev => ({
+                      ...prev,
+                      sender_id: value ? Number(value) : null
+                    }))
+                  }
                   options={senders.map(s => ({ value: String(s.id), label: s.name }))}
                   placeholder={locale.forms.placeholders.choose_sender}
                   canClear={true}

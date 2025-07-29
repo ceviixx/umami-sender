@@ -5,13 +5,13 @@ import { CheckIcon, ChevronUpDownIcon, XMarkIcon } from '@heroicons/react/20/sol
 
 interface Option {
   label: string
-  value: string
+  value: string | number
 }
 
 interface Props {
   label?: string
-  value: string
-  onChange: (value: string) => void
+  value: string | number | null
+  onChange: (value: string | null) => void
   options: Option[]
   placeholder?: string
   disabled?: boolean

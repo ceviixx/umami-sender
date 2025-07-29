@@ -1,6 +1,7 @@
 {
-  "name": "UmamiSender-frontend",
+  "name": "umamisender-frontend",
   "private": true,
+  "version": "1.0.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

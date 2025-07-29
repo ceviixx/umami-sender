@@ -16,7 +16,15 @@ import { showError, showSuccess } from '@/lib/toast'
 export default function NewWebhookPage() {
   const router = useRouter()
   const { locale } = useI18n()
-  const [form, setForm] = useState({ name: '', url: '', type: '' })
+  const [form, setForm] = useState<{
+      name: string;
+      url: String | null;
+      type: String | null;
+    }>({
+      name: '',
+      url: '',
+      type: null
+    });
   const [testing, setTesting] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,12 +75,11 @@ export default function NewWebhookPage() {
           placeholder={locale.forms.labels.name}
         />
         <SelectBox
-          label={locale.forms.labels.webhook}
-          value={form.type}
+          label={locale.forms.labels.type}
+          value={String(form.type)}
           onChange={(value) => setForm({ ...form, type: value })}
           options={[
             { value: 'DISCORD', label: 'Discord' },
-            // { value: 'MS_TEAMS', label: 'Microsoft Teams' },
             { value: 'SLACK', label: 'Slack' },
             { value: 'CUSTOM', label: locale.forms.labels.custom },
           ]}
@@ -81,7 +88,7 @@ export default function NewWebhookPage() {
         <TextInput
           label={form.type === 'CUSTOM' ? locale.forms.labels.webhook_type.url : locale.forms.labels.webhook_type.token}
           name="url"
-          value={form?.url}
+          value={String(form?.url)}
           onChange={handleChange}
           placeholder={form.type === 'CUSTOM' ? 'https://example.com/webhook' : 'xxxxxxxxxxxxxxxxxx'}
         />

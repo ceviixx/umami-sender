@@ -33,7 +33,7 @@
       "service": {
         "type": {
           "cloud": "Cloud",
-          "selfhost": "Selfhost"
+          "selfhost": "Selbstgehostet"
         },
         "name": "Typ"
       },
@@ -105,7 +105,8 @@
     },
     "service_type": {
       "cloud": "Cloud",
-      "selfhost": "Selfhost"
+      "selfhost": "Selfhost",
+      "self_hosted": "Selbstgehostet"
     },
     "metrics": {
       "stats": "Statistiken",

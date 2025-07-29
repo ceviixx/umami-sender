@@ -53,7 +53,7 @@ export default function SettingsPage() {
               <div>
                 <div className="font-semibold">{instance.name}</div>
                 <div className="text-sm text-gray-600">
-                  {instance.type === 'cloud' ? locale.enums.service_type.cloud : locale.enums.service_type.selfhost}
+                  {locale.enums.service_type[instance.type as 'cloud' | 'self_hosted'] || instance.type}
                 </div>
               </div>
 
