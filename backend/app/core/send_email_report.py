@@ -19,7 +19,7 @@ def send_email_report(db: Session, job: Job, summary: dict):
     if not template:
         raise Exception(f"Mail template not found. {sender_type}")
 
-    html_body = render_template(template.html, {
+    html_body = render_template(template.content, {
         "summary": summary,
         "job": job,
     })

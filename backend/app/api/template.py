@@ -76,8 +76,7 @@ def delete_template(template_type: str, db: Session = Depends(get_db)):
             status=404,
             detail=f"No template found for type '{template_type}'"
         )
-    template.html = None
-    template.json = None
+    template.content = None
 
     db.commit()
     return {"success": True}

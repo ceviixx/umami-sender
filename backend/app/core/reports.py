@@ -29,7 +29,7 @@ def send_report(db: Session, job: Job):
 
     # Generate email body
     text_body = "No Plain Text Version available."
-    html_body = render_template(template.html, {
+    html_body = render_template(template.content, {
         "summary": summary,
         "job": job,
     })

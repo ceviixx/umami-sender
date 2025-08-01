@@ -18,6 +18,7 @@ import { showSuccess, showError } from '@/lib/toast'
 export default function EditSenderPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const { locale } = useI18n()
+  const [loading, setLoading] = useState(true)
 
   const [form, setForm] = useState({
     name: '',
@@ -32,7 +33,6 @@ export default function EditSenderPage({ params }: { params: { id: string } }) {
   })
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

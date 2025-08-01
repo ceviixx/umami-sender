@@ -46,15 +46,7 @@ const JobLineChart = ({ jobData }: JobLineChartProps) => {
         backgroundColor: '#f44336',
         tension: 0.3,
         fill: false,
-      },
-      {
-        label: 'Skipped',
-        data: jobData.map((entry) => entry.skipped),
-        borderColor: '#ff9800',
-        backgroundColor: '#ff9800',
-        tension: 0.3,
-        fill: false,
-      },
+      }
     ],
   };
 

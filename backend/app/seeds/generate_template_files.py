@@ -1,10 +1,6 @@
 import os
 
-report_types = [
-    "INSIGHTS", "FUNNEL", "RETENTION", "UTM",
-    "GOALS", "JOURNEY", "REVENUE", "ATTRIBUTION"
-]
-
+report_types = ["INSIGHTS", "FUNNEL", "RETENTION", "UTM", "GOALS", "JOURNEY", "REVENUE", "ATTRIBUTION"]
 webhook_channels = ["DISCORD", "SLACK", "CUSTOM"]
 
 output_dir = "templates"
@@ -29,15 +25,12 @@ from app.models.template import MailTemplate
 
 SENDER_TYPE = "{key}"
 
-TEMPLATE_MAIL = """
-"""
-
-TEMPLATE_WEBHOOK = """
+TEMPLATE_CONTENT = """
 """
 
 def seed():
     default()
-    custom()
+    # custom()
 
 def default():
     db: Session = SessionLocal()
@@ -47,9 +40,7 @@ def default():
         template = MailTemplate(
             type="default",
             sender_type=SENDER_TYPE,
-            description=None,
-            html=TEMPLATE_MAIL.strip() or None,
-            json=TEMPLATE_WEBHOOK.strip() or None
+            content=TEMPLATE_CONTENT.strip() or None
         )
         db.add(template)
         db.commit()
@@ -64,9 +55,7 @@ def custom():
         template = MailTemplate(
             type="custom",
             sender_type=SENDER_TYPE,
-            description=None,
-            html=TEMPLATE_MAIL.strip() or None,
-            json=TEMPLATE_WEBHOOK.strip() or None
+            content=TEMPLATE_CONTENT.strip() or None
         )
         db.add(template)
         db.commit()

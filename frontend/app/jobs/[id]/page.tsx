@@ -9,6 +9,7 @@ import MultiSelectListbox from "@/components/MultiSelectListbox";
 import ListInput from "@/components/ListInput";
 import TimePicker from "@/components/TimePicker";
 import FormButtons from "@/components/FormButtons";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { UmamiInstance, Website, Sender, WebhookRecipient, Template } from '@/types'
 import { 
   ChevronLeftIcon,
@@ -38,6 +39,7 @@ import {
 export default function Jobs_Edit({ params }: { params: { id: number } }) {
   const router = useRouter()
   const { locale } = useI18n();
+  const [loading, setLoading] = useState(true)
 
   const sections = [
     locale.ui.general, 
@@ -147,78 +149,83 @@ export default function Jobs_Edit({ params }: { params: { id: number } }) {
     }
   };
 
-  useEffect(() => {
-    fetchUmamis().then(setInstances)
-    fetchWebhooks().then(setWebhookOptions)
-    fetchMailers().then(setSenders)
-    fetchTemplates().then(setTemplates)
-  }, [])
-
-  useEffect(() => {
-  const loadJob = async () => {
-    try {
-      const job = await fetchJob(params.id); // fetchJob verwendet die ID
-      setForm({
-        name: job.name || '',
-        sender_id: job.sender_id || null,
-        host_id: job.host_id || null,
-        website_id: job.website_id || '',
-        report_type: job.report_type || 'summary',
-        summary_items: job.summary_items || [],
-        report_id: job.report_id || null,
-        frequency: job.frequency || 'daily',
-        day: job.day || null,
-        execution_time: job.execution_time || '08:00',
-        email_recipients: job.email_recipients || [],
-        webhook_recipients: job.webhook_recipients || [],
-        is_active: job.is_active !== undefined ? job.is_active : true
-      });
-    } catch (error) {
-      console.error('Fehler beim Laden des Jobs:', error);
-    }
-  };
-
-  loadJob();
-}, [params.id]);
-
-
 
 
   useEffect(() => {
-    if (!form.host_id) return
-    setWebsites([])
-    const loadWebsites = async () => {
+    const loadAllData = async () => {
+      setLoading(true);
       try {
-        const websites = await fetchWebsitesByUmami(Number(form.host_id))
-        setWebsites(websites)
-        //setError(null)
-      } catch (err) {
-        setWebsites([])
-        //setError('Websites konnten nicht geladen werden.')
-      }
-    }
-    loadWebsites()
-  }, [form.host_id])
+        // Paralleles Laden der "statischen" Daten
+        const [
+          umamis,
+          webhooks,
+          mailers,
+          templates,
+          job
+        ] = await Promise.all([
+          fetchUmamis(),
+          fetchWebhooks(),
+          fetchMailers(),
+          fetchTemplates(),
+          fetchJob(params.id)
+        ]);
 
+        // Set state nach erfolgreichem Laden
+        setInstances(umamis);
+        setWebhookOptions(webhooks);
+        setSenders(mailers);
+        setTemplates(templates);
 
-  useEffect(() => {
-    const loadReports = async () => {
-      if (form.report_type !== 'report' || !form.website_id) return;
+        // Set Job + Formulardaten
+        setForm({
+          name: job.name || '',
+          sender_id: job.sender_id || null,
+          host_id: job.host_id || null,
+          website_id: job.website_id || '',
+          report_type: job.report_type || 'summary',
+          summary_items: job.summary_items || [],
+          report_id: job.report_id || null,
+          frequency: job.frequency || 'daily',
+          day: job.day || null,
+          execution_time: job.execution_time || '08:00',
+          email_recipients: job.email_recipients || [],
+          webhook_recipients: job.webhook_recipients || [],
+          is_active: job.is_active !== undefined ? job.is_active : true
+        });
 
-      setReportsLoading(true);
-      try {
-        const result = await fetchReportsByWebsite(Number(form.host_id), form.website_id);
-        setReports(result);
+        // Optional: direkt abhängige Daten wie Websites und Reports auch hier laden
+        if (job.host_id) {
+          try {
+            const websites = await fetchWebsitesByUmami(Number(job.host_id));
+            setWebsites(websites);
+          } catch {
+            setWebsites([]);
+          }
+        }
+
+        if (job.report_type === 'report' && job.website_id && job.host_id) {
+          setReportsLoading(true);
+          try {
+            const reports = await fetchReportsByWebsite(Number(job.host_id), job.website_id);
+            setReports(reports);
+          } catch {
+            setReports([]);
+          } finally {
+            setReportsLoading(false);
+          }
+        }
+
       } catch (error) {
-        console.error('Fehler beim Laden der Reports:', error);
-        setReports([]);
+        console.error('Fehler beim Laden der Daten:', error);
       } finally {
-        setReportsLoading(false);
+        setLoading(false);
       }
     };
 
-    loadReports();
-  }, [form.report_type, form.website_id]);
+    loadAllData();
+  }, [params.id]);
+
+
 
 
   const next = () => setActive((prev) => Math.min(prev + 1, sections.length - 1));
@@ -273,7 +280,9 @@ export default function Jobs_Edit({ params }: { params: { id: number } }) {
   }, [form, active]);
 
 
-
+  if (loading) {
+    return <LoadingSpinner />
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">

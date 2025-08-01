@@ -4,15 +4,12 @@ from app.models.template import MailTemplate
 
 SENDER_TYPE = "WEBHOOK_REPORT_FUNNEL_DISCORD"
 
-TEMPLATE_MAIL = """
-"""
-
-TEMPLATE_WEBHOOK = """
+TEMPLATE_CONTENT = """
 """
 
 def seed():
     default()
-    custom()
+    # custom()
 
 def default():
     db: Session = SessionLocal()
@@ -22,9 +19,7 @@ def default():
         template = MailTemplate(
             type="default",
             sender_type=SENDER_TYPE,
-            description="",
-            html=TEMPLATE_MAIL.strip() or None,
-            json=TEMPLATE_WEBHOOK.strip() or None
+            content=TEMPLATE_CONTENT.strip() or None
         )
         db.add(template)
         db.commit()
@@ -39,9 +34,7 @@ def custom():
         template = MailTemplate(
             type="custom",
             sender_type=SENDER_TYPE,
-            description="",
-            html=TEMPLATE_MAIL.strip() or None,
-            json=TEMPLATE_WEBHOOK.strip() or None
+            content=TEMPLATE_CONTENT.strip() or None
         )
         db.add(template)
         db.commit()

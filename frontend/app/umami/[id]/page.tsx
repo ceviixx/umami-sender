@@ -8,7 +8,7 @@ import {
   fetchUmami, 
   updateUmami 
 } from '@/lib/api/umami'
-import SelectBox from '@/components/SelectBox'
+import LoadingSpinner from "@/components/LoadingSpinner";
 import PageHeader from '@/components/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/TextInput'
@@ -39,13 +39,14 @@ export default function InstanceDetails() {
     api_key: null
   });
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!id) return
 
     fetchUmami(id)
       .then(setForm)
+      .finally(() => setLoading(false))
       .catch(() => setError('Fehler beim Laden der Instanz'))
   }, [id])
 
@@ -72,8 +73,8 @@ export default function InstanceDetails() {
     }
   }
 
-  if (!form) {
-    return <div className="p-6 text-gray-600">Lade Daten...</div>
+  if (loading) {
+    return <LoadingSpinner />
   }
 
   return (

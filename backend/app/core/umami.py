@@ -40,6 +40,11 @@ def fetch_website_summary(instance: Umami, job: Job):
         "stats": stats,
         "metrics": metrics
     }
+
+    formatted_start = start.strftime('%B %d, %Y')
+    formatted_end = end.strftime('%B %d, %Y')
+    returnObject['period'] = f'{formatted_start} – {formatted_end}'
+
     return returnObject
 
 def fetch_website_stats(instance: Umami, website_id: str, startAt, endAt):
@@ -70,7 +75,8 @@ def fetch_website_metrics(instance: Umami, website_id: str, startAt, endAt, metr
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()
-        return data[:5]
+        filtered = [item for item in data if item.get("y", 0) > 0]
+        return filtered[:5]
     else:
         return []
 

@@ -20,13 +20,17 @@ import test from "node:test";
 export default function EditWebhookPage() {
   const { id } = useParams()
   const router = useRouter()
+  const [loading, setLoading] = useState(true)
+
   const { locale } = useI18n()
   const [form, setForm] = useState<WebhookRecipient | null>(null)
   const [testing, setTesting] = useState(false)
 
   useEffect(() => {
     if (id) {
-      fetchWebhook(Number(id)).then(setForm)
+      fetchWebhook(Number(id))
+      .then(setForm)
+      .finally(() => setLoading(false))
     }
   }, [id])
 
@@ -67,6 +71,8 @@ export default function EditWebhookPage() {
       setTesting(false)
     }
   }
+
+  if (loading) { return <LoadingSpinner /> }
 
   return (
     <div className="max-w-4xl mx-auto p-6">

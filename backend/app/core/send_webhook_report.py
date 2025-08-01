@@ -20,7 +20,7 @@ def send_webhook_report(db: Session, job: Job, summary: dict):
         if not template:
             raise Exception("Webhook template not found.", sender_type)
         
-        html_body = render_template(template.json, {
+        html_body = render_template(template.content, {
             "summary": summary,
             "job": job,
         })

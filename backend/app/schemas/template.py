@@ -4,9 +4,7 @@ from typing import Optional, Any
 class MailTemplateBase(BaseModel):
     type: str
     sender_type: str
-    description: Optional[str] = None
-    html: Optional[str] = None
-    json: Optional[Any] = None
+    content: Optional[str] = None
 
 class MailTemplateCreate(MailTemplateBase):
     pass
