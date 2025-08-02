@@ -90,7 +90,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
       <h1>UmamiSender</h1>
     </div>
 
-    <h2>Your summary for</h2>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
@@ -107,7 +107,74 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 
 TEMPLATE_EXAMPLE = {
     "summary": {
-        
+        "type": "insights", 
+        "result": [
+            {
+                "views": 171558,
+                "visitors": 103524,
+                "visits": 138653,
+                "bounces": 114612,
+                "totaltime": 8727342,
+                "url": "/"
+            },
+            {
+                "views": 43772,
+                "visitors": 23858,
+                "visits": 29683,
+                "bounces": 21365,
+                "totaltime": 3572573,
+                "url": "/docs"
+            },
+            {
+                "views": 38271,
+                "visitors": 28753,
+                "visits": 31989,
+                "bounces": 27263,
+                "totaltime": 1545083,
+                "url": "/pricing"
+            },
+            {
+                "views": 20756,
+                "visitors": 12943,
+                "visits": 15932,
+                "bounces": 12617,
+                "totaltime": 1676259,
+                "url": "/docs/install"
+            },
+            {
+                "views": 18188,
+                "visitors": 13215,
+                "visits": 14632,
+                "bounces": 12112,
+                "totaltime": 750090,
+                "url": "/features"
+            },
+            {
+                "views": 16456,
+                "visitors": 9629,
+                "visits": 12147,
+                "bounces": 9311,
+                "totaltime": 1507622,
+                "url": "/docs/track-events"
+            },
+            {
+                "views": 14396,
+                "visitors": 9011,
+                "visits": 10714,
+                "bounces": 8156,
+                "totaltime": 1037753,
+                "url": "/docs/collect-data"
+            },
+            {
+                "views": 12224,
+                "visitors": 6586,
+                "visits": 8133,
+                "bounces": 5859,
+                "totaltime": 988292,
+                "url": "/docs/api"
+            }
+        ],
+        "embedded_logo": ""
     }
 }
 

@@ -7,19 +7,19 @@ from . import templates
 
 
 def main():
-    print("📦 Starte Seeding aller Templates...")
+    print("📦 Starting to seed all templates...")
     for _, module_name, is_pkg in pkgutil.iter_modules(templates.__path__):
         if is_pkg:
             continue
         try:
             module = importlib.import_module(f".{module_name}", package=__package__ + ".templates")
             if hasattr(module, "seed"):
-                print(f"🚀 Seede {module_name}...")
+                print(f"🚀 Seeding {module_name}...")
                 module.seed()
             else:
-                print(f"⚠️  Keine seed() Funktion in {module_name}")
+                print(f"⚠️  No seed() function found in {module_name}")
         except Exception as e:
-            print(f"❌ Fehler beim Seed von {module_name}: {e}")
+            print(f"❌ Error while seeding {module_name}: {e}")
             traceback.print_exc()
 
 

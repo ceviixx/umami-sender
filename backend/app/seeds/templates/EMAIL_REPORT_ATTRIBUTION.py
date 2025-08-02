@@ -90,12 +90,52 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
       <h1>UmamiSender</h1>
     </div>
 
-    <h2>Your summary for</h2>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
 
 
+    <table>
+    <tr>
+        <th>Total Pageviews</th>
+        <th>Total Visits</th>
+        <th>Total Visitors</th>
+    </tr>
+    <tr>
+        <td>{{ summary.result.total.pageviews }}</td>
+        <td>{{ summary.result.total.visits }}</td>
+        <td>{{ summary.result.total.visitors }}</td>
+    </tr>
+    </table>
+    
+    {% set tables = [
+      ('Referrer', summary.result.referrer),
+      ('Paid Ads', summary.result.paidAds),
+      ('UTM Source', summary.result.utm_source),
+      ('UTM Medium', summary.result.utm_medium),
+      ('UTM Campaign', summary.result.utm_campaign),
+      ('UTM Term', summary.result.utm_term),
+      ('UTM Content', summary.result.utm_content)
+    ] %}
+
+    {% for title, entries in tables %}
+      {% if entries %}
+        <h2>{{ title }}</h2>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th style="width: 100px;">Revenue</th>
+          </tr>
+          {% for entry in entries %}
+            <tr>
+              <td>{{ entry.name or '–' }}</td>
+              <td>{{ entry.value }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    {% endfor %}
   </div>
 
   <div class="footer">
@@ -107,7 +147,141 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 
 TEMPLATE_EXAMPLE = {
     "summary": {
-        
+        "type": "attribution", 
+        "result": {
+            "referrer": [
+                {
+                    "name": "chatgpt.com",
+                    "value": 59910
+                },
+                {
+                    "name": "google.com",
+                    "value": 21430
+                },
+                {
+                    "name": "",
+                    "value": 3940
+                },
+                {
+                    "name": "checkout.stripe.com",
+                    "value": 930
+                },
+                {
+                    "name": "emv8e.r.a.d.sendibm1.com",
+                    "value": 60
+                }
+            ],
+            "paidAds": [
+                {
+                    "name": "Microsoft Ads",
+                    "value": 37290
+                },
+                {
+                    "name": "Facebook / Meta",
+                    "value": 28050
+                },
+                {
+                    "name": "Google Ads",
+                    "value": 20930
+                }
+            ],
+            "utm_source": [
+                {
+                    "name": "microsoft",
+                    "value": 37290
+                },
+                {
+                    "name": "facebook",
+                    "value": 28050
+                },
+                {
+                    "name": "google",
+                    "value": 20930
+                }
+            ],
+            "utm_medium": [
+                {
+                    "name": "paid-social",
+                    "value": 28050
+                },
+                {
+                    "name": "paid-search",
+                    "value": 20930
+                },
+                {
+                    "name": "affiliate",
+                    "value": 20790
+                },
+                {
+                    "name": "cpc",
+                    "value": 16500
+                }
+            ],
+            "utm_campaign": [
+                {
+                    "name": "bing-ad-campaign-2",
+                    "value": 20790
+                },
+                {
+                    "name": "google-ad-campaign-2",
+                    "value": 16770
+                },
+                {
+                    "name": "bing-ad-campaign-1",
+                    "value": 16500
+                },
+                {
+                    "name": "facebook-ad-campaign-1",
+                    "value": 14430
+                },
+                {
+                    "name": "facebook-ad-campaign-2",
+                    "value": 13620
+                },
+                {
+                    "name": "google-ad-campaign-1",
+                    "value": 4160
+                }
+            ],
+            "utm_content": [
+                {
+                    "name": "",
+                    "value": 86270
+                }
+            ],
+            "utm_term": [
+                {
+                    "name": "open-source-analytics",
+                    "value": 18740
+                },
+                {
+                    "name": "privacy-focused-analytics",
+                    "value": 18550
+                },
+                {
+                    "name": "google-analytics-alternative",
+                    "value": 16770
+                },
+                {
+                    "name": "umami-software",
+                    "value": 14430
+                },
+                {
+                    "name": "saas-analytics",
+                    "value": 13620
+                },
+                {
+                    "name": "website-analytics",
+                    "value": 4160
+                }
+            ],
+            "total": {
+                "pageviews": 2598,
+                "visitors": 1992,
+                "visits": 2246
+            }
+        },
+        "embedded_logo": ""
     }
 }
 

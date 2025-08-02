@@ -90,7 +90,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
       <h1>UmamiSender</h1>
     </div>
 
-    <h2>Your summary for</h2>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
@@ -122,7 +122,53 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 
 TEMPLATE_EXAMPLE = {
     "summary": {
-        
+        "type": "journey", 
+        "result": [
+            {
+                "items": [
+                    "/",
+                    None,
+                    None
+                ],
+                "count": 41350
+            },
+            {
+                "items": [
+                    "/",
+                    "login-button-header",
+                    None,
+                    None
+                ],
+                "count": 28053
+            },
+            {
+                "items": [
+                    "/",
+                    "get-started-button",
+                    None,
+                    None
+                ],
+                "count": 8118
+            },
+            {
+                "items": [
+                    "/",
+                    "/pricing",
+                    None,
+                    None
+                ],
+                "count": 6781
+            },
+            {
+                "items": [
+                    "/blog",
+                    None,
+                    None
+                ],
+                "count": 4280
+            }
+        ],
+        "embedded_logo": ""
     }
 }
 

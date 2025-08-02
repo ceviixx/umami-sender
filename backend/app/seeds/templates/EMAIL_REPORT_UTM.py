@@ -88,7 +88,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
       <img src="{{ summary.embedded_logo }}" alt="Logo" />
       <h1>UmamiSender</h1>
     </div>
-    <h2>Your summary for</h2>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
@@ -180,13 +180,41 @@ TEMPLATE_EXAMPLE = {
     "summary": {
         "type": "utm", 
         "result": {
-            "utm_source": {"apple": 13}, 
-            "utm_medium": {"testflight": 4}, 
-            "utm_campaign": {}, 
-            "utm_content": {"app": 8, "privacy": 5}, 
-            "utm_term": {}, 
-            "utm_agid": {}, 
-            "utm_banner": {}
+            "utm_source": {
+                "coolify.io": 1012,
+                "chatgpt.com": 206,
+                "openalternative.co": 174,
+                "awesome-homelab.com": 50,
+                "dopubox.com": 38
+            },
+            "utm_medium": {
+                "referral": 107,
+                "cpc": 42,
+                "email": 17,
+                "outbound-email": 6,
+                "paid-social": 2
+            },
+            "utm_campaign": {
+                "navigation": 52,
+                "website_analytics": 37,
+                "website-analytics": 6,
+                "newsletter-issue-102": 5,
+                "devkit": 5
+            },
+            "utm_content": {
+                "website-analytics-email-2": 6,
+                "insightful": 1,
+                "sidebar-cta": 1
+            },
+            "utm_term": {},
+            "utm_agid": {},
+            "utm_banner": {
+                "6673263": 1,
+                "1761521953": 1,
+                "8631802": 1,
+                "2225639": 1,
+                "8124433": 1
+            }
         },
         "embedded_logo": ""
     }

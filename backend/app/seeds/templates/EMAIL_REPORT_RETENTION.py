@@ -90,7 +90,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
       <h1>UmamiSender</h1>
     </div>
 
-    <h2>Your summary for</h2>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
@@ -137,7 +137,45 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 
 TEMPLATE_EXAMPLE = {
     "summary": {
-        
+        "type": "retention", 
+        "result": [
+            {
+                "date": "2025-05-04T22:00:00Z",
+                "day": 0,
+                "visitors": 1886,
+                "returnVisitors": 1886,
+                "percentage": 100
+            },
+            {
+                "date": "2025-05-04T22:00:00Z",
+                "day": 1,
+                "visitors": 1886,
+                "returnVisitors": 171,
+                "percentage": 9.066808059384941
+            },
+            {
+                "date": "2025-05-04T22:00:00Z",
+                "day": 2,
+                "visitors": 1886,
+                "returnVisitors": 104,
+                "percentage": 5.514316012725344
+            },
+            {
+                "date": "2025-05-04T22:00:00Z",
+                "day": 3,
+                "visitors": 1886,
+                "returnVisitors": 79,
+                "percentage": 4.188759278897137
+            },
+            {
+                "date": "2025-05-04T22:00:00Z",
+                "day": 4,
+                "visitors": 1886,
+                "returnVisitors": 67,
+                "percentage": 3.552492046659597
+            }
+        ],
+        "embedded_logo": ""
     }
 }
 

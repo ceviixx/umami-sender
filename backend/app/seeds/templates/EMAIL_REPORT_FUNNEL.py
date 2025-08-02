@@ -90,7 +90,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
       <h1>UmamiSender</h1>
     </div>
 
-    <h2>Your summary for</h2>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
@@ -109,14 +109,14 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
         <td>{{ step.dropped }}</td>
         <td>
         {% if step.dropoff is not none %}
-            {{ step.dropoff }}%
+            {{ step.dropoff | round(2) }}%
         {% else %}
             –
         {% endif %}
         </td>
         <td>
         {% if step.remaining is not none %}
-            {{ step.remaining }}
+            {{ step.remaining | round(2) }}
         {% else %}
             –
         {% endif %}
@@ -137,7 +137,28 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 
 TEMPLATE_EXAMPLE = {
     "summary": {
-        
+        "type": "funnel", 
+        "result": [
+            {
+                "type": "url",
+                "value": "/",
+                "visitors": 104370,
+                "previous": 0,
+                "dropped": 0,
+                "dropoff": None,
+                "remaining": 1
+            },
+            {
+                "type": "url",
+                "value": "/contact",
+                "visitors": 1310,
+                "previous": 104370,
+                "dropped": 103060,
+                "dropoff": 0.9874485005269713,
+                "remaining": 0.012551499473028648
+            }
+        ],
+        "embedded_logo": ""
     }
 }
 

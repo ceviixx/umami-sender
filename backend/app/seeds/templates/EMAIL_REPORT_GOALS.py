@@ -90,7 +90,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
       <h1>UmamiSender</h1>
     </div>
 
-    <h2>Your summary for</h2>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
@@ -153,7 +153,22 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 
 TEMPLATE_EXAMPLE = {
     "summary": {
-        
+        "type": "goals", 
+        "result": [
+            {
+                "type": "url",
+                "value": "/",
+                "goal": 10000,
+                "result": 243322
+            },
+            {
+                "type": "event",
+                "value": "live-demo-button",
+                "goal": 10000,
+                "result": 11791
+            }
+        ],
+        "embedded_logo": ""
     }
 }
 

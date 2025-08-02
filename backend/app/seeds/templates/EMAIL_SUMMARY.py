@@ -88,7 +88,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
       <img src="{{ summary.embedded_logo }}" alt="Logo" />
       <h1>UmamiSender</h1>
     </div>
-    <h2>Your summary for</h2>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
@@ -439,7 +439,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 
 TEMPLATE_EXAMPLE = {
     "summary": {
-        "embedded_logo": "...",
+        "embedded_logo": "",
         "name": "Newsletter Monthly",
         "period": "2025-07-01 - 2025-08-01",
         "stats": {

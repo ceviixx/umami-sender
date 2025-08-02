@@ -24,11 +24,13 @@ def convertUTM(data):
             for value in values:
                 result[key][value] += count
 
-    # Erstelle das finale dict mit allen utm_keys
+    # Finales dict mit Sortierung nach Anzahl (absteigend)
     final = {}
     for key in utm_keys:
         if key in result:
-            final[key] = dict(result[key])
+            sorted_items = sorted(result[key].items(), key=lambda x: x[1], reverse=True)
+            final[key] = dict(sorted_items)
         else:
             final[key] = {}
+
     return final
