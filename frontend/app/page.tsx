@@ -46,9 +46,9 @@ export default function Dashboard() {
       />
 
       <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-6">
-        <DashboardTile loading={loading} label={locale.pages.umami} value={stats?.umami} icon={<ChartBarIcon className="text-blue-400 w-12 h-12" />} dest='umami-config' />
+        <DashboardTile loading={loading} label={locale.pages.umami} value={stats?.umami} icon={<ChartBarIcon className="text-blue-400 w-12 h-12" />} dest='umami' />
         <DashboardTile loading={loading} label={locale.pages.jobs} value={stats?.jobs} icon={<BriefcaseIcon className="text-blue-400 w-12 h-12" />} dest='jobs' />
-        <DashboardTile loading={loading} label={locale.pages.mailer} value={stats?.senders} icon={<PaperAirplaneIcon className="text-blue-400 w-12 h-12" />} dest='senders' />
+        <DashboardTile loading={loading} label={locale.pages.mailer} value={stats?.senders} icon={<PaperAirplaneIcon className="text-blue-400 w-12 h-12" />} dest='mailers' />
         <DashboardTile loading={loading} label={locale.pages.webhook} value={stats?.webhooks} icon={<PuzzlePieceIcon className="text-blue-400 w-12 h-12" />} dest='webhooks' />
       </div>
 

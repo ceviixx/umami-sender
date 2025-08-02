@@ -1,10 +1,13 @@
-# frontend/Dockerfile
 FROM node:18-alpine
 
 WORKDIR /app
 
-COPY . .
+COPY package*.json ./
 
 RUN npm install
 
-CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
+COPY . .
+
+RUN npm run build
+
+CMD ["npm", "start", "--", "--hostname", "0.0.0.0"]
