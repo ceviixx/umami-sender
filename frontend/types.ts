@@ -11,8 +11,7 @@ export interface Template {
   type: string
   sender_type: string
   description: string
-  html?: string | null
-  json?: string | null
+  content: string
 }
 
 export type Sender = {

@@ -83,13 +83,11 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
   </style>
 </head>
 <body>
-
   <div class="container">
     <div class="header">
       <img src="{{ summary.embedded_logo }}" alt="Logo" />
       <h1>UmamiSender</h1>
     </div>
-
     <h2>Your summary for</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
@@ -104,80 +102,92 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
         <th>Unique Customers</th>
     </tr>
     <tr>
-        <td>€{{ (summary.result.total.sum / 1000) | round(2) }}k</td>
-        <td>€{{ (summary.result.total.sum / summary.result.total.count) | round(2) }}</td>
-        <td>{{ summary.result.total.count }}</td>
-        <td>{{ summary.result.total.unique_count }}</td>
+        {% if summary.result %}
+          <td>€{{ (summary.result.total.sum / 1000) | round(2) }}k</td>
+          <td>€{{ (summary.result.total.sum / summary.result.total.count) | round(2) }}</td>
+          <td>{{ summary.result.total.count }}</td>
+          <td>{{ summary.result.total.unique_count }}</td>
+        {% else %}
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        {% endif %}
     </tr>
     </table>
 
     <h2>Top Countries</h2>
     <table>
-    <tr><th>Country</th><th>Total</th></tr>
-    {% for entry in summary.result.country %}
-    <tr>
-        <td>{{ entry.name }}</td>
-        <td>{{ entry.value }}</td>
-    </tr>
-    {% endfor %}
+    <tr><th>Country</th><th style="width: 100px;">Total</th></tr>
+    {% if summary.result %}
+      {% for entry in summary.result.country %}
+      <tr>
+          <td>{{ entry.name }}</td>
+          <td>{{ entry.value }}</td>
+      </tr>
+      {% endfor %}
+    {% endif %}
     </table>
 
 
     <h2>Revenue by Currency</h2>
     <table>
     <tr><th>Currency</th><th>Total</th><th>Transactions</th><th>Unique Customers</th></tr>
-    {% for row in summary.result.table %}
-    <tr>
-        <td>{{ row.currency }}</td>
-        <td>{{ row.sum }}</td>
-        <td>{{ row.count }}</td>
-        <td>{{ row.unique_count }}</td>
-    </tr>
-    {% endfor %}
+    {% if summary.result %}
+      {% for row in summary.result.table %}
+      <tr>
+          <td>{{ row.currency }}</td>
+          <td>{{ row.sum }}</td>
+          <td>{{ row.count }}</td>
+          <td>{{ row.unique_count }}</td>
+      </tr>
+      {% endfor %}
+    {% endif %}
     </table>
 
 
 
 
   </div>
-
   <div class="footer">
     Sent with <a href="https://github.com/ceviixx/UmamiSender">UmamiSender</a>
   </div>
-
 </body>
 </html>"""
 
-def seed():
-    default()
-    # custom()
+TEMPLATE_EXAMPLE = {
+    "summary": {
+        
+    }
+}
 
-def default():
+def seed():
     db: Session = SessionLocal()
 
-    if not db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="default").first():
-        print(f"🌱 Seede Standard-{SENDER_TYPE}-Template...")
-        template = MailTemplate(
+    template = db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="default").first()
+
+    if template:
+        # Always update example_content
+        template.example_content = TEMPLATE_EXAMPLE or None
+
+        if not template.is_customized:
+            print(f"♻️ Updating default template for {SENDER_TYPE} (not customized)...")
+            template.content = TEMPLATE_CONTENT.strip() or None
+        else:
+            print(f"⛔️ Default template for {SENDER_TYPE} has been customized – skipping content update.")
+
+        db.commit()
+
+    else:
+        print(f"🌱 Seeding new default template for {SENDER_TYPE}...")
+        new_template = MailTemplate(
             type="default",
             sender_type=SENDER_TYPE,
-            content=TEMPLATE_CONTENT.strip() or None
+            content=TEMPLATE_CONTENT.strip() or None,
+            example_content=TEMPLATE_EXAMPLE or None
         )
-        db.add(template)
+        db.add(new_template)
         db.commit()
 
     db.close()
 
-def custom():
-    db: Session = SessionLocal()
-
-    if not db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="custom").first():
-        print(f"🌱 Seede Custom-{SENDER_TYPE}-Template...")
-        template = MailTemplate(
-            type="custom",
-            sender_type=SENDER_TYPE,
-            content=TEMPLATE_CONTENT.strip() or None
-        )
-        db.add(template)
-        db.commit()
-
-    db.close()

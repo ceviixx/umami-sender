@@ -36,14 +36,14 @@ export default function WebhooksPage() {
     }
   }
 
+  if (loading) { return <LoadingSpinner title={locale.pages.webhook} /> }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
         title={locale.pages.webhook}
         href='/webhooks/new'
       />
-
-      {loading && <LoadingSpinner />}
 
       {webhooks.length === 0 ? (
         <EmptyState />

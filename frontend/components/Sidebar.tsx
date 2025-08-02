@@ -26,7 +26,7 @@ export default function Sidebar() {
     { href: '/mailers', label: locale.pages.mailer, icon: <PaperAirplaneIcon className="text-primary-600 w-5 h-5" /> },
     { href: '/webhooks', label: locale.pages.webhook, icon: <PuzzlePieceIcon className="text-primary-600 w-5 h-5" /> },
 
-    // { href: '/templates', label: locale.pages.templates, icon: <DocumentIcon className="text-primary-600 w-5 h-5" /> },
+    { href: '/templates', label: locale.pages.templates, icon: <DocumentIcon className="text-primary-600 w-5 h-5" /> },
   ]
 
   return (

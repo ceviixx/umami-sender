@@ -135,36 +135,39 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 </body>
 </html>"""
 
-def seed():
-    default()
-    # custom()
+TEMPLATE_EXAMPLE = {
+    "summary": {
+        
+    }
+}
 
-def default():
+def seed():
     db: Session = SessionLocal()
 
-    if not db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="default").first():
-        print(f"🌱 Seede Standard-{SENDER_TYPE}-Template...")
-        template = MailTemplate(
+    template = db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="default").first()
+
+    if template:
+        # Always update example_content
+        template.example_content = TEMPLATE_EXAMPLE or None
+
+        if not template.is_customized:
+            print(f"♻️ Updating default template for {SENDER_TYPE} (not customized)...")
+            template.content = TEMPLATE_CONTENT.strip() or None
+        else:
+            print(f"⛔️ Default template for {SENDER_TYPE} has been customized – skipping content update.")
+
+        db.commit()
+
+    else:
+        print(f"🌱 Seeding new default template for {SENDER_TYPE}...")
+        new_template = MailTemplate(
             type="default",
             sender_type=SENDER_TYPE,
-            content=TEMPLATE_CONTENT.strip() or None
+            content=TEMPLATE_CONTENT.strip() or None,
+            example_content=TEMPLATE_EXAMPLE or None
         )
-        db.add(template)
+        db.add(new_template)
         db.commit()
 
     db.close()
 
-def custom():
-    db: Session = SessionLocal()
-
-    if not db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="custom").first():
-        print(f"🌱 Seede Custom-{SENDER_TYPE}-Template...")
-        template = MailTemplate(
-            type="custom",
-            sender_type=SENDER_TYPE,
-            content=TEMPLATE_CONTENT.strip() or None
-        )
-        db.add(template)
-        db.commit()
-
-    db.close()

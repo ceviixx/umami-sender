@@ -83,114 +83,142 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
   </style>
 </head>
 <body>
-
   <div class="container">
     <div class="header">
       <img src="{{ summary.embedded_logo }}" alt="Logo" />
       <h1>UmamiSender</h1>
     </div>
-
     <h2>Your summary for</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
 
 
-    <h2>source</h2>
-    <table>
-    <tr><th></th><th>Views</th></tr>
-    {% for entry in summary.result if "utm_source=" in entry.url_query %}
-    <tr>
-        <td>{{ entry.url_query.split("utm_source=")[1].split("&")[0] }}</td>
-        <td>{{ entry.num }}</td>
-    </tr>
-    {% endfor %}
-    </table>
+    <h2>Source</h2>
+    {% if summary.result.utm_source %}
+      <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+        {% for value, count in summary.result.utm_source.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No data</p>
+    {% endif %}
 
-    <h2>medium</h2>
-    <table>
-    <tr><th></th><th>Views</th></tr>
-    {% for entry in summary.result if "utm_medium=" in entry.url_query %}
-    <tr>
-        <td>{{ entry.url_query.split("utm_medium=")[1].split("&")[0] }}</td>
-        <td>{{ entry.num }}</td>
-    </tr>
-    {% endfor %}
-    </table>
+    <h2>Medium</h2>
+    {% if summary.result.utm_medium %}
+      <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+        {% for value, count in summary.result.utm_medium.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No data</p>
+    {% endif %}
+    
+    <h2>Campaign</h2>
+    {% if summary.result.utm_campaign %}
+      <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+        {% for value, count in summary.result.utm_campaign.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No data</p>
+    {% endif %}
 
-    <h2>campaign</h2>
-    <table>
-    <tr><th></th><th>Views</th></tr>
-    {% for entry in summary.result if "utm_campaign=" in entry.url_query %}
-    <tr>
-        <td>{{ entry.url_query.split("utm_campaign=")[1].split("&")[0] }}</td>
-        <td>{{ entry.num }}</td>
-    </tr>
-    {% endfor %}
-    </table>
+    <h2>Term</h2>
+    {% if summary.result.utm_term %}
+      <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+        {% for value, count in summary.result.utm_term.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No data</p>
+    {% endif %}
 
-    <h2>term</h2>
-    <table>
-    <tr><th></th><th>Views</th></tr>
-    {% for entry in summary.result if "utm_term=" in entry.url_query %}
-    <tr>
-        <td>{{ entry.url_query.split("utm_term=")[1].split("&")[0] }}</td>
-        <td>{{ entry.num }}</td>
-    </tr>
-    {% endfor %}
-    </table>
-
-    <h2>content</h2>
-    <table>
-    <tr><th></th><th>Views</th></tr>
-    {% for entry in summary.result if "utm_content=" in entry.url_query %}
-    <tr>
-        <td>{{ entry.url_query.split("utm_content=")[1].split("&")[0] }}</td>
-        <td>{{ entry.num }}</td>
-    </tr>
-    {% endfor %}
-    </table>
-
+    <h2>Content</h2>
+    {% if summary.result.utm_content %}
+      <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+        {% for value, count in summary.result.utm_content.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No data</p>
+    {% endif %}
 
 
   </div>
-
   <div class="footer">
     Sent with <a href="https://github.com/ceviixx/UmamiSender">UmamiSender</a>
   </div>
-
 </body>
 </html>"""
 
-def seed():
-    default()
-    # custom()
+TEMPLATE_EXAMPLE = {
+    "summary": {
+        "type": "utm", 
+        "result": {
+            "utm_source": {"apple": 13}, 
+            "utm_medium": {"testflight": 4}, 
+            "utm_campaign": {}, 
+            "utm_content": {"app": 8, "privacy": 5}, 
+            "utm_term": {}, 
+            "utm_agid": {}, 
+            "utm_banner": {}
+        },
+        "embedded_logo": ""
+    }
+}
 
-def default():
+def seed():
     db: Session = SessionLocal()
 
-    if not db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="default").first():
-        print(f"🌱 Seede Standard-{SENDER_TYPE}-Template...")
-        template = MailTemplate(
+    template = db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="default").first()
+
+    if template:
+        # Always update example_content
+        template.example_content = TEMPLATE_EXAMPLE or None
+
+        if not template.is_customized:
+            print(f"♻️ Updating default template for {SENDER_TYPE} (not customized)...")
+            template.content = TEMPLATE_CONTENT.strip() or None
+        else:
+            print(f"⛔️ Default template for {SENDER_TYPE} has been customized – skipping content update.")
+
+        db.commit()
+
+    else:
+        print(f"🌱 Seeding new default template for {SENDER_TYPE}...")
+        new_template = MailTemplate(
             type="default",
             sender_type=SENDER_TYPE,
-            content=TEMPLATE_CONTENT.strip() or None
+            content=TEMPLATE_CONTENT.strip() or None,
+            example_content=TEMPLATE_EXAMPLE or None
         )
-        db.add(template)
+        db.add(new_template)
         db.commit()
 
     db.close()
 
-def custom():
-    db: Session = SessionLocal()
-
-    if not db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="custom").first():
-        print(f"🌱 Seede Custom-{SENDER_TYPE}-Template...")
-        template = MailTemplate(
-            type="custom",
-            sender_type=SENDER_TYPE,
-            content=TEMPLATE_CONTENT.strip() or None
-        )
-        db.add(template)
-        db.commit()
-
-    db.close()

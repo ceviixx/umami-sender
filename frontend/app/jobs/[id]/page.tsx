@@ -279,10 +279,7 @@ export default function Jobs_Edit({ params }: { params: { id: number } }) {
     setIsStepValid(validateForm());
   }, [form, active]);
 
-
-  if (loading) {
-    return <LoadingSpinner />
-  }
+  if (loading) { return <LoadingSpinner title={locale.ui.edit} /> }
 
   return (
     <div className="max-w-4xl mx-auto p-6">

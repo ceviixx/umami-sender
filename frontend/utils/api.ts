@@ -32,6 +32,8 @@ export async function apiFetch<T = any>(
 
     clearTimeout(id);
 
+    const contentType = res.headers.get('Content-Type') || '';
+
     if (!res.ok) {
       const errorText = await res.text();
       throw new Error(errorText || `Error on request: ${method} ${path}`);
@@ -39,7 +41,12 @@ export async function apiFetch<T = any>(
 
     if (res.status === 204) return {} as T;
 
-    return res.json();
+    if (contentType.includes('application/json')) {
+      return res.json();
+    } else {
+      const text = await res.text();
+      return text as unknown as T; // oder spezifischer: `as T & string`, wenn du weißt, dass es HTML ist
+    }
   } catch (err: any) {
     clearTimeout(id);
 

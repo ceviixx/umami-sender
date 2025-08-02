@@ -106,7 +106,7 @@ export default function EditSenderPage({ params }: { params: { id: string } }) {
     }
   }
 
-  if (loading) { return <LoadingSpinner /> }
+  if (loading) { return <LoadingSpinner title={locale.ui.edit} /> }
 
   return (
     <div className="max-w-4xl mx-auto p-6">

@@ -12,6 +12,11 @@ class MailTemplateCreate(MailTemplateBase):
 class MailTemplateUpdate(MailTemplateBase):
     pass
 
+
+class MailTemplateList(BaseModel):
+    id: int
+    sender_type: str
+
 class MailTemplateOut(MailTemplateBase):
     id: int
 

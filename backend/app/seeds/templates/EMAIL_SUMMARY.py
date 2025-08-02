@@ -83,13 +83,11 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
   </style>
 </head>
 <body>
-
   <div class="container">
     <div class="header">
       <img src="{{ summary.embedded_logo }}" alt="Logo" />
       <h1>UmamiSender</h1>
     </div>
-
     <h2>Your summary for</h2>
     <p><strong>Report:</strong> {{ summary.name }}</p>
     <p><strong>Period:</strong> {{ summary.period }}</p>
@@ -124,7 +122,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Pages</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.url %}
             <tr>
@@ -145,7 +143,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Refferers</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.referrer %}
             <tr>
@@ -166,7 +164,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Channels</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.channel %}
             <tr>
@@ -187,7 +185,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Browsers</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.browser %}
             <tr>
@@ -208,7 +206,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Operating systems</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.os %}
             <tr>
@@ -229,7 +227,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Devices</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.device %}
             <tr>
@@ -250,7 +248,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Countries</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.country %}
             <tr>
@@ -271,7 +269,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Regions</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.region %}
             <tr>
@@ -292,7 +290,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Cities</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.city %}
             <tr>
@@ -313,7 +311,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Languages</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.language %}
             <tr>
@@ -334,7 +332,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Screens</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.screen %}
             <tr>
@@ -355,7 +353,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Events</th>
-                <th>Actions</th>
+                <th style="width: 100px;">Actions</th>
             </tr>
             {% for entry in summary.metrics.event %}
             <tr>
@@ -376,7 +374,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Query</th>
-                <th>Views</th>
+                <th style="width: 100px;">Views</th>
             </tr>
             {% for entry in summary.metrics.query %}
             <tr>
@@ -397,7 +395,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Hosts</th>
-                <th>Visitors</th>
+                <th style="width: 100px;">Visitors</th>
             </tr>
             {% for entry in summary.metrics.host %}
             <tr>
@@ -418,7 +416,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
             <table>
             <tr>
                 <th>Tags</th>
-                <th>Views</th>
+                <th style="width: 100px;">Views</th>
             </tr>
             {% for entry in summary.metrics.tag %}
             <tr>
@@ -433,44 +431,84 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
     {% endif %}
 
   </div>
-
   <div class="footer">
     Sent with <a href="https://github.com/ceviixx/UmamiSender">UmamiSender</a>
   </div>
-
 </body>
 </html>"""
 
-def seed():
-    default()
-    # custom()
+TEMPLATE_EXAMPLE = {
+    "summary": {
+        "embedded_logo": "...",
+        "name": "Newsletter Monthly",
+        "period": "2025-07-01 - 2025-08-01",
+        "stats": {
+            "pageviews": "4.39k",
+            "visits": "1.8k",
+            "visitors": "1.5k",
+            "bounces": "65%",
+            "totaltime": "2m"
+        },
+        "metrics": {
+            "url": [
+                {"x": "/","y": 1156}, 
+                {"x": "/pricing","y": 258}, 
+                {"x": "/docs","y": 212}, 
+                {"x": "/blog/what-is-coming-in-umami-v3","y": 159}, 
+                {"x": "/docs/install","y": 120}
+            ],
+            "referrer": [
+                {"x": "google.com","y": 350}, 
+                {"x": "qiita.com","y": 45}, 
+                {"x": "duckduckgo.com","y": 36}, 
+                {"x": "chatgpt.com","y": 25}, 
+                {"x": "t.co","y": 18}
+            ],
+            "channel": [
+                {"x": "direct","y": 860}, 
+                {"x": "organicSearch","y": 456}, 
+                {"x": "organicSocial","y": 31}, 
+                {"x": "referral","y": 1}, 
+                {"x": "paidAds","y": 1},
+            ],
+            "browser": [
+                {"x": "chrome","y": 961}, 
+                {"x": "firefox","y": 213}, {"x": "safari","y": 93}, 
+                {"x": "ios","y": 88}, 
+                {"x": "edge-chromium","y": 73}, 
+                {"x": "crios","y": 27}
+            ]
+        }
+    }
+}
 
-def default():
+def seed():
     db: Session = SessionLocal()
 
-    if not db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="default").first():
-        print(f"🌱 Seede Standard-{SENDER_TYPE}-Template...")
-        template = MailTemplate(
+    template = db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="default").first()
+
+    if template:
+        # Always update example_content
+        template.example_content = TEMPLATE_EXAMPLE or None
+
+        if not template.is_customized:
+            print(f"♻️ Updating default template for {SENDER_TYPE} (not customized)...")
+            template.content = TEMPLATE_CONTENT.strip() or None
+        else:
+            print(f"⛔️ Default template for {SENDER_TYPE} has been customized – skipping content update.")
+
+        db.commit()
+
+    else:
+        print(f"🌱 Seeding new default template for {SENDER_TYPE}...")
+        new_template = MailTemplate(
             type="default",
             sender_type=SENDER_TYPE,
-            content=TEMPLATE_CONTENT.strip() or None
+            content=TEMPLATE_CONTENT.strip() or None,
+            example_content=TEMPLATE_EXAMPLE or None
         )
-        db.add(template)
+        db.add(new_template)
         db.commit()
 
     db.close()
 
-def custom():
-    db: Session = SessionLocal()
-
-    if not db.query(MailTemplate).filter_by(sender_type=SENDER_TYPE, type="custom").first():
-        print(f"🌱 Seede Custom-{SENDER_TYPE}-Template...")
-        template = MailTemplate(
-            type="custom",
-            sender_type=SENDER_TYPE,
-            content=TEMPLATE_CONTENT.strip() or None
-        )
-        db.add(template)
-        db.commit()
-
-    db.close()

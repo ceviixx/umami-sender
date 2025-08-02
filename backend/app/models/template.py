@@ -1,6 +1,6 @@
 # app/models/template.py
 
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Text, JSON, Boolean
 from app.database import Base
 
 class MailTemplate(Base):
@@ -10,3 +10,5 @@ class MailTemplate(Base):
     type = Column(Text, nullable=False, default='default')
     sender_type = Column(Text, nullable=False, default='email')
     content = Column(Text, nullable=True)
+    example_content = Column(JSON, nullable=True)
+    is_customized = Column(Boolean, nullable=False, default=False, server_default="false")

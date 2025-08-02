@@ -93,13 +93,6 @@ Thanks to the built-in NGINX reverse proxy, everything runs on port 80:
 | `/`       | Web UI (Next.js)     |
 | `/api/*`  | Backend API (FastAPI)|
 
-👉 In the frontend, make sure to prefix API calls with `/api`:
-
-```ts
-// Example API call
-const res = await fetch('/api/umami');
-```
-
 ---
 
 ## 🔐 Security

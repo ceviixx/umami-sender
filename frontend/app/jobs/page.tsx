@@ -48,14 +48,14 @@ export default function MailerPage() {
     yearly: locale.enums.frequency.yearly
   };
 
+  if (loading) { return <LoadingSpinner title={locale.pages.jobs} /> }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
         title={locale.pages.jobs}
         href='/jobs/new'
       />
-
-      {loading && <LoadingSpinner />}
 
       {jobs.length === 0 ? (
         <EmptyState />

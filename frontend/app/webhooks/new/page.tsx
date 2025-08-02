@@ -46,20 +46,20 @@ export default function NewWebhookPage() {
   }
 
   const handleTest = async () => {
-      setTesting(true)
-      try {
-        const payload = {
-          ...form
-        }
-        await testWebhook(payload)
-        showSuccess('Test success!')
-        console.log(payload)
-      } catch (e: any) {
-        showError(`Error: ${e.message || 'Connection failure.'}`)
-      } finally {
-        setTesting(false)
+    setTesting(true)
+    try {
+      const payload = {
+        ...form
       }
+      await testWebhook(payload)
+      showSuccess('Test success!')
+      console.log(payload)
+    } catch (e: any) {
+      showError(`Error: ${e.message || 'Connection failure.'}`)
+    } finally {
+      setTesting(false)
     }
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">

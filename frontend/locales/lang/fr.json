@@ -8,6 +8,8 @@
     "templates": ""
   },
   "buttons": {
+    "close": "",
+    "refresh": "",
     "save": "",
     "update": "",
     "edit": "",
@@ -129,6 +131,17 @@
     "job_content_type": {
       "summary": "",
       "report": ""
+    },
+    "sender_report_template_type": {
+      "EMAIL_SUMMARY": "",
+      "EMAIL_REPORT_INSIGHTS": "",
+      "EMAIL_REPORT_ATTRIBUTION": "",
+      "EMAIL_REPORT_FUNNEL": "",
+      "EMAIL_REPORT_GOALS": "",
+      "EMAIL_REPORT_JOURNEY": "",
+      "EMAIL_REPORT_RETENTION": "",
+      "EMAIL_REPORT_REVENUE": "",
+      "EMAIL_REPORT_UTM": ""
     }
   },
   "messages": {
@@ -154,6 +167,9 @@
     "general": "",
     "config": "",
     "recipients": "",
-    "overview": ""
+    "overview": "",
+    "template_preview": "",
+    "preview": "",
+    "preview_refreshed": ""
   }
 }

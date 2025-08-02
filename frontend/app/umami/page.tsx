@@ -35,14 +35,14 @@ export default function SettingsPage() {
     }
   }
 
+  if (loading) { return <LoadingSpinner title={locale.pages.umami} /> }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
         title={locale.pages.umami}
         href='/umami/new'
       />
-
-      {loading && <LoadingSpinner />}
 
       {instances.length === 0 ? (
         <EmptyState />
