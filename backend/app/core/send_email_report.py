@@ -4,6 +4,7 @@ from app.models.sender import Sender
 from app.models.template import MailTemplate
 from app.core.send_email import send_email
 from app.core.render_template import render_template
+from app.models.template_styles import MailTemplateStyle
 
 def send_email_report(db: Session, job: Job, summary: dict):
     sender = db.query(Sender).filter_by(id=job.sender_id).first()
@@ -14,14 +15,25 @@ def send_email_report(db: Session, job: Job, summary: dict):
     job_report_type = job.report_type.upper()
     sender_type = 'EMAIL_' + job_report_type + (f'_{report_type}' if report_type else '')
 
-    # template = db.query(MailTemplate).filter_by(type=job.template_type, sender_type='EMAIL').first()
-    template = db.query(MailTemplate).filter_by(type=job.template_type, sender_type=sender_type).first()
+    template = db.query(MailTemplate).filter_by(
+        type=job.template_type, 
+        sender_type=sender_type
+    ).first()
+
     if not template:
         raise Exception(f"Mail template not found. {sender_type}")
+
+    if template.style_id:
+        style = db.query(MailTemplateStyle).filter_by(id=template.style_id).first()
+    else:
+        style = db.query(MailTemplateStyle).filter_by(is_default=True).first()
+    css = style.css if style else ""
+
 
     html_body = render_template(template.content, {
         "summary": summary,
         "job": job,
+        "inline_css": css,
     })
 
     text_body = "No plain text available"

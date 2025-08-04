@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.template import MailTemplate
 from app.schemas.template import MailTemplateCreate, MailTemplateOut, MailTemplateUpdate, MailTemplateList
+from app.models.template_styles import MailTemplateStyle
 from sqlalchemy import and_
 from app.utils.responses import send_status_response
 from app.core.render_template import render_template
@@ -42,11 +43,19 @@ def get_preview(template_type: str, db: Session = Depends(get_db)):
             status=404,
             detail=f"No template found for type '{template_type}'"
         )
+    
+    if template.style_id:
+        style = db.query(MailTemplateStyle).filter_by(id=template.style_id).first()
+    else:
+        style = db.query(MailTemplateStyle).filter_by(is_default=True).first()
+    css = style.css if style else ""
+
     try:
         example_content = template.example_content
         if "summary" not in example_content or not isinstance(example_content["summary"], dict):
             example_content["summary"] = {}
         example_content["summary"]["embedded_logo"] = embedded_logo()
+        example_content["inline_css"] = css
         html = render_template(template.content, example_content or {})
         return HTMLResponse(content=html)
     except (KeyError, TypeError) as e:

@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   }}
                   containerStyle={{ 
                     zIndex: 9999,
-                    marginTop: '72px',
+                    marginTop: '0px',
                   }}
                   reverseOrder={false}
                   gutter={8}

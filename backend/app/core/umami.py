@@ -145,6 +145,11 @@ def fetch_report_summary(instance: Umami, job: Job):
         "type": type,
         "result": content
     }
+
+    dateRange = parameters.get("dateRange", {}).get("value", "")
+    formattedDateRange = format_date_range(dateRange)
+
+    returnObject['period'] = f'{formattedDateRange}'
     return returnObject
 
 
@@ -176,3 +181,44 @@ def runReport(instance, type, parameters):
     url = f"{hostname}/reports/{type}"
     response = requests.post(url, headers=headers, json=parameters)
     return response.json()
+
+
+
+
+
+
+def format_date_range(date_range: str) -> str:
+    if date_range == "0day":
+        return "Today"
+    elif date_range == "24hour":
+        return "Last 24 hours"
+    elif date_range == "0week":
+        return "This week"
+    elif date_range == "7day":
+        return "Last 7 days"
+    elif date_range == "0month":
+        return "This month"
+    elif date_range == "30day":
+        return "Last 30 days"
+    elif date_range == "90day":
+        return "Last 90 days"
+    elif date_range == "0year":
+        return "This year"
+    elif date_range == "6month":
+        return "Last 6 months"
+    elif date_range == "12month":
+        return "Last 12 months"
+    elif date_range.startswith("range:"):
+        try:
+            parts = date_range.split(":")
+            if len(parts) == 3:
+                start_ts = int(parts[1]) / 1000
+                end_ts = int(parts[2]) / 1000
+
+                start_date = datetime.utcfromtimestamp(start_ts).strftime("%B %d, %Y")
+                end_date = datetime.utcfromtimestamp(end_ts).strftime("%B %d, %Y")
+
+                return f"{start_date} – {end_date}"
+        except Exception as e:
+            print("Error parsing dateRange:", e)
+    return None

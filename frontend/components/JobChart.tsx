@@ -15,7 +15,7 @@ import { Line } from 'react-chartjs-2';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
 type JobEntry = {
-  date: string;    // adjust if you use Date objects or something else
+  date: string;
   success: number;
   failed: number;
   skipped: number;
@@ -50,7 +50,6 @@ const JobLineChart = ({ jobData }: JobLineChartProps) => {
     ],
   };
 
-  // Explicit type for options
   const options: ChartOptions<'line'> = {
     responsive: true,
     plugins: {
@@ -58,7 +57,7 @@ const JobLineChart = ({ jobData }: JobLineChartProps) => {
         display: false,
       },
       tooltip: {
-        mode: 'index' as const,  // <-- here we use 'as const' to tell TypeScript this is a valid literal
+        mode: 'index' as const,
         intersect: false,
       },
     },
