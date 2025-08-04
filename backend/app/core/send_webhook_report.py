@@ -4,6 +4,7 @@ from app.models.webhooks import WebhookRecipient
 from app.core.send_webhook import send_webhook
 from app.models.template import MailTemplate
 from app.core.render_template import render_template
+from app.utils.response_clean import process_api_response
 import json
 
 def send_webhook_report(db: Session, job: Job, summary: dict):
@@ -24,6 +25,7 @@ def send_webhook_report(db: Session, job: Job, summary: dict):
             "summary": summary,
             "job": job,
         })
+        html_body = process_api_response(response=html_body, db=db)
 
         json_body = json.loads(html_body)
         send_webhook(

@@ -8,6 +8,7 @@ from sqlalchemy import and_
 from app.utils.responses import send_status_response
 from app.core.render_template import render_template
 from app.core.generate_report_summary import embedded_logo
+from app.utils.response_clean import process_api_response
 
 router = APIRouter(prefix="/templates", tags=["templates"])
 
@@ -56,6 +57,9 @@ def get_preview(template_type: str, db: Session = Depends(get_db)):
             example_content["summary"] = {}
         example_content["summary"]["embedded_logo"] = embedded_logo()
         example_content["inline_css"] = css
+
+        example_content = process_api_response(response=example_content, db=db)
+
         html = render_template(template.content, example_content or {})
         return HTMLResponse(content=html)
     except (KeyError, TypeError) as e:

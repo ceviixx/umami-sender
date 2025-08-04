@@ -55,7 +55,7 @@ export default function Dashboard() {
       </div>
 
       <div className="pt-10">
-        <div className="bg-white rounded-lg border p-6 flex flex-col justify-between">
+        <div className="bg-white rounded-lg border p-3 flex flex-col justify-between">
           <JobChart jobData={logStats} />
         </div>
       </div>
