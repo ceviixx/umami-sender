@@ -74,10 +74,15 @@ nginx/     # Reverse proxy for unified access
 - [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 - Optional: Node.js (for local frontend development)
 
-### Start the app
+### Start the App (Local Build)
 
 ```bash
-docker-compose up --build
+docker compose -f docker-compose.build.yml up --build
+```
+
+### Start the App (Using GHCR Images)
+```bash
+docker compose -f docker-compose.ghcr.yml up
 ```
 
 ### Available at:

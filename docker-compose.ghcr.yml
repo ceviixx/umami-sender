@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  proxy:
+    image: nginx:stable
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
+  frontend:
+    container_name: frontend
+    image: ghcr.io/ceviixx/umami-sender-frontend:latest
+    expose:
+      - "3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=/api
+
+  backend:
+    container_name: backend
+    image: ghcr.io/ceviixx/umami-sender-backend:latest
+    expose:
+      - "8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db/umamisender
+      - REDIS_URL=redis://redis:6379/0
+      - CLOUD_HOSTNAME=https://api.umami.is/v1
+
+  worker:
+    container_name: worker
+    image: ghcr.io/ceviixx/umami-sender-worker:latest
+    depends_on:
+      - backend
+      - redis
+      - db
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db/umamisender
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/worker
+
+  beat:
+    container_name: beat
+    image: ghcr.io/ceviixx/umami-sender-beat:latest
+    depends_on:
+      - backend
+      - redis
+      - db
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db/umamisender
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/worker/app
+    command: >
+      celery -A tasks.worker beat --loglevel=info
+
+  redis:
+    container_name: redis
+    image: redis:7
+    restart: always
+
+  db:
+    container_name: db
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: umamisender
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "54321:5432"
+
+volumes:
+  pgdata:
