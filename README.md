@@ -15,6 +15,15 @@
   <a href="https://github.com/ceviixx/UmamiSender/actions">
     <img src="https://img.shields.io/github/actions/workflow/status/ceviixx/UmamiSender/ci.yml" alt="CI Status" />
   </a>
+  <a href="">
+    <img src="https://img.shields.io/badge/node-20.19.x-brightgreen" alt="node" />
+  </a>
+  <a href="">
+    <img src="https://img.shields.io/badge/Next.js-14.2.30-blue" alt="next.js" />
+  </a>
+  <a href="https://umami.is">
+    <img src="https://img.shields.io/badge/umami-2.19.x-black" alt="umami" />
+  </a>
 </p>
 
 ---
@@ -65,10 +74,15 @@ nginx/     # Reverse proxy for unified access
 - [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 - Optional: Node.js (for local frontend development)
 
-### Start the app
+### Start the App (Local Build)
 
 ```bash
-docker-compose up --build
+docker compose -f docker-compose.build.yml up --build
+```
+
+### Start the App (Using GHCR Images)
+```bash
+docker compose -f docker-compose.ghcr.yml up
 ```
 
 ### Available at:
@@ -86,13 +100,6 @@ Thanks to the built-in NGINX reverse proxy, everything runs on port 80:
 |-----------|----------------------|
 | `/`       | Web UI (Next.js)     |
 | `/api/*`  | Backend API (FastAPI)|
-
-👉 In the frontend, make sure to prefix API calls with `/api`:
-
-```ts
-// Example API call
-const res = await fetch('/api/umami');
-```
 
 ---
 
@@ -121,11 +128,4 @@ Pull requests, suggestions, and bug reports are very welcome!
 
 ## 💬 Community
 
-Got questions or feedback?  
-Join the community on Discord:
-
-<p align="leading">
-  <a href="https://discord.gg/tX4XQT7cG7">
-    <img src="https://img.shields.io/badge/Discord-Join-blue?style=for-the-badge&logo=discord&logoColor=white" height="28" />
-  </a>
-</p>
+Got questions or feedback? Create issue or PR on GitHub

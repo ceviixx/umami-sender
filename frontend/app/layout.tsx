@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <aside className="fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] bg-gray-50 border-r border-gray-200 shadow-sm z-10 flex flex-col">
                 <Sidebar />
               </aside>
-              <main className="ml-64 flex-1 overflow-y-auto p-6 bg-gray-50">
+              <main className="ml-64 flex-1 overflow-y-auto p-6 bg-white-50">
                 {children}
                 <Toaster
                   position="top-right"
@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   }}
                   containerStyle={{ 
                     zIndex: 9999,
-                    marginTop: '72px',
+                    marginTop: '0px',
                   }}
                   reverseOrder={false}
                   gutter={8}

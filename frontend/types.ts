@@ -6,6 +6,13 @@ export interface UmamiInstance {
   type: UmamiType
 }
 
+export interface Template {
+  id: number
+  type: string
+  sender_type: string
+  description: string
+  content: string
+}
 
 export type Sender = {
   id: number
@@ -34,7 +41,7 @@ export type MailerJob = {
   host_name: string
   website_id: string
   website_name: string
-  frequency: 'daily' | 'weekly' | 'monhtly'
+  frequency: 'daily' | 'weekly' | 'monthly'
   day: string | null
   report_type: string
   is_active: boolean
@@ -46,6 +53,7 @@ export type MailerJobUpdate = {
   name: string
   host_id: number
   website_id: string
+  sender_id: number | null
   frequency: 'daily' | 'weekly' | 'monthly'
   day: number | null
   is_active: boolean

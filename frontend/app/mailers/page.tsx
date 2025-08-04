@@ -2,9 +2,12 @@
 
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
-import { deleteSender, fetchSenders } from '@/lib/api'
+import { 
+  fetchMailers, 
+  deleteMailer 
+
+} from '@/lib/api/mailers'
 import { Sender } from '@/types'
-import SenderForm from '@/components/SenderForm'
 import ConfirmDelete from '@/components/ConfirmDelete'
 import EmptyState from '@/components/EmptyState'
 import ContextMenu from '@/components/ContextMenu'
@@ -19,10 +22,8 @@ export default function SendersPage() {
   const router = useRouter()
   const { locale } = useI18n()
 
-  const [showForm, setShowForm] = useState(false)
-
   useEffect(() => {
-    fetchSenders()
+    fetchMailers()
       .then(setSenders)
       .finally(() => setLoading(false))
   }, [])
@@ -30,20 +31,20 @@ export default function SendersPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const handleDelete = async () => {
     if (deleteId !== null) {
-      await deleteSender(deleteId)
+      await deleteMailer(deleteId)
       setDeleteId(null)
       setSenders(prev => prev.filter(w => w.id !== deleteId))
     }
   }
 
+  if (loading) { return <LoadingSpinner title={locale.pages.mailer} /> }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
-        title={locale.pages.sender}
-        href='/senders/new'
+        title={locale.pages.mailer}
+        href='/mailers/new'
       />
-
-      {loading && <LoadingSpinner />}
 
       {senders.length === 0 ? (
         <EmptyState />
@@ -57,7 +58,7 @@ export default function SendersPage() {
               </div>
 
               <ContextMenu
-                onEdit={() => router.push(`/senders/${sender.id}`)}
+                onEdit={() => router.push(`/mailers/${sender.id}`)}
                 onDelete={() => setDeleteId(sender.id)}
               />
             </li>
@@ -68,17 +69,6 @@ export default function SendersPage() {
             onCancel={() => setDeleteId(null)}
           />
         </ul>
-      )}
-      
-      {showForm && (
-        <SenderForm
-          sender={editing}
-          onClose={() => setShowForm(false)}
-          onSuccess={async () => {
-            setShowForm(false)
-            await loadSenders()
-          }}
-        />
       )}
     </div>
   )

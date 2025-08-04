@@ -1,4 +1,4 @@
-from app.models.mailer import MailerJob
+from app.models.jobs import Job
 from app.models.umami import Umami
 from app.models.sender import Sender
 from app.models.template import MailTemplate
@@ -6,11 +6,11 @@ from app.models.webhooks import WebhookRecipient
 from app.core.send_email import send_email
 from app.core.send_webhook import send_webhook
 from app.core.umami import fetch_website_summary
-from app.core.mail_template import render_mail_template
+from app.core.render_template import render_template
 from sqlalchemy.orm import Session
 
-def send_report(db: Session, job: MailerJob):
-    """Creates and sends a report for a MailerJob via email and/or webhook."""
+def send_report(db: Session, job: Job):
+    """Creates and sends a report for a Job via email and/or webhook."""
 
     # Load Umami instance
     instance: Umami = db.query(Umami).filter_by(id=job.host_id).first()
@@ -29,7 +29,7 @@ def send_report(db: Session, job: MailerJob):
 
     # Generate email body
     text_body = "No Plain Text Version available."
-    html_body = render_mail_template(template.html, {
+    html_body = render_template(template.content, {
         "summary": summary,
         "job": job,
     })

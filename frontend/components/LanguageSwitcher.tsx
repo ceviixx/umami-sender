@@ -3,13 +3,19 @@
 import { useState, useRef, useEffect } from "react";
 import { useI18n } from "@/locales/I18nContext";
 import { GlobeAltIcon } from '@heroicons/react/20/solid';
+import { Language } from "@/locales";
+
+type LanguageOption = {
+  code: Language;
+  label: String;
+}
 
 const LanguageSwitcher = () => {
   const { lang, setLang } = useI18n();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const languages = [
+  const languages: LanguageOption[] = [
     { code: "en", label: "English" },
     { code: "de", label: "Deutsch" },
     { code: "fr", label: "Français" },
@@ -18,7 +24,6 @@ const LanguageSwitcher = () => {
 
   const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
 
-  // ❌ Click outside → Dropdown schließen
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

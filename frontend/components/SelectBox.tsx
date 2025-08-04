@@ -5,17 +5,18 @@ import { CheckIcon, ChevronUpDownIcon, XMarkIcon } from '@heroicons/react/20/sol
 
 interface Option {
   label: string
-  value: string
+  value: string | number
 }
 
 interface Props {
   label?: string
-  value: string
-  onChange: (value: string) => void
+  value: string | number | null
+  onChange: (value: string | null) => void
   options: Option[]
   placeholder?: string
   disabled?: boolean
   canClear?: boolean
+  hasCheckbox?: boolean
 }
 
 export default function SelectBox({
@@ -23,9 +24,10 @@ export default function SelectBox({
   onChange,
   options,
   label,
-  placeholder = 'Auswahl treffen',
+  placeholder,
   disabled,
-  canClear = false
+  canClear = false,
+  hasCheckbox = true
 }: Props) {
   const selected = options.find(opt => opt.value === value) || null
 
@@ -72,7 +74,7 @@ export default function SelectBox({
                 key={opt.value}
                 value={opt.value}
                 className={({ active }) =>
-                  `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                  `relative cursor-default select-none py-2 ${hasCheckbox ? ('pl-10') : ('pl-4')} pr-4 ${
                     active ? 'bg-blue-100 text-blue-900' : 'text-gray-900'
                   }`
                 }
@@ -82,7 +84,7 @@ export default function SelectBox({
                     <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
                       {opt.label}
                     </span>
-                    {selected && (
+                    {selected && hasCheckbox && (
                       <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
                         <CheckIcon className="h-5 w-5" aria-hidden="true" />
                       </span>

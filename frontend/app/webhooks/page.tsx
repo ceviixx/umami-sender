@@ -4,7 +4,10 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { fetchWebhookRecipients, deleteWebhookRecipient } from '@/lib/api'
+import { 
+  fetchWebhooks, 
+  deleteWebhook 
+} from '@/lib/api/webhook'
 import { WebhookRecipient } from '@/types'
 import ConfirmDelete from '@/components/ConfirmDelete'
 import EmptyState from '@/components/EmptyState'
@@ -19,7 +22,7 @@ export default function WebhooksPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchWebhookRecipients()
+    fetchWebhooks()
       .then(setWebhooks)
       .finally(() => setLoading(false))
   }, [])
@@ -27,11 +30,13 @@ export default function WebhooksPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const handleDelete = async () => {
     if (deleteId !== null) {
-      await deleteWebhookRecipient(deleteId)
+      await deleteWebhook(deleteId)
       setDeleteId(null)
       setWebhooks(prev => prev.filter(w => w.id !== deleteId))
     }
   }
+
+  if (loading) { return <LoadingSpinner title={locale.pages.webhook} /> }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -39,8 +44,6 @@ export default function WebhooksPage() {
         title={locale.pages.webhook}
         href='/webhooks/new'
       />
-
-      {loading && <LoadingSpinner />}
 
       {webhooks.length === 0 ? (
         <EmptyState />

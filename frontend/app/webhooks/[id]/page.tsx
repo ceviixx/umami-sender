@@ -3,7 +3,11 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { fetchWebhookRecipient, testWebook, updateWebhookRecipient } from '@/lib/api'
+import { 
+  fetchWebhook, 
+  updateWebhook, 
+  testWebhook 
+} from '@/lib/api/webhook'
 import { WebhookRecipient } from '@/types'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import SelectBox from '@/components/SelectBox'
@@ -11,17 +15,22 @@ import PageHeader from '@/components/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
+import test from "node:test";
 
 export default function EditWebhookPage() {
   const { id } = useParams()
   const router = useRouter()
+  const [loading, setLoading] = useState(true)
+
   const { locale } = useI18n()
   const [form, setForm] = useState<WebhookRecipient | null>(null)
   const [testing, setTesting] = useState(false)
 
   useEffect(() => {
     if (id) {
-      fetchWebhookRecipient(Number(id)).then(setForm)
+      fetchWebhook(Number(id))
+      .then(setForm)
+      .finally(() => setLoading(false))
     }
   }, [id])
 
@@ -36,11 +45,10 @@ export default function EditWebhookPage() {
     if (!form) return
 
     try {
-      await updateWebhookRecipient(form.id, {
+      await updateWebhook(form.id, {
         name: form.name,
         url: form.url,
       })
-
       showSuccess('Updated')
     } catch (error: any) {
       const message = error?.response?.data?.detail || error?.message || 'Failed to update webhook'
@@ -54,19 +62,18 @@ export default function EditWebhookPage() {
       const payload = {
         ...form
       }
-      await testWebook(payload)
+      await testWebhook(payload)
       showSuccess('Test success!')
       console.log(payload)
     } catch (e: any) {
-      // setTestResult(`❌ Error: ${e.message || 'Connection failure.'}`)
       showError(`Error: ${e.message || 'Connection failure.'}`)
     } finally {
       setTesting(false)
     }
   }
 
-  // if (loading) { return <LoadingSpinner /> }
-
+  if (loading) { return <LoadingSpinner title={locale.ui.edit} /> }
+  
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
@@ -78,14 +85,14 @@ export default function EditWebhookPage() {
         <TextInput
           label={locale.forms.labels.name}
           name="name"
-          value={form?.name}
+          value={String(form?.name)}
           onChange={handleChange}
           placeholder={locale.forms.labels.name}
         />
         <TextInput
           label={form?.type === 'CUSTOM' ? locale.forms.labels.webhook_type.url : locale.forms.labels.webhook_type.token}
           name="url"
-          value={form?.url}
+          value={String(form?.url)}
           onChange={handleChange}
           placeholder={form?.type === 'CUSTOM' ? 'https://example.com/webhook' : 'xxxxxxxxxxxxxxxxxx'}
         />

@@ -1,6 +1,6 @@
 'use client'
 
-import { Listbox } from '@headlessui/react'
+import { Listbox, ListboxOption, ListboxOptions, ListboxButton } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
 interface Option {
@@ -40,7 +40,7 @@ export default function MultiSelectListbox({
 
       <Listbox as="div" disabled={disabled}>
         <div className="relative">
-          <Listbox.Button
+          <ListboxButton
             className={`relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm
               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
               ${disabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'text-gray-900'}`}
@@ -57,11 +57,11 @@ export default function MultiSelectListbox({
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
             </span>
-          </Listbox.Button>
+          </ListboxButton>
 
-          <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white border border-gray-200 py-1 text-base shadow-lg focus:outline-none sm:text-sm">
+          <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white border border-gray-200 py-1 text-base shadow-lg focus:outline-none sm:text-sm">
             {options.map(option => (
-              <Listbox.Option
+              <ListboxOption
                 key={option.id}
                 as="div"
                 className={({ active }) =>
@@ -70,6 +70,7 @@ export default function MultiSelectListbox({
                   }`
                 }
                 onClick={() => toggleOption(option.id)}
+                value=''
               >
                 <span className={`block truncate ${selected.includes(option.id) ? 'font-medium' : 'font-normal'}`}>
                   {option.name}
@@ -79,9 +80,9 @@ export default function MultiSelectListbox({
                     <CheckIcon className="h-5 w-5" aria-hidden="true" />
                   </span>
                 )}
-              </Listbox.Option>
+              </ListboxOption>
             ))}
-          </Listbox.Options>
+          </ListboxOptions>
         </div>
       </Listbox>
     </div>

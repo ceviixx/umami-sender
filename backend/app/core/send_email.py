@@ -11,7 +11,6 @@ def send_email(sender: Sender, to: list[str], subject: str, body: str, html: str
         "port": sender.smtp_port,
     }
 
-    # SMTP-Verbindung aufbauen (außerhalb der Schleife, wenn möglich)
     if sender.use_ssl:
         server = smtplib.SMTP_SSL(**smtp_args)
     else:
@@ -21,18 +20,15 @@ def send_email(sender: Sender, to: list[str], subject: str, body: str, html: str
 
     server.login(sender.smtp_username, sender.smtp_password)
 
-    # Für jeden Empfänger eine eigene Mail senden
     for recipient in to:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
         msg["From"] = sender.email
         msg["To"] = recipient
 
-        # Text-Version
         text_part = MIMEText(body, "plain")
         msg.attach(text_part)
 
-        # HTML-Version (optional)
         if html:
             html_part = MIMEText(html, "html")
             msg.attach(html_part)

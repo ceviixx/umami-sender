@@ -3,9 +3,11 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { deleteInstance, fetchInstances } from '@/lib/api'
+import { 
+  fetchUmamis, 
+  deleteUmami 
+} from '@/lib/api/umami'
 import { UmamiInstance } from '@/types'
-import InstanceForm from '@/components/InstanceForm'
 import ConfirmDelete from '@/components/ConfirmDelete'
 import EmptyState from '@/components/EmptyState'
 import ContextMenu from '@/components/ContextMenu'
@@ -18,13 +20,8 @@ export default function SettingsPage() {
   const router = useRouter()
   const { locale } = useI18n()
 
-  const loadInstances = async () => {
-    const data = await fetchInstances()
-    setInstances(data)
-  }
-
   useEffect(() => {
-    fetchInstances()
+    fetchUmamis()
       .then(setInstances)
       .finally(() => setLoading(false))
   }, [])
@@ -32,20 +29,20 @@ export default function SettingsPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const handleDelete = async () => {
     if (deleteId !== null) {
-      await deleteInstance(deleteId)
+      await deleteUmami(deleteId)
       setDeleteId(null)
-      loadInstances()
+      setInstances(prev => prev.filter(w => w.id !== deleteId))
     }
   }
+
+  if (loading) { return <LoadingSpinner title={locale.pages.umami} /> }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
         title={locale.pages.umami}
-        href='/umami-config/new'
+        href='/umami/new'
       />
-
-      {loading && <LoadingSpinner />}
 
       {instances.length === 0 ? (
         <EmptyState />
@@ -56,12 +53,12 @@ export default function SettingsPage() {
               <div>
                 <div className="font-semibold">{instance.name}</div>
                 <div className="text-sm text-gray-600">
-                  {instance.type === 'cloud' ? locale.enums.service_type.cloud : locale.enums.service_type.selfhost}
+                  {locale.enums.service_type[instance.type as 'cloud' | 'self_hosted'] || instance.type}
                 </div>
               </div>
 
               <ContextMenu
-                onEdit={() => router.push(`/umami-config/${instance.id}`)}
+                onEdit={() => router.push(`/umami/${instance.id}`)}
                 onDelete={() => setDeleteId(instance.id)}
               />
             </li>

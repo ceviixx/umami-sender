@@ -1,9 +1,9 @@
 import requests
 from app.models.webhooks import WebhookRecipient
-from app.models.mailer import MailerJob
+from app.models.jobs import Job
 from typing import Any
 
-def send_webhook(webhook: WebhookRecipient, summary: dict, job: MailerJob):
+def send_webhook(webhook: WebhookRecipient, summary: dict, job: Job):
     """Sends a report summary via webhook to the given recipient."""
 
     url = build_webhook_url(webhook)
@@ -23,6 +23,7 @@ def send_webhook(webhook: WebhookRecipient, summary: dict, job: MailerJob):
             timeout=10
         )
         response.raise_for_status()
+        
     except Exception as e:
         raise Exception(f"Webhook failed for {webhook.name} ({webhook.type}): {e}")
 
@@ -50,7 +51,7 @@ def build_webhook_url(webhook: WebhookRecipient) -> str:
     raise ValueError(f"Unsupported webhook type: {webhook.type}")
 
 
-def build_payload(webhook: WebhookRecipient, summary: dict, job: MailerJob) -> dict:
+def build_payload(webhook: WebhookRecipient, summary: dict, job: Job) -> dict:
     """Generates the webhook message payload based on the webhook type."""
 
     # Fallback title/summary

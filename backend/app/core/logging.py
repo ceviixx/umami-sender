@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
-from app.models.log import MailerJobLog
+from app.models.jobs_log import JobLog
 
 def log_mailer_job(db: Session, job_id: int, status: str, error: str = None, channel: str = "email"):
-    from app.models.log import MailerJobLog
+    from app.models.jobs_log import JobLog
 
-    log = MailerJobLog(
+    log = JobLog(
         job_id=job_id,
         status=status,
         error=error,
-        channel=channel 
+        channel=channel
     )
     db.add(log)
     db.commit()

@@ -28,7 +28,7 @@ class SenderOut(BaseModel):
     use_ssl: bool
 
     class Config:
-        from_attributes = True  # für SQLAlchemy in Pydantic v2
+        from_attributes = True 
 
 class SenderBase(BaseModel):
     name: str

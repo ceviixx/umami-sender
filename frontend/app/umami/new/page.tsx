@@ -3,9 +3,7 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { UmamiInstance, UmamiType } from '@/types'
-import { createInstance, updateInstance } from '@/lib/api'
-import SelectBox from '@/components/SelectBox'
+import { createUmami } from '@/lib/api/umami'
 import PageHeader from '@/components/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/TextInput'
@@ -38,9 +36,9 @@ export default function InstanceForm() {
     setError(null)
 
     try {
-      await createInstance(form)
+      await createUmami(form)
       showSuccess('Umami-Instanz erfolgreich gespeichert')
-      router.push('/umami-config')
+      router.push('/umami')
     } catch (err: any) {
       const message = err?.response?.data?.detail || err?.message || 'Fehler beim Speichern'
       setError(message)

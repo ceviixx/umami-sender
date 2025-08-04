@@ -3,16 +3,16 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import {
-  fetchMailJobs,
-  deleteMailerJob,
-} from '@/lib/api'
+  fetchJobs,
+  deleteJob,
+} from '@/lib/api/jobs'
 import { MailerJob } from '@/types'
 import ConfirmDelete from '@/components/ConfirmDelete'
 import EmptyState from '@/components/EmptyState'
 import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
-import { ListItem } from '@/components/ListItem'
+
 import { 
   PaperAirplaneIcon,
   PuzzlePieceIcon
@@ -26,7 +26,7 @@ export default function MailerPage() {
   const { locale } = useI18n()
 
   useEffect(() => {
-    fetchMailJobs()
+    fetchJobs()
       .then(setJobs)
       .finally(() => setLoading(false))
   }, [])
@@ -34,7 +34,7 @@ export default function MailerPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const handleDelete = async () => {
     if (deleteId !== null) {
-      await deleteMailerJob(deleteId)
+      await deleteJob(deleteId)
       setDeleteId(null)
       setJobs(prev => prev.filter(w => w.id !== deleteId))
     }
@@ -48,14 +48,14 @@ export default function MailerPage() {
     yearly: locale.enums.frequency.yearly
   };
 
+  if (loading) { return <LoadingSpinner title={locale.pages.jobs} /> }
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
         title={locale.pages.jobs}
         href='/jobs/new'
       />
-
-      {loading && <LoadingSpinner />}
 
       {jobs.length === 0 ? (
         <EmptyState />
@@ -74,7 +74,8 @@ export default function MailerPage() {
                 <div>
                   <div className="font-semibold">{job.name}</div>
                   <div className="text-gray-600 text-sm">
-                    {locale.forms.labels.frequency}: {frequencyMap[job.frequency] || 'Unknown'} | {locale.forms.labels.type} {job.report_type}
+                    {locale.forms.labels.frequency}: {frequencyMap[job.frequency] || 'Unknown'} | {locale.forms.labels.type}: {locale.enums.job_content_type[job.report_type as 'summary' | 'report'] || job.report_type}
+
                   </div>
                   
                 </div>

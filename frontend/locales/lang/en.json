@@ -3,11 +3,13 @@
     "dashboard": "Dashboard",
     "umami": "Umami",
     "jobs": "Jobs",
-    "sender": "Mailer",
+    "mailer": "Mailer",
     "webhook": "Webhook",
     "templates": "Templates"
   },
   "buttons": {
+    "close": "Close",
+    "refresh": "Refresh",
     "save": "Save",
     "update": "Update",
     "edit": "Edit",
@@ -54,10 +56,13 @@
       "password": "Password",
       "type": "Type",
       "name": "Name",
+      "description": "Description",
       "frequency": "Frequency",
       "weekday": "Weekday",
       "day": "Day",
-      "webhook_recipients": "Webhook Recipients"
+      "webhook_recipients": "Webhook Recipients",
+      "report": "Report",
+      "execution_time": "Execution time"
     },
     "placeholders": {
       "choose_website": "– Choose website –",
@@ -65,12 +70,28 @@
       "choose_sender": "– Choose sender –",
       "choose_umami": "– Choose Umami instance –",
       "choose_webhook_type": "– Choose type –",
+      "choose_sender_type": "- Choose type -",
       "choose_webhook": "- Choose webhook(s) -",
       "choose_day": "- Choose day -",
+      "choose_report": "- Choose report -",
       "loading": "– Loading... –"
+    },
+    "errors": {
+      "max_items": "Maximum of {max} items allowed"
     }
   },
   "enums": {
+    "template_insert_placeholder": {
+      "job_name": "Job name",
+      "period": "Period",
+      "pageviews": "Pageviews",
+      "visits": "Visits",
+      "visitors": "Visitors",
+      "bounce_rate": "Bounce rate",
+      "visit_duration": "Visit duration",
+      "top_pageviews": "Top pageviews",
+      "top_referrer": "Top referrer"
+    },
     "frequency": {
       "unknown": "Unknown",
       "hourly": "Hourly",
@@ -86,7 +107,41 @@
     },
     "service_type": {
       "cloud": "Cloud",
-      "selfhost": "Selfhost"
+      "selfhost": "Selfhost",
+      "self_hosted": "Selfhost"
+    },
+    "metrics": {
+      "stats": "Stats",
+      "url": "Pages",
+      "referrer": "Referrers",
+      "channel": "Channels",
+      "browser": "Stats",
+      "os": "Operating system",
+      "device": "Devices",
+      "country": "Countries",
+      "region": "Regions",
+      "city": "Cities",
+      "language": "Languages",
+      "screen": "Screens",
+      "event": "Events",
+      "query": "Query parameters",
+      "host": "Hosts",
+      "tag": "Tags"
+    },
+    "job_content_type": {
+      "summary": "Summary",
+      "report": "Report"
+    },
+    "sender_report_template_type": {
+      "EMAIL_SUMMARY": "Statistic Summary",
+      "EMAIL_REPORT_INSIGHTS": "Insights",
+      "EMAIL_REPORT_ATTRIBUTION": "Attribution",
+      "EMAIL_REPORT_FUNNEL": "Funnel",
+      "EMAIL_REPORT_GOALS": "Goals",
+      "EMAIL_REPORT_JOURNEY": "Journey",
+      "EMAIL_REPORT_RETENTION": "Retention",
+      "EMAIL_REPORT_REVENUE": "Revenue",
+      "EMAIL_REPORT_UTM": "UTM"
     }
   },
   "messages": {
@@ -107,6 +162,14 @@
     "edit": "Edit",
     "create": "Create",
     "webhook": "Webhook",
-    "mail": "Mail"
+    "mail": "Mail",
+    "setup": "Setup",
+    "general": "General",
+    "config": "Config",
+    "recipients": "Recipients",
+    "overview": "Overview",
+    "template_preview": "Template Preview",
+    "preview": "Preview",
+    "preview_refreshed": "Preview refreshed"
   }
 }

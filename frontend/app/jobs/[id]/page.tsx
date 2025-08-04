@@ -1,29 +1,93 @@
-'use client'
-
+'use client';
 import { useI18n } from "@/locales/I18nContext";
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import {
-  fetchInstances,
-  fetchMailerJob,
-  fetchWebsitesByInstance,
-  updateMailerJob,
-  fetchWebhookRecipients,
-  fetchSenders,
-} from '@/lib/api'
-import { MailerJobUpdate, UmamiInstance, Website, WebhookRecipient, Sender } from '@/types'
+import PageHeader from '@/components/PageHeader'
+import TextInput from '@/components/TextInput'
 import SelectBox from '@/components/SelectBox'
 import MultiSelectListbox from "@/components/MultiSelectListbox";
-import LoadingSpinner from '@/components/LoadingSpinner'
-import PageHeader from '@/components/PageHeader'
-import FormButtons from '@/components/FormButtons'
-import TextInput from '@/components/TextInput'
-import { showError, showSuccess } from "@/lib/toast";
+import ListInput from "@/components/ListInput";
+import TimePicker from "@/components/TimePicker";
+import FormButtons from "@/components/FormButtons";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { UmamiInstance, Website, Sender, WebhookRecipient, Template } from '@/types'
+import { 
+  ChevronLeftIcon,
+  ChevronRightIcon
+ } from '@heroicons/react/20/solid';
+import CheckboxPicker from "@/components/CheckboxPicker";
+import {
+  fetchJob,
+  updateJob
+} from '@/lib/api/jobs'
+import {
+  fetchUmamis,
+  fetchWebsitesByUmami,
+  fetchReportsByWebsite
+} from '@/lib/api/umami'
+import {
+  fetchMailers
+} from '@/lib/api/mailers'
+import {
+  fetchWebhooks
+} from '@/lib/api/webhook'
+import {
+  fetchTemplates
+} from '@/lib/api/templates'
 
-export default function EditMailerPage() {
-  const { id } = useParams()
+
+export default function Jobs_Edit({ params }: { params: { id: number } }) {
   const router = useRouter()
-  const { locale } = useI18n()
+  const { locale } = useI18n();
+  const [loading, setLoading] = useState(true)
+
+  const sections = [
+    locale.ui.general, 
+    locale.ui.config, 
+    locale.ui.recipients, 
+    locale.ui.overview
+  ];
+
+  const [isStepValid, setIsStepValid] = useState(false);
+  const [active, setActive] = useState(0);
+  const [form, setForm] = useState<{
+    name: string;
+    sender_id: number | null;
+    host_id: number | null;
+    website_id: string;
+    report_type: string;
+    summary_items: string[];
+    report_id: string | null;
+    frequency: string;
+    day: number | null;
+    execution_time: string;
+    email_recipients: string[];
+    webhook_recipients: number[];
+    is_active: boolean;
+  }>({
+    name: '',
+    sender_id: null,
+    host_id: null,
+    website_id: '',
+    report_type: 'summary',
+    summary_items: [],
+    report_id: null,
+    frequency: 'daily',
+    day: null,
+    execution_time: '08:00',
+    email_recipients: [],
+    webhook_recipients: [],
+    is_active: true
+  });
+
+
+  const [reportsLoading, setReportsLoading] = useState(false);
+  const [reports, setReports] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [senders, setSenders] = useState<Sender[]>([])
+  const [webhookOptions, setWebhookOptions] = useState<WebhookRecipient[]>([])
+  const [instances, setInstances] = useState<UmamiInstance[]>([])
+  const [websites, setWebsites] = useState<Website[]>([])
 
   const WEEKDAYS = [
     { value: 0, label: locale.weekdays.monday },
@@ -34,302 +98,457 @@ export default function EditMailerPage() {
     { value: 5, label: locale.weekdays.saturday },
     { value: 6, label: locale.weekdays.sunday },
   ]
-
-  const [instances, setInstances] = useState<UmamiInstance[]>([])
-  const [websites, setWebsites] = useState<Website[]>([])
-  const [senders, setSenders] = useState<Sender[]>([])
-  const [webhookOptions, setWebhookOptions] = useState<WebhookRecipient[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-
-  const [form, setForm] = useState({
-    name: '',
-    instance_id: '',
-    website_id: '',
-    sender_id: '',
-    frequency: 'daily',
-    day: '',
-    email_recipients: '',
-    webhook_recipients: [] as number[],
-    is_active: true,
-  })
-
-  useEffect(() => {
-    const load = async () => {
-      if (!id) return
-      try {
-        const job = await fetchMailerJob(Number(id))
-        setForm({
-          name: job.name,
-          instance_id: String(job.host_id),
-          website_id: job.website_id,
-          sender_id: job.sender_id ? String(job.sender_id) : '',
-          frequency: job.frequency,
-          day: job.day !== null ? String(job.day) : '',
-          email_recipients: job.email_recipients?.join(', ') || '',
-          webhook_recipients: job.webhook_recipients || [],
-          is_active: job.is_active,
-        })
-        const [instancesData, websitesData, webhookData, sendersData] = await Promise.all([
-          fetchInstances(),
-          fetchWebsitesByInstance(job.host_id),
-          fetchWebhookRecipients(),
-          fetchSenders(),
-        ])
-        setInstances(instancesData)
-        setWebsites(websitesData)
-        setWebhookOptions(webhookData)
-        setSenders(sendersData)
-      } catch (err) {
-        setError('Fehler beim Laden der Daten.')
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [id])
-
-  useEffect(() => {
-    if (!form.instance_id) return
-    const loadWebsites = async () => {
-      try {
-        const sites = await fetchWebsitesByInstance(Number(form.instance_id))
-        setWebsites(sites)
-        setError(null)
-      } catch (err) {
-        setWebsites([])
-        setError('Websites konnten nicht geladen werden.')
-      }
-    }
-    loadWebsites()
-  }, [form.instance_id])
-
-  useEffect(() => {
-    const hasEmail = form.sender_id && form.email_recipients.trim() !== '';
-    const hasWebhook = form.webhook_recipients.length > 0;
-
-    // Wenn weder Mail noch Webhook konfiguriert ist, deaktiviere automatisch
-    if (!hasEmail && !hasWebhook && form.is_active) {
-      setForm(prev => ({ ...prev, is_active: false }));
-    }
-
-    // Optional: Automatisch aktivieren, wenn wieder gültige Konfiguration gesetzt wird
-    if ((hasEmail || hasWebhook) && !form.is_active) {
-      setForm(prev => ({ ...prev, is_active: true }));
-    }
-  }, [form.sender_id, form.email_recipients, form.webhook_recipients]);
   
+  
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const options = [
+    { value: 'stats', label: locale.enums.metrics.stats },
+    { value: 'url', label: locale.enums.metrics.url },
+    { value: 'referrer', label: locale.enums.metrics.referrer },
+    { value: 'channel', label: locale.enums.metrics.channel },
+    { value: 'browser', label: locale.enums.metrics.browser },
+    { value: 'os', label: locale.enums.metrics.os },
+    { value: 'device', label: locale.enums.metrics.device },
+    { value: 'country', label: locale.enums.metrics.country },
+    { value: 'region', label: locale.enums.metrics.region },
+    { value: 'city', label: locale.enums.metrics.city },
+    { value: 'language', label: locale.enums.metrics.language },
+    { value: 'screen', label: locale.enums.metrics.screen },
+    { value: 'event', label: locale.enums.metrics.event },
+    { value: 'query', label: locale.enums.metrics.query },
+    { value: 'host', label: locale.enums.metrics.host },
+    { value: 'tag', label: locale.enums.metrics.tag },
+  ];
+
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> | { name: string, value: any }
   ) => {
-    const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
-  }
+    if ('target' in e) {
+      const { name, value } = e.target;
+      setForm((prev) => ({ ...prev, [name]: value }));
+    } else {
+      const { name, value } = e;
+
+      setForm((prev) => {
+        const updated = { ...prev, [name]: value };
+
+        // Typwechsel-Logik
+        if (name === 'report_type') {
+          if (value === 'report') {
+            updated.summary_items = [];
+          } else if (value === 'summary') {
+            updated.report_id = null;
+          }
+        }
+        if (name ==='frequency') {
+          updated.day = 0;
+        }
+        return updated;
+      });
+    }
+  };
+
+
+
+  useEffect(() => {
+    const loadAllData = async () => {
+      setLoading(true);
+      try {
+        // Paralleles Laden der "statischen" Daten
+        const [
+          umamis,
+          webhooks,
+          mailers,
+          templates,
+          job
+        ] = await Promise.all([
+          fetchUmamis(),
+          fetchWebhooks(),
+          fetchMailers(),
+          fetchTemplates(),
+          fetchJob(params.id)
+        ]);
+
+        // Set state nach erfolgreichem Laden
+        setInstances(umamis);
+        setWebhookOptions(webhooks);
+        setSenders(mailers);
+        setTemplates(templates);
+
+        // Set Job + Formulardaten
+        setForm({
+          name: job.name || '',
+          sender_id: job.sender_id || null,
+          host_id: job.host_id || null,
+          website_id: job.website_id || '',
+          report_type: job.report_type || 'summary',
+          summary_items: job.summary_items || [],
+          report_id: job.report_id || null,
+          frequency: job.frequency || 'daily',
+          day: job.day || null,
+          execution_time: job.execution_time || '08:00',
+          email_recipients: job.email_recipients || [],
+          webhook_recipients: job.webhook_recipients || [],
+          is_active: job.is_active !== undefined ? job.is_active : true
+        });
+
+        // Optional: direkt abhängige Daten wie Websites und Reports auch hier laden
+        if (job.host_id) {
+          try {
+            const websites = await fetchWebsitesByUmami(Number(job.host_id));
+            setWebsites(websites);
+          } catch {
+            setWebsites([]);
+          }
+        }
+
+        if (job.report_type === 'report' && job.website_id && job.host_id) {
+          setReportsLoading(true);
+          try {
+            const reports = await fetchReportsByWebsite(Number(job.host_id), job.website_id);
+            setReports(reports);
+          } catch {
+            setReports([]);
+          } finally {
+            setReportsLoading(false);
+          }
+        }
+
+      } catch (error) {
+        console.error('Fehler beim Laden der Daten:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAllData();
+  }, [params.id]);
+
+
+
+
+  const next = () => setActive((prev) => Math.min(prev + 1, sections.length - 1));
+  const back = () => setActive((prev) => Math.max(prev - 1, 0));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSaving(true)
-    setError(null)
 
-    const payload: MailerJobUpdate = {
-      name: form.name,
-      host_id: Number(form.instance_id),
-      website_id: form.website_id,
-      sender_id: form.sender_id ? Number(form.sender_id) : null,
-      frequency: form.frequency,
-      day: ['weekly', 'monthly'].includes(form.frequency) ? Number(form.day) : null,
-      email_recipients: form.email_recipients
-        .split(',')
-        .map(e => e.trim())
-        .filter(Boolean),
-      webhook_recipients: form.webhook_recipients,
-      is_active: form.is_active,
-    }
+    const emailList = form.email_recipients
+      .filter(Boolean)
 
-    try {
-      await updateMailerJob(Number(id), payload)
-    } catch (err) {
-      showError('Error')
-      console.error(err)
-    } finally {
-      showSuccess('Updated')
-      setIsSaving(false)
-    }
+    await updateJob(params.id, form)
+    router.push('/jobs')
   }
 
-  if (loading) {
-    return (<LoadingSpinner />)
-  }
+
+  const validateForm = (step: number = active): boolean => {
+    if (step === 0) {
+      return (
+        form.name.trim() !== '' &&
+        form.host_id !== null &&
+        form.website_id !== '' &&
+        form.frequency !== '' &&
+        form.execution_time !== '' &&
+        (form.frequency !== 'weekly' || form.day !== null) &&
+        (form.frequency !== 'monthly' || form.day !== null)
+      );
+    }
+
+    if (step === 1) {
+      return (
+        form.report_type !== '' &&
+        (form.report_type === 'summary' ? form.summary_items.length > 0 : true) &&
+        (form.report_type === 'report' ? form.report_id !== null : true)
+      );
+    }
+
+    if (step === 2) {
+      return true;
+    }
+
+    if (step === 3) {
+      return true;
+    }
+
+    return false; // Fallback: ungültig
+  };
+
+
+  useEffect(() => {
+    setIsStepValid(validateForm());
+  }, [form, active]);
+
+  if (loading) { return <LoadingSpinner title={locale.ui.edit} /> }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <PageHeader
-        hasBack={true}
-        title={locale.ui.edit}
-      />
+      <PageHeader title={locale.ui.edit} />
+
+      {/* Wizard Navigation */}
+      <div className="flex items-center justify-between mb-6 border-b pb-2">
+        <div className="flex space-x-4">
+          {sections.map((label, i) => (
+            <>
+            {i >= active ? (
+              <div
+                key={i}
+                className={`text-sm font-medium px-2 pb-1 border-b-2 ${
+                  active === i ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400'
+                }`}
+              >
+                {label}
+              </div>
+            ) : (
+              <button
+                key={i}
+                className={`text-sm font-medium px-2 pb-1 border-b-2 hover:text-blue-600 ${
+                  active === i ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400'
+                }`}
+                onClick={() => setActive(i)}
+              >
+                {label}
+              </button>
+            )}
+            
+            </>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {active > 0 && (
+            <button
+              onClick={back}
+              className="p-2 rounded-full bg-gray-100 hover:bg-gray-100 text-gray-600 text-bold"
+            >
+              <ChevronLeftIcon className="text-gray-600 w-5 h-5" />
+            </button>
+          )}
+          <button
+            onClick={next}
+            className={`p-2 rounded-full ${
+              isStepValid
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            }`}
+            disabled={!isStepValid || active >= sections.length - 1}
+          >
+            <ChevronRightIcon className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <TextInput
-          label={locale.forms.labels.name}
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder={locale.forms.labels.name}
-        />
-        
-        <div className="flex items-center gap-2">
-          <SelectBox
-            label={locale.forms.labels.umami}
-            value={form.instance_id}
-            onChange={(value) => setForm(prev => ({ ...prev, instance_id: value }))}
-            options={instances.map(i => ({ value: String(i.id), label: i.name }))}
-            placeholder={locale.forms.labels.umami}
-          />
 
-          <SelectBox
-            label={locale.forms.labels.website}
-            value={form.website_id}
-            onChange={(value) => setForm(prev => ({ ...prev, website_id: value }))}
-            options={websites.map(w => ({ value: w.id, label: w.name }))}
-            placeholder={locale.forms.placeholders.choose_website}
-            disabled={!websites.length}
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <SelectBox
-            label={locale.forms.labels.frequency}
-            value={form.frequency}
-            onChange={(value) => setForm(prev => ({ ...prev, frequency: value }))}
-            options={[
-              { value: 'daily', label: locale.enums.frequency.daily },
-              { value: 'weekly', label: locale.enums.frequency.weekly },
-              { value: 'monthly', label: locale.enums.frequency.monthly },
-            ]}
-          />
-
-          {form.frequency === 'weekly' && (
-            <SelectBox
-              label={locale.forms.labels.weekday}
-              value={form.day}
-              onChange={(value) => setForm(prev => ({ ...prev, day: value }))}
-              options={WEEKDAYS.map(day => ({
-                value: String(day.value),
-                label: day.label
-              }))}
-              placeholder={locale.forms.placeholders.choose_weekday}
-            />
-          )}
-          {form.frequency === 'monthly' && (
-            <SelectBox
-              label={locale.forms.labels.day}
-              value={form.day}
-              onChange={(value) => setForm(prev => ({ ...prev, day: value }))}
-              options={Array.from({ length: 31 }, (_, i) => ({
-                value: String(i + 1),
-                label: String(i + 1)
-              }))}
-              placeholder={locale.forms.placeholders.choose_day}
-            />
-          )}
-        </div>
-        
-        {senders.length > 0 && (
+      {/* Wizard Content */}
+      <div className="space-y-4">
+        {active === 0 && (
           <>
-            <SelectBox
-              label={locale.forms.labels.email_sender}
-              value={form.sender_id}
-              onChange={(value) => setForm(prev => ({ ...prev, sender_id: value }))}
-              options={senders.map(s => ({ value: String(s.id), label: s.name }))}
-              placeholder={locale.forms.placeholders.choose_sender}
-              canClear={true}
+            <TextInput
+              label={locale.forms.labels.name}
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder={locale.forms.labels.name}
             />
-            {form.sender_id && (
-              <TextInput
-                label={locale.forms.labels.email_recipients}
-                name="email_recipients"
-                value={form.email_recipients}
-                onChange={handleChange}
-                placeholder="anna@example.com, max@example.org"
-                disabled={!form.sender_id}
+
+            <div className="flex items-center gap-2">
+              <SelectBox
+                label={locale.forms.labels.umami}
+                value={form.host_id}
+                onChange={(value) => handleChange({ name: 'host_id', value })}
+                options={instances.map(i => ({ value: Number(i.id), label: i.name }))}
+                placeholder={locale.forms.placeholders.choose_umami}
               />
-            )}
-        </>
+
+              {form.host_id && (
+                <SelectBox
+                  label={locale.forms.labels.website}
+                  value={form.website_id}
+                  onChange={(value) => handleChange({ name: 'website_id', value })}
+                  options={websites.map(w => ({ value: w.id, label: w.name }))}
+                  placeholder={websites.length ? locale.forms.placeholders.choose_website : locale.forms.placeholders.loading}
+                  disabled={!websites.length}
+                />
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <SelectBox
+                label={locale.forms.labels.frequency}
+                value={form.frequency}
+                onChange={(value) => handleChange({ name: 'frequency', value })}
+                options={[
+                  { value: 'daily', label: locale.enums.frequency.daily },
+                  { value: 'weekly', label: locale.enums.frequency.weekly },
+                  { value: 'monthly', label: locale.enums.frequency.monthly },
+                ]}
+              />
+
+              {form.frequency === 'weekly' && (
+                <SelectBox
+                  label={locale.forms.labels.weekday}
+                  value={form.day}
+                  onChange={(value) => handleChange({ name: 'day', value })}
+                  options={WEEKDAYS.map(day => ({
+                    value: String(day.value),
+                    label: day.label
+                  }))}
+                  placeholder={locale.forms.placeholders.choose_weekday}
+                />
+              )}
+
+              {form.frequency === 'monthly' && (
+                <SelectBox
+                  label={locale.forms.labels.day}
+                  value={form.day}
+                  onChange={(value) => handleChange({ name: 'day', value })}
+                  options={Array.from({ length: 31 }, (_, i) => ({
+                    value: String(i + 1),
+                    label: String(i + 1)
+                  }))}
+                  placeholder={locale.forms.placeholders.choose_day}
+                />
+              )}
+
+
+              <TimePicker
+                label={locale.forms.labels.execution_time}
+                value={form.execution_time}
+                onChange={(newTime) => handleChange({ name: 'execution_time', value: newTime })}
+              />
+            </div>
+            
+          </>
         )}
 
+        {active === 1 && (
+          <>
+            <SelectBox
+              label={locale.forms.labels.type}
+              value={form.report_type}
+              onChange={(value) => handleChange({ name: 'report_type', value })}
+              options={[
+                { value: 'summary', label: locale.enums.job_content_type.summary },
+                { value: 'report', label: locale.enums.job_content_type.report },
+              ]}
+            />
 
-<MultiSelectListbox
-  label={locale.forms.labels.webhook_recipients}
-  options={webhookOptions} // [{id, name}]
-  selected={form.webhook_recipients} // number[]
-  onChange={(newSelected) => setForm(prev => ({ ...prev, webhook_recipients: newSelected }))}
-  placeholder={locale.forms.placeholders.choose_webhook}
-/>
+            {form.report_type === 'summary' && (
+              <CheckboxPicker
+                name="summary_items" 
+                options={options}
+                selectedOptions={form.summary_items}
+                onChange={handleChange}
+              />
+            )}
 
-{/*
-        <label className="block">
-          <span className="text-sm font-medium text-gray-700">{locale.forms.labels.webhook_recipients}</span>
+            {form.report_type === 'report' && (
+              <SelectBox
+                label={locale.forms.labels.report}
+                value={form.report_id}
+                onChange={(value) => handleChange({ name: 'report_id', value })}
+                options={reports.map(w => ({ value: w.id, label: w.name + ' - '  + w.type }))}
+                placeholder={reports.length ? locale.forms.placeholders.choose_report : locale.forms.placeholders.loading}
+                disabled={!reports.length}
+              />
+            )}
+          </>
+        )}
 
-          {webhookOptions.length === 0 ? (
-            <small className='text-gray-700'><br />{locale.messages.no_webhooks}</small>
-          ) : (
-            <select
-              multiple
-              className="w-full border rounded p-2 mt-1"
-              value={form.webhook_recipients.map(String)}
-              onChange={(e) => {
-                const selected = Array.from(e.target.selectedOptions).map(opt => Number(opt.value))
-                setForm(prev => ({ ...prev, webhook_recipients: selected }))
-              }}
-            >
-              {webhookOptions.map(wh => (
-                <option key={wh.id} value={wh.id}>
-                  {wh.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </label>
-*/}
-        {error && <div className="text-red-600">{error}</div>}
-
-        <div className="flex items-center gap-2 justify-between">
-          <div className="flex items-center gap-2">
-            <label className="flex items-center cursor-pointer">
-              <div className="relative">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  checked={form.is_active}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, is_active: e.target.checked }))
+        {active === 2 && (
+          <>
+            {senders.length > 0 && (
+              <>
+                <SelectBox
+                  label={locale.forms.labels.email_sender}
+                  value={form.sender_id}
+                  onChange={(value) =>
+                    setForm(prev => ({
+                      ...prev,
+                      sender_id: value ? Number(value) : null
+                    }))
                   }
-                  className="sr-only"
+                  options={senders.map(s => ({ value: String(s.id), label: s.name }))}
+                  placeholder={locale.forms.placeholders.choose_sender}
+                  canClear={true}
                 />
-                <div
-                  className={`w-10 h-6 bg-gray-300 rounded-full transition-colors ${
-                    form.is_active ? 'bg-green-500' : ''
-                  }`}
-                ></div>
-                <div
-                  className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                    form.is_active ? 'translate-x-4' : ''
-                  }`}
-                ></div>
-              </div>
-            </label>
-          </div>
+                {form.sender_id && (
+                  <ListInput
+                    label={locale.forms.labels.email_recipients}
+                    value={form.email_recipients}
+                    onChange={(emails) => setForm(prev => ({ ...prev, email_recipients: emails }))}
+                    placeholder={form.email_recipients.length > 0 ? '' : "anna@example.com, max@example.org"}
+                    disabled={!form.sender_id}
+                  />
+                )}
 
-          <FormButtons
-            saveLabel={locale.buttons.update}
-            cancelLabel={locale.buttons.cancel}
-            isSubmitting={isSaving}
-            disabled={!form.instance_id || !form.website_id || (form.frequency === 'weekly' && !form.day)}
-          />
-        </div>
+                <hr />
+
+                <MultiSelectListbox
+                  label={locale.forms.labels.webhook_recipients}
+                  options={webhookOptions}
+                  selected={form.webhook_recipients}
+                  onChange={(newSelected) => setForm(prev => ({ ...prev, webhook_recipients: newSelected }))}
+                  placeholder={locale.forms.placeholders.choose_webhook}
+                />
+              </>
+            )}
+          </>
+        )}
+
+        {active === 3 && (
+          <>
+
+            <div>
+              <p className="text-gray-500 text-sm">{locale.forms.labels.name}</p>
+              <p>{form.name}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-500 text-sm">{locale.forms.labels.umami}</p>
+              <p>{form.host_id}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-500 text-sm">{locale.forms.labels.website}</p>
+              <p>{form.website_id}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-500 text-sm">{locale.forms.labels.frequency}</p>
+              <p>{form.frequency}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-500 text-sm">{locale.forms.labels.execution_time}</p>
+              <p>{form.execution_time}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-500 text-sm">{locale.forms.labels.type}</p>
+              <p>{form.report_type}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-500 text-sm">{'locale.forms.labels.'}</p>
+              <p>{form.summary_items.join(', ')}</p>
+            </div>
+
+
+
+            {/*<pre className="text-sm bg-gray-100 p-4 rounded">{JSON.stringify(form, null, 2)}</pre>*/}
+            
+            <FormButtons 
+              cancelLabel={locale.buttons.cancel}
+              saveLabel={locale.buttons.save}
+              disabled={!form.host_id || !form.website_id || (form.frequency === 'weekly' && !form.day)}
+            />
+          </>
+        )}
+      </div>
+
       </form>
     </div>
-  )
+  );
 }

@@ -3,13 +3,15 @@
 import { useI18n } from "@/locales/I18nContext";
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import packageJson from '../package.json'
 
 import { 
   Squares2X2Icon,
   ChartBarIcon,
   BriefcaseIcon,
   PaperAirplaneIcon,
-  PuzzlePieceIcon
+  PuzzlePieceIcon,
+  DocumentIcon
 } from '@heroicons/react/20/solid'
 
 export default function Sidebar() {
@@ -21,14 +23,17 @@ export default function Sidebar() {
     { href: '/umami', label: locale.pages.umami, icon: <ChartBarIcon className="text-primary-600 w-5 h-5" /> },
     { href: '/jobs', label: locale.pages.jobs, icon: <BriefcaseIcon className="text-primary-600 w-5 h-5" /> },
 
-    { href: '/senders', label: locale.pages.sender, icon: <PaperAirplaneIcon className="text-primary-600 w-5 h-5" /> },
+    { href: '/mailers', label: locale.pages.mailer, icon: <PaperAirplaneIcon className="text-primary-600 w-5 h-5" /> },
     { href: '/webhooks', label: locale.pages.webhook, icon: <PuzzlePieceIcon className="text-primary-600 w-5 h-5" /> },
+
+    { href: '/templates', label: locale.pages.templates, icon: <DocumentIcon className="text-primary-600 w-5 h-5" /> },
   ]
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full justify-between">
       <aside className="w-64 bg-gray-50 border-r border-gray-200 shadow-sm flex flex-col flex-shrink-0 h-full">
-        <nav className="flex flex-col gap-1 p-4">
+        <nav className="flex flex-col flex-1 justify-between p-4 text-sm text-gray-700">
+          <div className="space-y-2">
           {links.map(link => (
             <Link
               key={link.href}
@@ -47,6 +52,10 @@ export default function Sidebar() {
               {link.label}
             </Link>
           ))}
+          </div>
+          <div className="text-gray-400 text-xs text-center pt-4 border-t border-gray-200">
+            Version {packageJson.version}
+          </div>
         </nav>
       </aside>
     </div>

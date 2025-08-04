@@ -1,20 +1,20 @@
 'use client'
 
 import { useI18n } from "@/locales/I18nContext";
-import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Sender } from '@/types'
-import { getSender, updateSender, testSenderConnection } from '@/lib/api'
-import LoadingSpinner from '@/components/LoadingSpinner'
+import { createMailer, testConnection } from '@/lib/api/mailers'
 import PageHeader from '@/components/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
 
-export default function EditSenderPage({ params }: { params: { id: string } }) {
+export default function SenderForm() {
+  const [sender, setSender] = useState<Sender | null>(null);
   const router = useRouter()
   const { locale } = useI18n()
-
+  
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -26,24 +26,20 @@ export default function EditSenderPage({ params }: { params: { id: string } }) {
     use_ssl: false,
     use_auth: true,
   })
+
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const load = async () => {
-      const sender = await getSender(Number(params.id))
+    if (sender) {
       setForm({
         ...sender,
         smtp_password: '',
         use_auth: !!sender.smtp_username,
       })
-      setLoading(false)
     }
-    load()
-  }, [params.id])
+  }, [sender])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -63,9 +59,6 @@ export default function EditSenderPage({ params }: { params: { id: string } }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSaving(true)
-    setError(null)
-
     const payload = {
       ...form,
       smtp_username: form.use_auth ? form.smtp_username : '',
@@ -73,10 +66,10 @@ export default function EditSenderPage({ params }: { params: { id: string } }) {
     }
 
     try {
-      await updateSender(Number(params.id), payload)
-      showSuccess('Updated')
+      await createMailer(payload)
+      showSuccess('Created')
+      router.push('/mailers')
     } catch (err: any) {
-      setError('Speichern fehlgeschlagen. Bitte versuche es erneut.')
       const message = err?.response?.data?.detail || err?.message || 'Fehler beim Speichern'
       showError(message)
     } finally {
@@ -93,22 +86,19 @@ export default function EditSenderPage({ params }: { params: { id: string } }) {
         smtp_username: form.use_auth ? form.smtp_username : '',
         smtp_password: form.use_auth ? form.smtp_password : '',
       }
-      await testSenderConnection(payload)
-      setTestResult('✅ Verbindung erfolgreich!')
+      await testConnection(payload)
+      showSuccess('Test success!')
     } catch (e: any) {
-      setTestResult(`❌ Fehler: ${e.message || 'Verbindung fehlgeschlagen.'}`)
+      showError(`Error: ${e.message || 'Connection failure.'}`)
     } finally {
       setTesting(false)
     }
   }
 
-  if (loading) { return <LoadingSpinner /> }
-
   return (
     <div className="max-w-4xl mx-auto p-6">
       <PageHeader
-        hasBack={true}
-        title={locale.ui.edit}
+        title={locale.ui.create}
       />
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex items-center gap-2">
@@ -140,7 +130,7 @@ export default function EditSenderPage({ params }: { params: { id: string } }) {
             type='number'
             label={locale.forms.labels.smtp.port}
             name="smtp_port"
-            value={form.smtp_port}
+            value={String(form.smtp_port)}
             onChange={handleChange}
             placeholder="1025"
           />
@@ -187,55 +177,70 @@ export default function EditSenderPage({ params }: { params: { id: string } }) {
           </div>
         )}
 
-        <div>
-          <label className="block font-medium mb-1">{locale.forms.labels.encryption}</label>
-          <div className="flex bg-gray-100 rounded-lg overflow-hidden w-fit">
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${!form.use_tls && !form.use_ssl ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-              onClick={() => handleEncryptionChange('none')}
-            >
-              {locale.enums.encryption.none}
-            </button>
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${form.use_tls ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-              onClick={() => handleEncryptionChange('tls')}
-            >
-              {locale.enums.encryption.tls}
-            </button>
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${form.use_ssl ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-200'}`}
-              onClick={() => handleEncryptionChange('ssl')}
-            >
-              {locale.enums.encryption.ssl}
-            </button>
-          </div>
+       <div>
+        <label className="block font-medium mb-1">{locale.forms.labels.encryption}</label>
+        <div className="flex bg-gray-100 rounded-lg overflow-hidden w-fit">
+          <button
+            type="button"
+            className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${
+              !form.use_tls && !form.use_ssl
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-700 hover:bg-gray-200'
+            }`}
+            onClick={() => handleEncryptionChange('none')}
+          >
+            {locale.enums.encryption.none}
+          </button>
+          <button
+            type="button"
+            className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${
+              form.use_tls
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-700 hover:bg-gray-200'
+            }`}
+            onClick={() => handleEncryptionChange('tls')}
+          >
+            {locale.enums.encryption.tls}
+          </button>
+          <button
+            type="button"
+            className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${
+              form.use_ssl
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-700 hover:bg-gray-200'
+            }`}
+            onClick={() => handleEncryptionChange('ssl')}
+          >
+            {locale.enums.encryption.ssl}
+          </button>
+        </div>
+      </div>
+
+
+      <div className="flex items-center gap-2 justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={handleTest}
+            disabled={testing}
+            className="px-4 py-2 bg-gray-100 border border-gray-300 rounded"
+          >
+            {testing ? locale.buttons.states.testing : locale.buttons.test}
+          </button>
+          {testResult && (
+            <span className={`text-sm ${testResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+              {testResult}
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center gap-2 justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={handleTest}
-              disabled={testing}
-              className="px-4 py-2 bg-gray-100 border border-gray-300 rounded"
-            >
-              {testing ? locale.buttons.states.testing : locale.buttons.test}
-            </button>
-            {testResult && (
-              <span className={`text-sm ${testResult.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>{testResult}</span>
-            )}
-          </div>
-
-          <FormButtons
-            cancelLabel={locale.buttons.cancel}
-            saveLabel={locale.buttons.update}
-          />
-          
+        <FormButtons
+          cancelLabel={locale.buttons.cancel}
+          saveLabel={locale.buttons.save}
+        />
+        
         </div>
-      </form>
-    </div>
+    </form>
+  </div>
   )
 }

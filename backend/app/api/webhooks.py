@@ -4,6 +4,7 @@ from app.database import get_db
 from app.models.webhooks import WebhookRecipient
 from app.schemas.webhooks import WebhookRecipientCreate, WebhookRecipientUpdate, WebhookRecipientOut
 from app.services.webhook import send_test_webhook
+from app.utils.responses import send_status_response
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
@@ -13,7 +14,12 @@ def test_webhook(data: WebhookRecipientCreate):
         send_test_webhook(data)
         return {"success": True, "message": "Connection successful"}
     except RuntimeError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return send_status_response(
+            code="WEBHOOK_TEST_FAILED",
+            message="Webhook test failed",
+            status=400,
+            detail=str(e)
+        )
 
 @router.get("/", response_model=list[WebhookRecipientOut])
 def list_webhooks(db: Session = Depends(get_db)):
@@ -33,7 +39,12 @@ def create_webhook(webhook: WebhookRecipientCreate, db: Session = Depends(get_db
 def get_webhook(webhook_id: int, db: Session = Depends(get_db)):
     webhook = db.query(WebhookRecipient).get(webhook_id)
     if not webhook:
-        raise HTTPException(status_code=404, detail="Webhook not found")
+        return send_status_response(
+            code="WEBHOOK_NOT_FOUND",
+            message="Webhook not found",
+            status=404,
+            detail=f"No webhook with ID {webhook_id}"
+        )
     return webhook
 
 
@@ -41,7 +52,12 @@ def get_webhook(webhook_id: int, db: Session = Depends(get_db)):
 def update_webhook(webhook_id: int, data: WebhookRecipientUpdate, db: Session = Depends(get_db)):
     webhook = db.query(WebhookRecipient).get(webhook_id)
     if not webhook:
-        raise HTTPException(status_code=404, detail="Webhook not found")
+        return send_status_response(
+            code="WEBHOOK_NOT_FOUND",
+            message="Webhook not found",
+            status=404,
+            detail=f"No webhook with ID {webhook_id}"
+        )
 
     for key, value in data.dict(exclude_unset=True).items():
         setattr(webhook, key, value)
@@ -55,7 +71,12 @@ def update_webhook(webhook_id: int, data: WebhookRecipientUpdate, db: Session = 
 def delete_webhook(webhook_id: int, db: Session = Depends(get_db)):
     webhook = db.query(WebhookRecipient).get(webhook_id)
     if not webhook:
-        raise HTTPException(status_code=404, detail="Webhook not found")
+        return send_status_response(
+            code="WEBHOOK_NOT_FOUND",
+            message="Webhook not found",
+            status=404,
+            detail=f"No webhook with ID {webhook_id}"
+        )
     db.delete(webhook)
     db.commit()
     return {"success": True}

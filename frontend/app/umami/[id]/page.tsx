@@ -3,9 +3,12 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { UmamiInstance } from '@/types'
-import { fetchInstance, updateInstance } from '@/lib/api'
-import SelectBox from '@/components/SelectBox'
+import { UmamiInstance, UmamiType } from '@/types'
+import { 
+  fetchUmami, 
+  updateUmami 
+} from '@/lib/api/umami'
+import LoadingSpinner from "@/components/LoadingSpinner";
 import PageHeader from '@/components/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/TextInput'
@@ -16,17 +19,34 @@ export default function InstanceDetails() {
   const { locale } = useI18n()
 
   const params = useParams()
-  const id = params.id
+  const id = Number(params.id)
 
-  const [form, setForm] = useState<UmamiInstance | null>(null)
+  const [form, setForm] = useState<{
+    id: number;
+    name: string;
+    type: UmamiType;
+    hostname: String | null;
+    username: String | null;
+    password: String | null;
+    api_key: String | null;
+  }>({
+    id: 0,
+    name: '',
+    type: 'cloud',
+    hostname: null,
+    username: null,
+    password: null,
+    api_key: null
+  });
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!id) return
 
-    fetchInstance(id)
+    fetchUmami(id)
       .then(setForm)
+      .finally(() => setLoading(false))
       .catch(() => setError('Fehler beim Laden der Instanz'))
   }, [id])
 
@@ -43,20 +63,17 @@ export default function InstanceDetails() {
     setError(null)
 
     try {
-      await updateInstance(id, form)
+      await updateUmami(id, form)
       showSuccess('Umami-Instanz erfolgreich aktualisiert')
     } catch (err: any) {
       const message = err?.response?.data?.detail || err?.message || 'Fehler beim Speichern'
-      setError(message)
       showError(message)
     } finally {
       setLoading(false)
     }
   }
 
-  if (!form) {
-    return <div className="p-6 text-gray-600">Lade Daten...</div>
-  }
+  if (loading) { return <LoadingSpinner title={locale.ui.edit} /> }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -74,34 +91,11 @@ export default function InstanceDetails() {
             placeholder={locale.forms.labels.name}
         />
 
-        <div>
-            <label className="block text-sm font-medium text-gray-900 mb-1">{locale.forms.labels.service.name}</label>
-            <div className="grid grid-cols-2 bg-gray-100 rounded-lg overflow-hidden">
-                {[
-                { value: 'cloud', label: locale.forms.labels.service.type.cloud },
-                { value: 'self_hosted', label: locale.forms.labels.service.type.selfhost },
-                ].map(({ value, label }) => (
-                <button
-                    key={value}
-                    type="button"
-                    className={`w-full px-4 py-2 text-sm font-medium focus:outline-none transition ${
-                    form.type === value
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-200'
-                    }`}
-                    onClick={() => setForm(prev => ({ ...prev, type: value }))}
-                >
-                    {label}
-                </button>
-                ))}
-            </div>
-        </div>
-
         {form.type === 'cloud' && (
             <TextInput
                 label={locale.forms.labels.apikey}
                 name="api_key"
-                value={form.api_key}
+                value={String(form.api_key)}
                 onChange={handleChange}
                 placeholder="xxxxxxxxxxxxxxxxxxxxxxxxx"
             />
@@ -112,7 +106,7 @@ export default function InstanceDetails() {
             <TextInput
                 label={locale.forms.labels.hostname}
                 name="hostname"
-                value={form.hostname}
+                value={String(form.hostname)}
                 onChange={handleChange}
                 placeholder="https://example.com"
             />
@@ -120,7 +114,7 @@ export default function InstanceDetails() {
                 <TextInput
                     label={locale.forms.labels.username}
                     name="username"
-                    value={form.username}
+                    value={String(form.username)}
                     onChange={handleChange}
                     placeholder="admin"
                 />
@@ -128,7 +122,7 @@ export default function InstanceDetails() {
                     type='password'
                     label={locale.forms.labels.password}
                     name="password"
-                    value={form.password}
+                    value={String(form.password)}
                     onChange={handleChange}
                     placeholder="umami"
                 />

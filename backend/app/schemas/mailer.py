@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from enum import Enum
+from datetime import time
 
 class Frequency(str, Enum):
     daily = "daily"
@@ -9,15 +10,18 @@ class Frequency(str, Enum):
 
 class MailerJobCreate(BaseModel):
     name: str
+    sender_id: Optional[int] = None
     host_id: int
     website_id: str
-    report_type: str = "summary"
+    report_type: str
+    summary_items: List[str] = []
+    report_id: Optional[str]
     frequency: Frequency
     day: Optional[int]
+    execution_time: time
     email_recipients: List[str] = []
     webhook_recipients: List[int] = []
     is_active: bool
-    sender_id: Optional[int] = None
 
 class MailerJobOut(MailerJobCreate):
     id: int

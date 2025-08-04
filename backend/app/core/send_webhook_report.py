@@ -1,34 +1,37 @@
 from sqlalchemy.orm import Session
-from app.models.mailer import MailerJob
+from app.models.jobs import Job
 from app.models.webhooks import WebhookRecipient
 from app.core.send_webhook import send_webhook
 from app.models.template import MailTemplate
-from app.core.render_template import render_webhook_template
+from app.core.render_template import render_template
+from app.utils.response_clean import process_api_response
 import json
 
-def send_webhook_report(db: Session, job: MailerJob, summary: dict):
+def send_webhook_report(db: Session, job: Job, summary: dict):
     recipients = db.query(WebhookRecipient).filter(WebhookRecipient.id.in_(job.webhook_recipients)).all()
     if not recipients:
         raise Exception("No webhook recipients configured.")
 
     for webhook in recipients:
-        webhook_type = 'WEBHOOK_' + webhook.type
-        template = db.query(MailTemplate).filter_by(type=job.template_type, sender_type=webhook_type).first()
+        report_type = summary.get("type", "").upper()
+        job_report_type = job.report_type.upper()
+        sender_type = 'WEBHOOK_' + job_report_type + (f'_{report_type}' if report_type else '') + '_' + webhook.type
+
+        template = db.query(MailTemplate).filter_by(type=job.template_type, sender_type=sender_type).first()
         if not template:
-            raise Exception("Mail template not found.", webhook.type)
+            raise Exception("Webhook template not found.", sender_type)
         
-        template_json = json.dumps(template.json)
-        html_body = render_webhook_template(template_json, {
+        html_body = render_template(template.content, {
             "summary": summary,
             "job": job,
         })
+        html_body = process_api_response(response=html_body, db=db)
 
         json_body = json.loads(html_body)
-        
         send_webhook(
-            webhook, 
-            json_body, 
-            job
+            webhook=webhook, 
+            summary=json_body, 
+            job=job
         )
 
 

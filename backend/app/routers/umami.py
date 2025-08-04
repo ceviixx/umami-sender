@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.umami import Umami, UmamiType
@@ -6,12 +6,11 @@ from app.schemas.umami import UmamiInstanceCreate, UmamiInstanceOut, UmamiInstan
 from hashlib import sha256
 import requests
 import os
-import os
+from app.utils.responses import send_status_response
 
 CLOUD_HOSTNAME = os.getenv("CLOUD_HOSTNAME", "https://api.umami.is/v1")
 router = APIRouter(prefix="/umami", tags=["umami"])
 
-# 🔐 Validierung und Speicherung
 @router.post("/", response_model=UmamiInstanceOut)
 def add_instance(data: UmamiInstanceCreate, db: Session = Depends(get_db)):
     # 🧪 Cloud: Prüfen, ob API-Key gültig ist
@@ -109,12 +108,10 @@ def add_instance(data: UmamiInstanceCreate, db: Session = Depends(get_db)):
     db.refresh(instance)
     return instance
 
-# 📥 Alle Instanzen
 @router.get("/", response_model=list[UmamiInstanceOut])
 def list_instances(db: Session = Depends(get_db)):
     return db.query(Umami).all()
 
-# 📄 Einzelne Instanz abrufen
 @router.get("/{instance_id}", response_model=UmamiInstanceOut)
 def get_instance(instance_id: int, db: Session = Depends(get_db)):
     instance = db.query(Umami).filter(Umami.id == instance_id).first()
@@ -122,8 +119,6 @@ def get_instance(instance_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Instance not found")
     return instance
 
-
-# ✏️ Update
 @router.put("/{instance_id}", response_model=UmamiInstanceOut)
 def update_instance(instance_id: int, data: UmamiInstanceUpdate, db: Session = Depends(get_db)):
     instance = db.query(Umami).filter(Umami.id == instance_id).first()
@@ -224,8 +219,6 @@ def update_instance(instance_id: int, data: UmamiInstanceUpdate, db: Session = D
     db.refresh(instance)
     return instance
 
-
-# ❌ Löschen
 @router.delete("/{instance_id}")
 def delete_instance(instance_id: int, db: Session = Depends(get_db)):
     instance = db.query(Umami).filter(Umami.id == instance_id).first()
@@ -236,8 +229,6 @@ def delete_instance(instance_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Deleted"}
 
-
-# 🌐 Websites einer Instanz abrufen (sicher)
 @router.get("/{instance_id}/websites")
 def get_websites_for_instance(instance_id: int, db: Session = Depends(get_db)):
     instance = db.query(Umami).filter(Umami.id == instance_id).first()
@@ -257,3 +248,30 @@ def get_websites_for_instance(instance_id: int, db: Session = Depends(get_db)):
         return response.json().get("data", [])
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Fehler beim Abrufen der Websites: {str(e)}")
+
+@router.get("/{instance_id}/reports")
+def get_reports_for_website_id(
+    instance_id: int,
+    website_id: str = Query(..., description="Die ID der gewünschten Website"),  # Pflichtparameter
+    db: Session = Depends(get_db)
+):
+    instance = db.query(Umami).filter(Umami.id == instance_id).first()
+    if not instance:
+        raise HTTPException(status_code=404, detail="Instance not found")
+
+    if instance.type == UmamiType.cloud:
+        base_url = os.getenv("CLOUD_HOSTNAME", "https://api.umami.is/v1")
+        headers = {"x-umami-api-key": instance.api_key}
+    else:
+        base_url = instance.hostname + "/api"
+        headers = {"Authorization": f"Bearer {instance.bearer_token}"}
+
+    # Parameter an externe API übergeben
+    params = {"website_id": website_id}
+
+    try:
+        response = requests.get(f"{base_url}/reports", headers=headers, params=params)
+        response.raise_for_status()
+        return response.json().get("data", [])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fehler beim Abrufen der Reports: {str(e)}")
