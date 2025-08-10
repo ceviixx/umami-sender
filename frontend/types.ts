@@ -1,13 +1,13 @@
 export type UmamiType = 'cloud' | 'self_hosted'
 
 export interface UmamiInstance {
-  id: number
+  id: string
   name: string
   type: UmamiType
 }
 
 export interface Template {
-  id: number
+  id: string
   type: string
   sender_type: string
   description: string
@@ -15,7 +15,7 @@ export interface Template {
 }
 
 export type Sender = {
-  id: number
+  id: string
   name: string
   email: string
   smtp_host: string
@@ -32,17 +32,26 @@ export interface Website {
   domain: string
 }
 
+export type LogItem = {
+  id: string
+  name: string
+  timestamp: string
+  status: string
+  error?: string
+  channel: string
+}
 
 export type MailerJob = {
-  id: number
+  id: string
   name: string
-  sender_id: number | null
-  host_id: number
+  mailer_id: string | null
+  umami_id: string
   host_name: string
   website_id: string
   website_name: string
   frequency: 'daily' | 'weekly' | 'monthly'
   day: string | null
+  execution_time: string
   report_type: string
   is_active: boolean
   webhook_recipients: number[]
@@ -51,11 +60,12 @@ export type MailerJob = {
 
 export type MailerJobUpdate = {
   name: string
-  host_id: number
+  umami_id: string
   website_id: string
-  sender_id: number | null
+  mailer_id: string | null
   frequency: 'daily' | 'weekly' | 'monthly'
   day: number | null
+  execution_time: string
   is_active: boolean
   email_recipients?: string[]
   webhook_recipients?: number[]
@@ -66,10 +76,15 @@ export type MailerJobUpdate = {
 
 
 
-
+export interface User {
+  id: string
+  username: string
+  role: 'admin' | 'user'
+  language: string
+}
 
 export interface WebhookRecipient {
-  id: number
+  id: string
   name: string
   url: string
   type: 'DISCORD' | 'SLACK' | 'CUSTOM'

@@ -28,7 +28,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:pass@db/umamisender
       - REDIS_URL=redis://redis:6379/0
-      - CLOUD_HOSTNAME=https://api.umami.is/v1
+      - SECRET_KEY=supersecret
     depends_on:
       - db
       - redis

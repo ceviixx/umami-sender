@@ -1,10 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from app.api import mailer
 from app.api import job
 from app.api import webhooks
 from app.api import stats
 from app.api import template
+from app.api import me
+from app.api import users
+from app.api import logs
 from app.routers import umami
+from app.routers import auth
+
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.responses import send_status_response
 
@@ -18,12 +23,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
+app.include_router(me.router)
+app.include_router(users.router)
 app.include_router(stats.router)
 app.include_router(mailer.router)
 app.include_router(umami.router)
 app.include_router(job.router)
 app.include_router(webhooks.router)
 app.include_router(template.router)
+app.include_router(logs.router)
 
 @app.get("/")
 def root():
@@ -35,9 +44,12 @@ def root():
     )
 
 
+
+
 from fastapi import FastAPI, Request
 from sqlalchemy.exc import IntegrityError, DataError, SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.exceptions import RequestValidationError
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -76,7 +88,6 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
         detail=str(exc.detail)
     )
 
-
 @app.exception_handler(IntegrityError)
 async def integrity_error_handler(request: Request, exc: IntegrityError):
     return send_status_response(
@@ -102,4 +113,18 @@ async def sqlalchemy_error_handler(request: Request, exc: SQLAlchemyError):
         message="An unexpected database error occurred.",
         status=500,
         detail=str(exc)
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    first_error = exc.errors()[0] if exc.errors() else {}
+    message = first_error.get("msg", "Invalid request")
+    detail = first_error.get("ctx", {}).get("reason", message)
+    location = ".".join(str(loc) for loc in first_error.get("loc", []))
+
+    return send_status_response(
+        code="INVALID_INPUT",
+        message=message,
+        status=400,
+        detail=str(detail) + f" at {location}",
     )

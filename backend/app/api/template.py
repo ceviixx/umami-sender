@@ -9,14 +9,15 @@ from app.utils.responses import send_status_response
 from app.core.render_template import render_template
 from app.core.generate_report_summary import embedded_logo
 from app.utils.response_clean import process_api_response
+from fastapi.responses import HTMLResponse
+from jinja2 import UndefinedError
 
 router = APIRouter(prefix="/templates", tags=["templates"])
 
 
-@router.get("/", response_model=list[MailTemplateList])
+@router.get("", response_model=list[MailTemplateList])
 def list_templates(db: Session = Depends(get_db)):
     return db.query(MailTemplate).filter(MailTemplate.sender_type.contains('EMAIL')).order_by(MailTemplate.id.asc()).all()
-
 
 @router.get("/{template_type}", response_model=MailTemplateOut)
 def get_template(template_type: str, db: Session = Depends(get_db)):
@@ -29,10 +30,6 @@ def get_template(template_type: str, db: Session = Depends(get_db)):
             detail=f"No template found for type '{template_type}'"
         )
     return template
-
-
-from fastapi.responses import HTMLResponse
-from jinja2 import UndefinedError
 
 @router.get("/{template_type}/preview", response_class=HTMLResponse)
 def get_preview(template_type: str, db: Session = Depends(get_db)):
@@ -77,7 +74,6 @@ def get_preview(template_type: str, db: Session = Depends(get_db)):
             detail=str(e)
         )
 
-
 @router.put("/{template_type}", response_model=MailTemplateOut)
 def update_template(template_type: str, data: MailTemplateUpdate, db: Session = Depends(get_db)):
     template = db.query(MailTemplate).filter(
@@ -100,7 +96,6 @@ def update_template(template_type: str, data: MailTemplateUpdate, db: Session = 
     db.commit()
     db.refresh(template)
     return template
-
 
 @router.delete("/{template_type}")
 def delete_template(template_type: str, db: Session = Depends(get_db)):

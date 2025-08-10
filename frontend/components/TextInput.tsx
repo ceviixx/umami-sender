@@ -20,7 +20,7 @@ export default function TextInput({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm font-medium text-gray-900 mb-1"
+          className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-1"
         >
           {label}
         </label>
@@ -33,11 +33,14 @@ export default function TextInput({
         onChange={onChange}
         placeholder={placeholder}
         disabled={disabled}
-        className={`relative w-full cursor-default rounded-md border bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-base ${
-          disabled ? 'bg-gray-100 text-gray-400 border-gray-200' : 'border-gray-200 text-gray-900'
-        }`}
+        className={`relative w-full cursor-default rounded-md border py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-base
+      ${disabled
+            ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 border-gray-200 dark:border-gray-700'
+            : 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700'
+          }`}
         {...rest}
       />
     </div>
+
   )
 }

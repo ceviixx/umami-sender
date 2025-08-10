@@ -30,24 +30,24 @@ const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange }) => {
 
   return (
     <div className="w-1/4">
-        {label && <label className="block text-sm font-medium mb-1">{label}</label>}
-        <div className="flex items-center gap-2">
+      {label && <label className="block text-sm font-medium mb-1">{label}</label>}
+      <div className="flex items-center gap-2">
         <SelectBox
-            label=""
-            value={hour}
-            onChange={handleHourChange}
-            options={hours}
-            hasCheckbox={false}
+          label=""
+          value={hour}
+          onChange={handleHourChange}
+          options={hours}
+          hasCheckbox={false}
         />
         <span className="text-xl">:</span>
         <SelectBox
-            label=""
-            value={minute}
-            onChange={handleMinuteChange}
-            options={minutes}
-            hasCheckbox={false}
+          label=""
+          value={minute}
+          onChange={handleMinuteChange}
+          options={minutes}
+          hasCheckbox={false}
         />
-        </div>
+      </div>
     </div>
   );
 };

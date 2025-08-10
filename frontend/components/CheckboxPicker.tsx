@@ -27,24 +27,29 @@ const CheckboxPicker = ({
 
   return (
     <div className="flex flex-wrap gap-4">
-      {options.map((option) => (
-        <div
-          key={option.value}
-          className={`flex items-center cursor-pointer border rounded-lg p-3 ${
-            selectedOptions.includes(option.value)
-              ? 'bg-white text-blue-500 border-gray-300'
-              : 'bg-white border-gray-300 text-gray-800 hover:bg-gray-50'
-          }`}
-          onClick={() => handleToggle(option.value)}
-        >
+      {options.map((option) => {
+        const isSelected = selectedOptions.includes(option.value)
+        return (
           <div
-            className={`w-5 h-5 border-2 rounded-full ${
-              selectedOptions.includes(option.value) ? 'bg-blue-500' : 'bg-white'
-            }`}
-          ></div>
-          <span className="ml-2">{option.label}</span>
-        </div>
-      ))}
+            key={option.value}
+            className={`flex items-center cursor-pointer border rounded-lg p-3 transition-colors
+              ${isSelected
+                ? 'bg-white dark:bg-gray-900 text-blue-500 border-gray-300 dark:border-gray-600'
+                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            onClick={() => handleToggle(option.value)}
+          >
+            <div
+              className={`w-5 h-5 border-2 rounded-full transition-colors
+                ${isSelected
+                  ? 'bg-blue-500 border-blue-500'
+                  : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-500'
+                }`}
+            ></div>
+            <span className="ml-2">{option.label}</span>
+          </div>
+        )
+      })}
     </div>
   );
 };

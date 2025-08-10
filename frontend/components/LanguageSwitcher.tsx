@@ -19,7 +19,6 @@ const LanguageSwitcher = () => {
     { code: "en", label: "English" },
     { code: "de", label: "Deutsch" },
     { code: "fr", label: "Français" },
-    // { code: "es", label: "Español" },
   ];
 
   const toggleDropdown = () => setDropdownOpen(!isDropdownOpen);
@@ -60,9 +59,8 @@ const LanguageSwitcher = () => {
                     setLang(language.code);
                     setDropdownOpen(false);
                   }}
-                  className={`flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${
-                    lang === language.code ? "bg-blue-50 font-semibold text-blue-700" : ""
-                  }`}
+                  className={`flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 ${lang === language.code ? "bg-blue-50 font-semibold text-blue-700" : ""
+                    }`}
                 >
                   <span>{language.label}</span>
                   {lang === language.code && (

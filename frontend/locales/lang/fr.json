@@ -5,9 +5,26 @@
     "jobs": "",
     "mailer": "",
     "webhook": "",
-    "templates": ""
+    "templates": "",
+    "account": "",
+    "changepassword": "",
+    "logs": "",
+    "adminSection": "",
+    "admin": {
+      "users": "",
+      "logs": "",
+      "config": "",
+      "settings": ""
+    }
   },
   "buttons": {
+    "logs": "",
+    "deactivate": "",
+    "activate": "",
+    "account": "",
+    "signin": "",
+    "profile": "",
+    "logout": "",
     "close": "",
     "refresh": "",
     "save": "",
@@ -19,12 +36,18 @@
     "back": "",
     "test": "",
     "states": {
+      "signingin": "",
       "loading": "",
       "testing": ""
     }
   },
   "forms": {
     "labels": {
+      "role": "",
+      "login": {
+        "username": "",
+        "password": ""
+      },
       "apikey": "",
       "smtp": {
         "host": "",
@@ -74,6 +97,7 @@
       "choose_webhook": "",
       "choose_day": "",
       "choose_report": "",
+      "choose_role": "",
       "loading": ""
     },
     "errors": {
@@ -81,6 +105,10 @@
     }
   },
   "enums": {
+    "userrole": {
+      "admin": "",
+      "user": ""
+    },
     "template_insert_placeholder": {
       "job_name": "",
       "period": "",
@@ -158,6 +186,8 @@
     "sunday": ""
   },
   "ui": {
+    "back_to_app": "",
+    "login": "",
     "context_menu": "",
     "edit": "",
     "create": "",

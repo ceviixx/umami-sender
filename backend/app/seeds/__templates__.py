@@ -14,10 +14,10 @@ def main():
         try:
             module = importlib.import_module(f".{module_name}", package=__package__ + ".templates")
             if hasattr(module, "seed"):
-                print(f"🚀 Seeding {module_name}...")
+                # print(f"🚀 Seeding {module_name}...")
                 module.seed()
-            else:
-                print(f"⚠️  No seed() function found in {module_name}")
+            #else:
+            #    print(f"⚠️  No seed() function found in {module_name}")
         except Exception as e:
             print(f"❌ Error while seeding {module_name}: {e}")
             traceback.print_exc()

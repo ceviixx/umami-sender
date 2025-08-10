@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel
 from typing import List, Optional
 from enum import Enum
@@ -10,8 +11,8 @@ class Frequency(str, Enum):
 
 class MailerJobCreate(BaseModel):
     name: str
-    sender_id: Optional[int] = None
-    host_id: int
+    mailer_id: Optional[UUID] = None
+    umami_id: UUID
     website_id: str
     report_type: str
     summary_items: List[str] = []
@@ -20,28 +21,29 @@ class MailerJobCreate(BaseModel):
     day: Optional[int]
     execution_time: time
     email_recipients: List[str] = []
-    webhook_recipients: List[int] = []
+    webhook_recipients: List[UUID] = []
     is_active: bool
 
 class MailerJobOut(MailerJobCreate):
-    id: int
+    id: UUID
 
     class Config:
         from_attributes = True
 
 class MailerJobUpdate(BaseModel):
     name: str
-    host_id: int
+    umami_id: UUID
     website_id: str
     report_type: str = "summary"
     frequency: Frequency
     day: Optional[int]
     email_recipients: List[str] = []
-    webhook_recipients: List[int] = []
+    webhook_recipients: List[UUID] = []
     is_active: bool
-    sender_id: Optional[int] = None
-    
+    mailer_id: Optional[UUID] = None
+    execution_time: Optional[str] = None
+
     class Config:
         from_attributes = True
-        orm_mode = True
         use_enum_values = True
+    

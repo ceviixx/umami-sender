@@ -33,21 +33,24 @@ export default function SelectBox({
 
   return (
     <div className="w-full">
-      {label && <label className="block text-sm font-medium mb-1">{label}</label>}
+      {label && (
+        <label className="block text-sm font-medium mb-1 text-gray-900 dark:text-gray-100">
+          {label}
+        </label>
+      )}
       <Listbox value={value} onChange={onChange} disabled={disabled}>
         <div className="relative">
           <Listbox.Button
-            className={`relative w-full cursor-default rounded-md border bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              disabled ? 'bg-gray-100 text-gray-400' : 'border-gray-300'
-            }`}
+            className={`relative w-full cursor-default rounded-md border py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+          ${disabled
+                ? 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+                : 'bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white'
+              }`}
           >
-
-            
             <span className="block truncate">
               {selected?.label || placeholder}
             </span>
 
-            {/* "X" zum Zurücksetzen */}
             {selected && canClear && (
               <span
                 onClick={(e) => {
@@ -57,25 +60,26 @@ export default function SelectBox({
                 className="absolute inset-y-0 right-8 flex items-center pr-2 cursor-pointer"
                 title="Auswahl löschen"
               >
-                <XMarkIcon className="h-4 w-4 text-gray-400 hover:text-red-500" />
+                <XMarkIcon className="h-4 w-4 text-gray-400 hover:text-red-500 dark:hover:text-red-400" />
               </span>
             )}
-            
 
-            {/* Chevron Icon */}
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-              <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
+              <ChevronUpDownIcon className="h-5 w-5 text-gray-400 dark:text-gray-300" />
             </span>
           </Listbox.Button>
 
-          <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white border border-gray-200 py-1 text-base shadow-lg focus:outline-none sm:text-sm">
-            {options.map(opt => (
+          <Listbox.Options
+            className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 py-1 text-base shadow-lg focus:outline-none sm:text-sm"
+          >
+            {options.map((opt) => (
               <Listbox.Option
                 key={opt.value}
                 value={opt.value}
                 className={({ active }) =>
-                  `relative cursor-default select-none py-2 ${hasCheckbox ? ('pl-10') : ('pl-4')} pr-4 ${
-                    active ? 'bg-blue-100 text-blue-900' : 'text-gray-900'
+                  `relative cursor-default select-none py-2 ${hasCheckbox ? 'pl-10' : 'pl-4'} pr-4 ${active
+                    ? 'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100'
+                    : 'text-gray-900 dark:text-gray-100'
                   }`
                 }
               >
@@ -85,7 +89,7 @@ export default function SelectBox({
                       {opt.label}
                     </span>
                     {selected && hasCheckbox && (
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600 dark:text-blue-400">
                         <CheckIcon className="h-5 w-5" aria-hidden="true" />
                       </span>
                     )}
@@ -97,5 +101,6 @@ export default function SelectBox({
         </div>
       </Listbox>
     </div>
+
   )
 }

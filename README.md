@@ -9,21 +9,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ceviixx/UmamiSender/releases">
-    <img src="https://img.shields.io/github/release/ceviixx/UmamiSender.svg" alt="Release" />
-  </a>
-  <a href="https://github.com/ceviixx/UmamiSender/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/ceviixx/UmamiSender/ci.yml" alt="CI Status" />
-  </a>
-  <a href="">
-    <img src="https://img.shields.io/badge/node-20.19.x-brightgreen" alt="node" />
-  </a>
-  <a href="">
-    <img src="https://img.shields.io/badge/Next.js-14.2.30-blue" alt="next.js" />
-  </a>
-  <a href="https://umami.is">
-    <img src="https://img.shields.io/badge/umami-2.19.x-black" alt="umami" />
-  </a>
+
+  [![Release](https://img.shields.io/github/release/ceviixx/UmamiSender.svg)](https://github.com/ceviixx/UmamiSender/releases)
+  [![CI](https://img.shields.io/github/actions/workflow/status/ceviixx/UmamiSender/ci.yml)](https://github.com/ceviixx/UmamiSender/actions)
+  ![Node](https://img.shields.io/badge/node-20.19.x-brightgreen)
+  ![Next.js](https://img.shields.io/badge/Next.js-14.2.30-blue)
+  [![Umami](https://img.shields.io/badge/umami-2.19.x-black)](https://umami.is)
+  ![Last commit](https://img.shields.io/github/last-commit/ceviixx/UmamiSender)
+
 </p>
 
 ---
@@ -36,6 +29,18 @@ Perfect for teams, client projects, or personal dashboards.
 > Works with both **Umami Cloud** and **Self-Hosted Umami**.
 
 ---
+
+## 🔐 Default Login
+
+After starting the app, you can log in using:
+
+```txt
+Username: admin
+Password: sender
+````
+
+> On first login, you will be **prompted to change your password immediately**.  
+> You can also change the **username** later in the **Account** page.
 
 ## 🧩 Features
 
@@ -103,17 +108,6 @@ Thanks to the built-in NGINX reverse proxy, everything runs on port 80:
 
 ---
 
-## 🔐 Security
-
-UmamiSender currently **does not include authentication**. All functionality is accessible without login.
-
-### 🔒 Recommendation:
-
-- Use it in **local/private networks** (e.g. home server, Raspberry Pi)
-- If exposed publicly: secure via reverse proxy auth (NGINX), VPN, or firewall
-
----
-
 ## 🤝 Contributing
 
 Pull requests, suggestions, and bug reports are very welcome!
@@ -121,8 +115,6 @@ Pull requests, suggestions, and bug reports are very welcome!
 ### Potential improvements for contributors:
 
 - 🧩 Customizing templates for emails and webhook platforms (e.g. Discord, Microsoft Teams)
-- 🔑 Add authentication (e.g. JWT or BasicAuth)
-- 📊 Report history & dashboard stats
 
 ---
 

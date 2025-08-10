@@ -5,9 +5,26 @@
     "jobs": "Jobs",
     "mailer": "Mailer",
     "webhook": "Webhook",
-    "templates": "Vorlagen"
+    "templates": "Vorlagen",
+    "account": "Konto",
+    "changepassword": "Passwort ändern",
+    "logs": "Protokolle",
+    "adminSection": "Admin",
+    "admin": {
+      "users": "Benutzer",
+      "logs": "Protokolle",
+      "config": "Konfiguration",
+      "settings": "Einstellungen"
+    }
   },
   "buttons": {
+    "logs": "Protokolle",
+    "deactivate": "Deaktivieren",
+    "activate": "Aktivieren",
+    "account": "Account",
+    "signin": "Anmelden",
+    "profile": "Profil",
+    "logout": "Abmelden",
     "close": "Schließen",
     "refresh": "Aktualisieren",
     "save": "Speichern",
@@ -19,12 +36,18 @@
     "back": "Zurück",
     "test": "Verbindung testen",
     "states": {
+      "signingin": "Anmelden...",
       "loading": "Wird geladen...",
       "testing": "Verbindung wird getestet..."
     }
   },
   "forms": {
     "labels": {
+      "role": "Rolle",
+      "login": {
+        "username": "Benutzername",
+        "password": "Passwort"
+      },
       "apikey": "API-Schlüssel",
       "smtp": {
         "host": "SMTP-Host",
@@ -74,6 +97,7 @@
       "choose_webhook": "- Webhook(s) wählen -",
       "choose_day": "- Tag wählen -",
       "choose_report": "- Bericht wählen -",
+      "choose_role": "- Rolle wählen -",
       "loading": "– Laden... –"
     },
     "errors": {
@@ -81,6 +105,10 @@
     }
   },
   "enums": {
+    "userrole": {
+      "admin": "Admin",
+      "user": "Benutzer"
+    },
     "template_insert_placeholder": {
       "job_name": "Job-Name",
       "period": "Zeitraum",
@@ -158,6 +186,8 @@
     "sunday": "Sonntag"
   },
   "ui": {
+    "back_to_app": "Zurück zur App",
+    "login": "Anmelden",
     "context_menu": "Menü",
     "edit": "Bearbeiten",
     "create": "Erstellen",

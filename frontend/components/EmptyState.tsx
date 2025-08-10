@@ -4,7 +4,7 @@ import { useI18n } from "@/locales/I18nContext";
 import { useRouter } from 'next/navigation'
 
 type Props = {
-  title?: string 
+  title?: string
   description?: string
   imageSrc?: string
 }

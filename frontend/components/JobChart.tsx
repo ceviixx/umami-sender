@@ -66,6 +66,14 @@ const JobLineChart = ({ jobData }: JobLineChartProps) => {
         fill: false,
       },
       {
+        label: 'Skipped',
+        data: filledData.map((entry) => entry.skipped),
+        borderColor: '#af8e4c',
+        backgroundColor: '#af8e4c',
+        tension: 0.3,
+        fill: false,
+      },
+      {
         label: 'Failed',
         data: filledData.map((entry) => entry.failed),
         borderColor: '#f44336',
@@ -77,67 +85,67 @@ const JobLineChart = ({ jobData }: JobLineChartProps) => {
   };
 
   const options: ChartOptions<'line'> = {
-  responsive: true,
-  layout: {
-    padding: { left: 16, right: 16 },
-  },
-  plugins: {
-    legend: {
-      display: false,
+    responsive: true,
+    layout: {
+      padding: { left: 16, right: 16 },
     },
-    tooltip: {
-      mode: 'index',
-      intersect: false,
-      callbacks: {
-        title: (tooltipItems) => {
-          const raw = tooltipItems[0].label;
-          return format(parseISO(raw), 'MMM dd'); // z. B. "Aug 04"
-        },
-      },
-    },
-  },
-  scales: {
-    x: {
-      title: {
+    plugins: {
+      legend: {
         display: false,
       },
-      ticks: {
-        display: true,
-        color: '#6b728082',
-        padding: 10,
-        maxRotation: 45,
-        minRotation: 45,
-        callback: function (value, index, ticks) {
-          const raw = this.getLabelForValue(value as number);
-          return format(parseISO(raw), 'MMM dd'); // z. B. "Aug 04"
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+        callbacks: {
+          title: (tooltipItems) => {
+            const raw = tooltipItems[0].label;
+            return format(parseISO(raw), 'MMM dd'); // z. B. "Aug 04"
+          },
         },
       },
-      grid: {
-        drawTicks: false,
-      },
     },
-    y: {
-      beginAtZero: true,
-      suggestedMax:
-        Math.max(...filledData.map((d) => Math.max(d.success, d.failed, d.skipped))) + 1,
-      ticks: {
-        display: true,
-        color: '#6b728082',
-        padding: 10,
-        stepSize: 1,
-        callback: function (value: number | string) {
-          return Number.isInteger(Number(value)) ? value : null;
+    scales: {
+      x: {
+        title: {
+          display: false,
+        },
+        ticks: {
+          display: true,
+          color: '#6b728082',
+          padding: 10,
+          maxRotation: 45,
+          minRotation: 45,
+          callback: function (value, index, ticks) {
+            const raw = this.getLabelForValue(value as number);
+            return format(parseISO(raw), 'MMM dd'); // z. B. "Aug 04"
+          },
+        },
+        grid: {
+          drawTicks: false,
         },
       },
-      title: {
-        display: false,
-      },
-      grid: {
-        drawTicks: false,
+      y: {
+        beginAtZero: true,
+        suggestedMax:
+          Math.max(...filledData.map((d) => Math.max(d.success, d.failed, d.skipped))) + 1,
+        ticks: {
+          display: true,
+          color: '#6b728082',
+          padding: 10,
+          stepSize: 1,
+          callback: function (value: number | string) {
+            return Number.isInteger(Number(value)) ? value : null;
+          },
+        },
+        title: {
+          display: false,
+        },
+        grid: {
+          drawTicks: false,
+        },
       },
     },
-  },
-};
+  };
 
 
   return <Line data={data} options={options} />;

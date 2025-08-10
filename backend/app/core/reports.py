@@ -13,9 +13,9 @@ def send_report(db: Session, job: Job):
     """Creates and sends a report for a Job via email and/or webhook."""
 
     # Load Umami instance
-    instance: Umami = db.query(Umami).filter_by(id=job.host_id).first()
+    instance: Umami = db.query(Umami).filter_by(id=job.umami_id).first()
     if not instance:
-        raise Exception(f"No Umami instance with ID {job.host_id} found.")
+        raise Exception(f"No Umami instance with ID {job.umami_id} found.")
 
     # Fetch analytics summary
     summary = fetch_website_summary(instance, job.website_id)
@@ -35,10 +35,10 @@ def send_report(db: Session, job: Job):
     })
 
     # --- Email report ---
-    if job.sender_id and job.email_recipients:
-        sender: Sender = db.query(Sender).filter_by(id=job.sender_id).first()
+    if job.mailer_id and job.email_recipients:
+        sender: Sender = db.query(Sender).filter_by(id=job.mailer_id).first()
         if not sender:
-            raise Exception(f"No sender with ID {job.sender_id} found.")
+            raise Exception(f"No sender with ID {job.mailer_id} found.")
         send_email(
             sender=sender,
             to=job.email_recipients,

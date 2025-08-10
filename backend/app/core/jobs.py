@@ -102,19 +102,27 @@ def process_jobs(db: Session, jobs: list[Job], today: date):
         try:
             summary = generate_report_summary(db, job)
         except Exception as e:
-            log_mailer_job(db, job.id, "failed", f"{e}", channel="ALL")
+            log_mailer_job(db, job.id, "failed", f"{e}", channel="GLOBAL")
             continue
 
-        if job.sender_id and not mail_sent:
+        if job.mailer_id and not mail_sent:
             try:
                 send_email_report(db, job, summary)
                 log_mailer_job(db, job.id, "success", channel="EMAIL")
             except Exception as e:
-                log_mailer_job(db, job.id, "failed", str(e), channel="EMAIL")
+                if "skipped|" in str(e):
+                    e = str(e).replace("skipped|", "")
+                    log_mailer_job(db, job.id, "skipped", e, channel="EMAIL")
+                else:
+                    log_mailer_job(db, job.id, "failed", str(e), channel="EMAIL")
 
         for webhook_id, channel_type in unsent_webhooks:
             try:
                 send_webhook_report(db, job, summary)
                 log_mailer_job(db, job.id, "success", channel=channel_type)
             except Exception as e:
-                log_mailer_job(db, job.id, "failed", str(e), channel=channel_type)
+                if "skipped|" in str(e):
+                    e = str(e).replace("skipped|", "")
+                    log_mailer_job(db, job.id, "skipped", e, channel=channel_type)
+                else:
+                    log_mailer_job(db, job.id, "failed", str(e), channel=channel_type)

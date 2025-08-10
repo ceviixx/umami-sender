@@ -5,9 +5,26 @@
     "jobs": "Jobs",
     "mailer": "Mailer",
     "webhook": "Webhook",
-    "templates": "Templates"
+    "templates": "Templates",
+    "account": "Account",
+    "changepassword": "Change Password",
+    "logs": "Logs",
+    "adminSection": "Admin",
+    "admin": {
+      "users": "Users",
+      "logs": "Logs",
+      "config": "Config",
+      "settings": "Settings"
+    }
   },
   "buttons": {
+    "logs": "Logs",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "account": "Account",
+    "signin": "Sign in",
+    "profile": "Profile",
+    "logout": "Logout",
     "close": "Close",
     "refresh": "Refresh",
     "save": "Save",
@@ -19,12 +36,18 @@
     "back": "Back",
     "test": "Test connection",
     "states": {
+      "signingin": "Signing in...",
       "loading": "Loading...",
       "testing": "Testing connection..."
     }
   },
   "forms": {
     "labels": {
+      "role": "Role",
+      "login": {
+        "username": "Username",
+        "password": "Password"
+      },
       "apikey": "API key",
       "smtp": {
         "host": "SMTP host",
@@ -74,6 +97,7 @@
       "choose_webhook": "- Choose webhook(s) -",
       "choose_day": "- Choose day -",
       "choose_report": "- Choose report -",
+      "choose_role": "- Choose role -",
       "loading": "– Loading... –"
     },
     "errors": {
@@ -81,6 +105,10 @@
     }
   },
   "enums": {
+    "userrole": {
+      "admin": "Admin",
+      "user": "User"
+    },
     "template_insert_placeholder": {
       "job_name": "Job name",
       "period": "Period",
@@ -158,6 +186,8 @@
     "sunday": "Sunday"
   },
   "ui": {
+    "back_to_app": "Back to app",
+    "login": "Log in",
     "context_menu": "Menu",
     "edit": "Edit",
     "create": "Create",

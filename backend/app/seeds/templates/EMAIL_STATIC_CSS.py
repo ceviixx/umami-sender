@@ -22,7 +22,7 @@ a {color: #6b7280;text-decoration: none;}"""
 def seed():
     db: Session = SessionLocal()
 
-    template = db.query(MailTemplateStyle).filter_by(id=1, is_default=True).first()
+    template = db.query(MailTemplateStyle).filter_by(is_default=True).first()
 
     if template:
         if not template.is_customized:

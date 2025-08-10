@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+# 🔐 Check for SECRET_KEY
+if [ -z "$SECRET_KEY" ]; then
+  echo "❌ SECRET_KEY is not set. Please define it as an environment variable (e.g. in docker-compose.yml or .env file)."
+  exit 1
+fi
+
 echo "⏳ Waiting for database..."
 until pg_isready -h db -p 5432 -U "user" > /dev/null 2>&1; do
   sleep 1
@@ -25,6 +31,8 @@ fi
 
 echo "🚀 Applying migrations..."
 alembic upgrade head
+
+python3 -m app.seeds.initial_user
 
 echo "🌱 Seeding default template (if not exists)..."
 python3 -m app.seeds.__templates__

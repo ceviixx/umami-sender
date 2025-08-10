@@ -4,7 +4,7 @@ import { useI18n } from "@/locales/I18nContext";
 
 export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
   const { locale } = useI18n();
-  
+
   return (
     <div className="p-6 text-center">
       <h1 className="text-2xl font-bold text-red-600 mb-4">An error occured</h1>
