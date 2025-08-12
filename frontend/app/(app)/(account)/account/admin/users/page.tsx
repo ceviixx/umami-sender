@@ -3,20 +3,17 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  fetchUsers,
-  deleteUser
-} from '@/lib/api/users'
+import { fetchUsers, deleteUser } from '@/lib/api/users'
 import { User } from '@/types'
 import ConfirmDelete from '@/components/ConfirmDelete'
 import EmptyState from '@/components/EmptyState'
 import NetworkError from "@/components/NetworkError";
 import ContextMenu from '@/components/ContextMenu'
-import PageHeader from '@/components/PageHeader'
+import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
-import CardItem from "@/components/CardItem";
+import CardList from "@/components/cardlist/CardList";
 
-export default function WebhooksPage() {
+export default function UsersPage() {
   const router = useRouter()
   const { locale } = useI18n()
   const [users, setUsers] = useState<User[]>([])
@@ -45,7 +42,7 @@ export default function WebhooksPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6">
       <PageHeader
         title={locale.pages.admin.users}
         href='/account/admin/users/new'
@@ -54,40 +51,34 @@ export default function WebhooksPage() {
       {users.length === 0 ? (
         <EmptyState />
       ) : (
-        <ul className="space-y-3">
-          {users.map(w => (
-            <CardItem
-              key={w.id}
-              rightSlot={
-                <ContextMenu
-                  items={[
-                    {
-                      title: locale.buttons.edit,
-                      action: () => router.push(`/account/admin/users/${w.id}`),
-                      tone: 'default',
-                    },
-                    {
-                      title: locale.buttons.delete,
-                      action: () => setDeleteId(w.id),
-                      tone: 'danger',
-                    },
-                  ]}
-                />
-              }
-            >
-              <div>
-                <div className="font-semibold">{w.username}</div>
-                <div className="text-sm text-gray-600">{w.role}</div>
-              </div>
-            </CardItem>
-          ))}
-          <ConfirmDelete
-            open={deleteId !== null}
-            onConfirm={handleDelete}
-            onCancel={() => setDeleteId(null)}
-          />
-        </ul>
+        <CardList
+          items={users}
+          keyField={(item) => item.id}
+          title={(item) => item.username}
+          subtitle={(item) =>  locale.enums.userrole[item.role]}
+          rightSlot={(item) => (
+            <ContextMenu
+              items={[
+                {
+                  title: locale.buttons.edit,
+                  action: () => router.push(`/account/admin/users/${item.id}`),
+                  tone: 'default',
+                },
+                {
+                  title: locale.buttons.delete,
+                  action: () => setDeleteId(item.id),
+                  tone: 'danger',
+                },
+              ]}
+            />
+          )}
+        />
       )}
+      <ConfirmDelete
+        open={deleteId !== null}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   )
 }

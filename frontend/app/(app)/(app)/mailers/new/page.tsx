@@ -5,12 +5,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Sender } from '@/types'
 import { createMailer, testConnection } from '@/lib/api/mailers'
-import PageHeader from '@/components/PageHeader'
+import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
-import TextInput from '@/components/TextInput'
+import TextInput from '@/components/inputs/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
 
-export default function SenderForm() {
+export default function MailerNewPage() {
   const [sender, setSender] = useState<Sender | null>(null);
   const router = useRouter()
   const { locale } = useI18n()
@@ -96,167 +96,163 @@ export default function SenderForm() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <PageHeader
-        title={locale.ui.create}
-      />
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center gap-2">
-          <TextInput
-            label={locale.forms.labels.name}
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder={locale.forms.labels.name}
-          />
-          <TextInput
-            label={locale.forms.labels.sender_email}
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="sender@local.net"
-          />
-        </div>
+    <div className="max-w-5xl mx-auto p-6">
+      <PageHeader title={locale.ui.create} />
 
-        <div className="flex items-center gap-2">
-          <TextInput
-            label={locale.forms.labels.smtp.host}
-            name="smtp_host"
-            value={form.smtp_host}
-            onChange={handleChange}
-            placeholder="local.net"
-          />
-          <TextInput
-            type='number'
-            label={locale.forms.labels.smtp.port}
-            name="smtp_port"
-            value={String(form.smtp_port)}
-            onChange={handleChange}
-            placeholder="1025"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-8">
 
-        <div className="flex items-center gap-2">
-          <label className="flex items-center cursor-pointer">
-            <div className="relative">
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+          <div className="px-5 pt-5 pb-1">
+            <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100">
+              {locale.forms.sections.sender}
+            </h2>
+          </div>
+          <div className="px-5 pb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <TextInput
+                label={locale.forms.labels.name}
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder={locale.forms.labels.name}
+                required
+                autoComplete="off"
+                inputMode="text"
+              />
+              <TextInput
+                label={locale.forms.labels.sender_email}
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="sender@local.net"
+                required
+                autoComplete="email"
+                inputMode="email"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 shadow-sm">
+          <div className="px-5 pt-5 pb-3">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              {locale.forms.sections.smtp_host}
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <TextInput
+                label=""
+                name="smtp_host"
+                value={form.smtp_host}
+                onChange={handleChange}
+                placeholder="local.net"
+              />
+              <TextInput
+                type="number"
+                label=""
+                name="smtp_port"
+                value={String(form.smtp_port)}
+                onChange={handleChange}
+                placeholder="1025"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 shadow-sm">
+          <div className="px-5 pt-5 pb-3 space-y-4">
+            <div className="flex items-center gap-3 pb-2">
               <input
                 type="checkbox"
                 name="use_auth"
+                id="use_auth"
                 checked={form.use_auth}
                 onChange={handleChange}
-                className="sr-only"
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <div
-                className={`w-10 h-6 rounded-full transition-colors
-                  ${form.use_auth
-                    ? 'bg-green-500'
-                    : 'bg-gray-300 dark:bg-gray-600'}
-                `}
-              ></div>
-              <div
-                className={`absolute left-1 top-1 w-4 h-4 rounded-full shadow transition-transform
-                  ${form.use_auth ? 'translate-x-4' : ''}
-                  bg-white dark:bg-gray-100
-                `}
-              ></div>
+              <label htmlFor="use_auth" className="text-sm text-gray-900 dark:text-gray-100">
+                {locale.forms.labels.auth_required}
+              </label>
             </div>
-            <span className="ml-3 text-sm text-gray-900 dark:text-gray-100">
-              {locale.forms.labels.auth_required}
-            </span>
-          </label>
-        </div>
 
-
-        {form.use_auth && (
-          <div className="flex items-center gap-2">
-            <TextInput
-              label={locale.forms.labels.smtp.username}
-              name="smtp_username"
-              value={form.smtp_username}
-              onChange={handleChange}
-              placeholder={locale.forms.labels.smtp.username}
-            />
-            <TextInput
-              type='password'
-              label={locale.forms.labels.smtp.password}
-              name="smtp_password"
-              value={form.smtp_password}
-              onChange={handleChange}
-              placeholder={locale.forms.labels.smtp.password}
-            />
-          </div>
-        )}
-
-        <div>
-          <label className="block font-medium mb-1 text-gray-900 dark:text-gray-100">
-            {locale.forms.labels.encryption}
-          </label>
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden w-fit">
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${!form.use_tls && !form.use_ssl
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-gray-700'
-                }`}
-              onClick={() => handleEncryptionChange('none')}
-            >
-              {locale.enums.encryption.none}
-            </button>
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${form.use_tls
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-gray-700'
-                }`}
-              onClick={() => handleEncryptionChange('tls')}
-            >
-              {locale.enums.encryption.tls}
-            </button>
-            <button
-              type="button"
-              className={`px-4 py-2 text-sm font-medium focus:outline-none transition ${form.use_ssl
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-700 hover:bg-gray-200 dark:text-gray-200 dark:hover:bg-gray-700'
-                }`}
-              onClick={() => handleEncryptionChange('ssl')}
-            >
-              {locale.enums.encryption.ssl}
-            </button>
-          </div>
-        </div>
-
-
-
-        <div className="flex items-center gap-2 justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={handleTest}
-              disabled={testing}
-              className="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100 rounded transition"
-            >
-              {testing ? locale.buttons.states.testing : locale.buttons.test}
-            </button>
-
-            {testResult && (
-              <span
-                className={`text-sm ${testResult.startsWith('✅')
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
-                  }`}
-              >
-                {testResult}
-              </span>
+            {form.use_auth && (
+              <div className="flex flex-col sm:flex-row gap-4">
+                <TextInput
+                  label={locale.forms.labels.smtp.username}
+                  name="smtp_username"
+                  value={form.smtp_username}
+                  onChange={handleChange}
+                  placeholder={locale.forms.labels.smtp.username}
+                />
+                <TextInput
+                  type='password'
+                  label={locale.forms.labels.smtp.password}
+                  name="smtp_password"
+                  value={form.smtp_password}
+                  onChange={handleChange}
+                  placeholder={locale.forms.labels.smtp.password}
+                />
+              </div>
             )}
           </div>
+        </section>
 
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 shadow-sm">
+          <div className="px-5 pt-5 pb-3">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">{locale.forms.labels.encryption}</h2>
+            <div className="inline-grid grid-cols-3 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-50/70 dark:bg-gray-800/60">
+              <button
+                type="button"
+                className={`px-4 py-2 text-sm font-medium transition ${!form.use_tls && !form.use_ssl ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                onClick={() => handleEncryptionChange('none')}
+              >
+                {locale.enums.encryption.none}
+              </button>
+              <button
+                type="button"
+                className={`px-4 py-2 text-sm font-medium transition ${form.use_tls ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                onClick={() => handleEncryptionChange('tls')}
+              >
+                {locale.enums.encryption.tls}
+              </button>
+              <button
+                type="button"
+                className={`px-4 py-2 text-sm font-medium transition ${form.use_ssl ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                onClick={() => handleEncryptionChange('ssl')}
+              >
+                {locale.enums.encryption.ssl}
+              </button>
+            </div>
+          </div>
+        </section>
 
-          <FormButtons
-            cancelLabel={locale.buttons.cancel}
-            saveLabel={locale.buttons.save}
-          />
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-5 py-4">
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={handleTest}
+                disabled={testing}
+                className="px-4 py-2 rounded-md text-sm font-medium transition-colors
+                          text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700
+                          hover:bg-gray-200 dark:hover:bg-gray-600"
+              >
+                {testing ? locale.buttons.states.testing : locale.buttons.test}
+              </button>
+              {testResult && (
+                <span className={`text-sm ${testResult.startsWith('✅')
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'}`}>
+                  {testResult}
+                </span>
+              )}
+            </div>
 
-        </div>
+            <FormButtons
+              cancelLabel={locale.buttons.cancel}
+              saveLabel={locale.buttons.create}
+            />
+          </div>
+        </section>
       </form>
     </div>
   )

@@ -2,27 +2,19 @@
 
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
-import {
-  fetchJobs,
-  deleteJob,
-  updateJobStatus,
-} from '@/lib/api/jobs'
+import { fetchJobs, deleteJob, updateJobStatus } from '@/lib/api/jobs'
 import { MailerJob } from '@/types'
 import ConfirmDelete from '@/components/ConfirmDelete'
 import EmptyState from '@/components/EmptyState'
 import NetworkError from "@/components/NetworkError";
 import ContextMenu from '@/components/ContextMenu'
-import PageHeader from '@/components/PageHeader'
+import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
-import CardItem from "@/components/CardItem";
-
-import {
-  PaperAirplaneIcon,
-  PuzzlePieceIcon
-} from '@heroicons/react/20/solid';
+import CardList from "@/components/cardlist/CardList";
+import { PaperAirplaneIcon, PuzzlePieceIcon } from '@heroicons/react/20/solid';
 import { useRouter } from 'next/navigation'
 
-export default function MailerPage() {
+export default function JobsPage() {
   const [jobs, setJobs] = useState<MailerJob[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -86,7 +78,7 @@ export default function MailerPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6">
       <PageHeader
         title={locale.pages.jobs}
         href='/jobs/new'
@@ -95,68 +87,56 @@ export default function MailerPage() {
       {jobs.length === 0 ? (
         <EmptyState />
       ) : (
-        <ul className="space-y-3">
-          {jobs.map(job => (
-            <CardItem
-              key={job.id}
-              rightSlot={
-                <>
-                  <div className="flex text-gray-600 gap-1 text-sm">
-                    {job.mailer_id && (<PaperAirplaneIcon className="text-gray-400 w-4 h-4" title={locale.ui.mail} />)}
-                    {job.webhook_recipients.length > 0 && (<PuzzlePieceIcon className="text-gray-400 w-4 h-4" title={locale.ui.webhook} />)}
-                  </div>
-                  <ContextMenu
-                    items={[
-                      {
-                        title: locale.buttons.edit,
-                        action: () => router.push(`/jobs/${job.id}`),
-                        tone: 'default',
-                      },
-                      {
-                        title: locale.buttons.logs,
-                        action: () => router.push(`/jobs/${job.id}/logs`),
-                        tone: 'default',
-                      },
-                      {
-                        title:
-                          job.is_active
-                            ? (locale.buttons.deactivate)
-                            : (locale.buttons.activate),
-                        action: () => handleToggleStatus(job.id),
-                        tone: job.is_active ? 'warning' : 'success',
-                        disabled: pendingToggle.has(job.id),
-                      },
-                      {
-                        title: locale.buttons.delete,
-                        action: () => setDeleteId(job.id),
-                        tone: 'danger',
-                      },
-                    ]}
-                  />
-                </>
-              }
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`w-3 h-3 rounded-full ${job.is_active ? 'bg-green-500' : 'bg-orange-500'
-                    }`}
-                ></span>
-                <div>
-                  <div className="font-semibold">{job.name}</div>
-                  <div className="text-gray-600 text-sm">
-                    {locale.forms.labels.frequency}: {frequencyMap[job.frequency] || 'Unknown'} | {locale.forms.labels.type}: {locale.enums.job_content_type[job.report_type as 'summary' | 'report'] || job.report_type}
-                  </div>
-                </div>
+        <CardList
+          items={jobs}
+          keyField={(item) => item.id}
+          title={(item) => item.name}
+          subtitle={(item) => `${locale.forms.labels.frequency}: ${frequencyMap[item.frequency] ?? 'Unknown'} | ${locale.forms.labels.type}: ${locale.enums.job_content_type[item.report_type as 'summary' | 'report'] ?? item.report_type}` }
+          badge={(item) => item.is_active ? locale.common.active : locale.common.inactive}
+          badgeTone={(item) => item.is_active ? "success" : "warning"}
+          rightSlot={(item) => (
+            <>
+              <div className="flex text-gray-600 gap-1 text-sm">
+                {item.mailer_id && (<PaperAirplaneIcon className="text-gray-400 w-4 h-4" title={locale.ui.mail} />)}
+                {item.webhook_recipients.length > 0 && (<PuzzlePieceIcon className="text-gray-400 w-4 h-4" title={locale.ui.webhook} />)}
               </div>
-            </CardItem>
-          ))}
-          <ConfirmDelete
-            open={deleteId !== null}
-            onConfirm={handleDelete}
-            onCancel={() => setDeleteId(null)}
-          />
-        </ul>
+              <ContextMenu
+                items={[
+                  {
+                    title: locale.buttons.edit,
+                    action: () => router.push(`/jobs/${item.id}`),
+                    tone: 'default',
+                  },
+                  {
+                    title: locale.buttons.logs,
+                    action: () => router.push(`/jobs/${item.id}/logs`),
+                    tone: 'default',
+                  },
+                  {
+                    title:
+                      item.is_active
+                        ? (locale.buttons.deactivate)
+                        : (locale.buttons.activate),
+                    action: () => handleToggleStatus(item.id),
+                    tone: item.is_active ? 'warning' : 'success',
+                    disabled: pendingToggle.has(item.id),
+                  },
+                  {
+                    title: locale.buttons.delete,
+                    action: () => setDeleteId(item.id),
+                    tone: 'danger',
+                  },
+                ]}
+              />
+            </>
+          )}
+        />
       )}
+      <ConfirmDelete
+        open={deleteId !== null}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteId(null)}
+      />
     </div>
   )
 }

@@ -6,9 +6,9 @@ import { useI18n } from '@/locales/I18nContext'
 import { translations } from '@/locales'
 import { languageDisplayNames } from '@/locales/languageMeta'
 import { fetchMe, updateMe } from '@/lib/api/me'
-import PageHeader from '@/components/PageHeader'
-import TextInput from '@/components/TextInput'
-import SelectBox from '@/components/SelectBox'
+import PageHeader from '@/components/navigation/PageHeader'
+import TextInput from '@/components/inputs/TextInput'
+import SelectBox from '@/components/inputs/SelectBox'
 import FormButtons from '@/components/FormButtons'
 import { showError, showSuccess } from '@/lib/toast'
 
@@ -19,6 +19,7 @@ type Account = {
 
 export default function AccountPage() {
   const router = useRouter()
+  const { locale } = useI18n()
   const { lang, setLang } = useI18n()
   const availableLanguages = Object.keys(translations) as (keyof typeof translations)[]
   const [form, setForm] = useState<Account | null>(null)
@@ -28,24 +29,21 @@ export default function AccountPage() {
     const loadAccount = async () => {
       try {
         const data = await fetchMe()
-
         setForm({
           username: data.username,
           language: data.language,
         })
-
         setLang(data.language)
       } catch (error) {
         showError('Failed to load account')
       }
     }
-
     loadAccount()
   }, [router, setLang])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setForm((prev) => prev ? { ...prev, [name]: value } : prev)
+    setForm(prev => prev ? { ...prev, [name]: value as any } : prev)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,38 +68,56 @@ export default function AccountPage() {
   if (!form) return null
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6">
       <PageHeader title="Account" />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <TextInput
-          label="Username"
-          name="username"
-          value={form.username}
-          onChange={handleChange}
-          disabled={submitting}
-        />
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+          <div className="px-5 pt-5 pb-1">
+            <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100">
+              {locale.forms.sections.profile}
+            </h2>
+          </div>
 
-        <SelectBox
-          label="Language"
-          value={form.language}
-          onChange={(value) =>
-            handleChange({ target: { name: 'language', value } } as React.ChangeEvent<HTMLSelectElement>)
-          }
-          options={availableLanguages.map((code) => ({
-            value: code,
-            label: languageDisplayNames[code] ?? code.toUpperCase(),
-          }))}
-          placeholder="Select language"
-          disabled={submitting}
-        />
+          <div className="px-5 pb-5 space-y-4">
+            <TextInput
+              label={locale.forms.labels.username}
+              name="username"
+              value={form.username}
+              onChange={handleChange}
+              disabled={submitting}
+              autoComplete="username"
+              required
+            />
 
+            <SelectBox
+              label={locale.forms.labels.language}
+              value={form.language}
+              onChange={(value) =>
+                handleChange({ target: { name: 'language', value } } as React.ChangeEvent<HTMLSelectElement>)
+              }
+              options={availableLanguages.map((code) => ({
+                value: code,
+                label: languageDisplayNames[code] ?? code.toUpperCase(),
+              }))}
+              placeholder={locale.forms.placeholders.choose_language}
+              disabled={submitting}
+            />
 
-        <FormButtons
-          isSubmitting={submitting}
-          hasCancel={false}
-          saveLabel={'{UPDATE}'}
-        />
+            <p className="text-xs text-gray-500 dark:text-gray-400"></p>
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400"></p>
+            <FormButtons
+              isSubmitting={submitting}
+              hasCancel={false}
+              saveLabel={locale.buttons.update}
+            />
+          </div>
+        </section>
       </form>
     </div>
   )

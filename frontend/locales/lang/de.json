@@ -10,6 +10,7 @@
     "changepassword": "Passwort ändern",
     "logs": "Protokolle",
     "adminSection": "Admin",
+    "systemSection": "System",
     "admin": {
       "users": "Benutzer",
       "logs": "Protokolle",
@@ -18,10 +19,11 @@
     }
   },
   "buttons": {
+    "change_password": "Passwort ändern",
     "logs": "Protokolle",
     "deactivate": "Deaktivieren",
     "activate": "Aktivieren",
-    "account": "Account",
+    "account": "Konto",
     "signin": "Anmelden",
     "profile": "Profil",
     "logout": "Abmelden",
@@ -36,13 +38,30 @@
     "back": "Zurück",
     "test": "Verbindung testen",
     "states": {
-      "signingin": "Anmelden...",
-      "loading": "Wird geladen...",
+      "signingin": "Anmeldung läuft...",
+      "loading": "Laden...",
       "testing": "Verbindung wird getestet..."
     }
   },
   "forms": {
+    "sections": {
+      "profile": "Profil",
+      "user": "Benutzer",
+      "general": "Allgemein",
+      "config": "Konfiguration",
+      "recipients": "Empfänger",
+      "sender": "Absender",
+      "smtp_host": "SMTP-Host",
+      "type": "Typ"
+    },
     "labels": {
+      "password": {
+        "password": "Passwort",
+        "current": "Aktuelles Passwort",
+        "new": "Neues Passwort",
+        "confirm": "Passwort bestätigen"
+      },
+      "language": "Sprache",
       "role": "Rolle",
       "login": {
         "username": "Benutzername",
@@ -58,7 +77,7 @@
       "service": {
         "type": {
           "cloud": "Cloud",
-          "selfhost": "Selbstgehostet"
+          "selfhost": "Selfhost"
         },
         "name": "Typ"
       },
@@ -68,40 +87,52 @@
       "sender_email": "Absender-E-Mail",
       "umami": "Umami",
       "website": "Website",
-      "email_sender": "Absender der E-Mail",
-      "email_recipients": "E-Mail Empfänger",
+      "email_sender": "E-Mail-Absender",
+      "email_recipients": "E-Mail-Empfänger",
       "webhook_type": {
         "url": "URL",
         "token": "Token"
       },
       "hostname": "Hostname",
       "username": "Benutzername",
-      "password": "Passwort",
       "type": "Typ",
       "name": "Name",
       "description": "Beschreibung",
-      "frequency": "Häufigkeit",
+      "frequency": "Frequenz",
       "weekday": "Wochentag",
       "day": "Tag",
-      "webhook_recipients": "Webhook Empfänger",
+      "webhook_recipients": "Webhook-Empfänger",
       "report": "Bericht",
-      "execution_time": "Ausführungszeit"
+      "execution_time": "Ausführungszeit (UTC)"
     },
     "placeholders": {
-      "choose_website": "– Website wählen –",
-      "choose_weekday": "– Wochentag wählen –",
-      "choose_sender": "– Absender wählen –",
-      "choose_sender_type": "- Sender wählen -",
-      "choose_umami": "– Umami-Instanz wählen –",
-      "choose_webhook_type": "– Typ wählen –",
-      "choose_webhook": "- Webhook(s) wählen -",
-      "choose_day": "- Tag wählen -",
-      "choose_report": "- Bericht wählen -",
-      "choose_role": "- Rolle wählen -",
-      "loading": "– Laden... –"
+      "choose_website": "– Website auswählen –",
+      "choose_weekday": "– Wochentag auswählen –",
+      "choose_sender": "– Absender auswählen –",
+      "choose_umami": "– Umami-Instanz auswählen –",
+      "choose_webhook_type": "– Typ auswählen –",
+      "choose_sender_type": "- Typ auswählen -",
+      "choose_webhook": "- Webhook(s) auswählen -",
+      "choose_day": "- Tag auswählen -",
+      "choose_report": "- Bericht auswählen -",
+      "choose_role": "- Rolle auswählen -",
+      "loading": "– Laden... –",
+      "no_senders_or_webhooks": "- Keine Daten -",
+      "choose_language": "- Sprache auswählen -"
     },
     "errors": {
       "max_items": "Maximal {max} Elemente erlaubt"
+    },
+    "help": {
+      "userEditHint": "Lasse das Passwort leer, um es nicht zu ändern.",
+      "userCreateHint": "Lege einen Benutzer mit Rolle und Passwort an.",
+      "instanceName": "Eindeutiger Anzeigename für diese Instanz.",
+      "cloud": "Für Umami Cloud genügt dein API-Key.",
+      "selfhost": "Wir nutzen Host, Benutzername und Passwort einmalig für ein Token.",
+      "webhookName": "Interner Name zur Identifikation.",
+      "webhookUrl": "Vollständige Ziel-URL, die POST-Payloads empfängt.",
+      "hint_general": "Bitte zuerst die allgemeinen Felder ausfüllen.",
+      "hint_config": "Bitte zuerst die Konfiguration abschließen."
     }
   },
   "enums": {
@@ -116,7 +147,7 @@
       "visits": "Besuche",
       "visitors": "Besucher",
       "bounce_rate": "Absprungrate",
-      "visit_duration": "Besuchszeit",
+      "visit_duration": "Besuchsdauer",
       "top_pageviews": "Top-Seitenaufrufe",
       "top_referrer": "Top-Referrer"
     },
@@ -136,12 +167,12 @@
     "service_type": {
       "cloud": "Cloud",
       "selfhost": "Selfhost",
-      "self_hosted": "Selbstgehostet"
+      "self_hosted": "Selfhost"
     },
     "metrics": {
       "stats": "Statistiken",
       "url": "Seiten",
-      "referrer": "Verweisquellen",
+      "referrer": "Referrer",
       "channel": "Kanäle",
       "browser": "Browser",
       "os": "Betriebssystem",
@@ -150,7 +181,7 @@
       "region": "Regionen",
       "city": "Städte",
       "language": "Sprachen",
-      "screen": "Bildschirmgrößen",
+      "screen": "Bildschirme",
       "event": "Ereignisse",
       "query": "Abfrageparameter",
       "host": "Hosts",
@@ -161,7 +192,7 @@
       "report": "Bericht"
     },
     "sender_report_template_type": {
-      "EMAIL_SUMMARY": "Statistik Zusammenfassung",
+      "EMAIL_SUMMARY": "Statistik-Zusammenfassung",
       "EMAIL_REPORT_INSIGHTS": "Einblicke",
       "EMAIL_REPORT_ATTRIBUTION": "Attribution",
       "EMAIL_REPORT_FUNNEL": "Trichter",
@@ -173,7 +204,7 @@
     }
   },
   "messages": {
-    "confirm_delete": "Löschung bestätigen",
+    "confirm_delete": "Löschen bestätigen",
     "no_webhooks": "Keine Webhooks konfiguriert"
   },
   "weekdays": {
@@ -192,8 +223,8 @@
     "edit": "Bearbeiten",
     "create": "Erstellen",
     "webhook": "Webhook",
-    "mail": "Mail",
-    "setup": "Einrichten",
+    "mail": "E-Mail",
+    "setup": "Setup",
     "general": "Allgemein",
     "config": "Konfiguration",
     "recipients": "Empfänger",
@@ -201,5 +232,9 @@
     "template_preview": "Vorlagenvorschau",
     "preview": "Vorschau",
     "preview_refreshed": "Vorschau aktualisiert"
+  },
+  "common": {
+    "active": "Aktiv",
+    "inactive": "Inaktiv"
   }
 }

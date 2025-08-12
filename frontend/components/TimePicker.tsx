@@ -1,5 +1,5 @@
 import React from 'react';
-import SelectBox from '@/components/SelectBox';
+import SelectBox from '@/components/inputs/SelectBox';
 
 interface TimePickerProps {
   label: string;
@@ -29,7 +29,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange }) => {
   };
 
   return (
-    <div className="w-1/4">
+    <div className="w-1/2">
       {label && <label className="block text-sm font-medium mb-1">{label}</label>}
       <div className="flex items-center gap-2">
         <SelectBox

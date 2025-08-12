@@ -2,23 +2,16 @@
 
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import {
-  fetchWebhook,
-  updateWebhook,
-  testWebhook
-} from '@/lib/api/webhook'
+import { useRouter } from 'next/navigation'
+import { fetchWebhook, updateWebhook, testWebhook } from '@/lib/api/webhook'
 import { WebhookRecipient } from '@/types'
 import LoadingSpinner from '@/components/LoadingSpinner'
-import SelectBox from '@/components/SelectBox'
-import PageHeader from '@/components/PageHeader'
+import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
-import TextInput from '@/components/TextInput'
+import TextInput from '@/components/inputs/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
-import test from "node:test";
 
-export default function Edit_Webhook({ params }: { params: { id: string } }) {
-  const router = useRouter()
+export default function WebhookEditPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true)
 
   const { locale } = useI18n()
@@ -40,7 +33,6 @@ export default function Edit_Webhook({ params }: { params: { id: string } }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!form) return
 
     try {
@@ -49,6 +41,7 @@ export default function Edit_Webhook({ params }: { params: { id: string } }) {
         url: form.url,
       })
       showSuccess('Updated')
+      // router.back()
     } catch (error: any) {
       const message = error?.response?.data?.detail || error?.message || 'Failed to update webhook'
       showError(message)
@@ -56,14 +49,11 @@ export default function Edit_Webhook({ params }: { params: { id: string } }) {
   }
 
   const handleTest = async () => {
+    if (!form) return
     setTesting(true)
     try {
-      const payload = {
-        ...form
-      }
-      await testWebhook(payload)
+      await testWebhook({ ...form })
       showSuccess('Test success!')
-      console.log(payload)
     } catch (e: any) {
       showError(`Error: ${e.message || 'Connection failure.'}`)
     } finally {
@@ -71,53 +61,78 @@ export default function Edit_Webhook({ params }: { params: { id: string } }) {
     }
   }
 
-  if (loading) { return <LoadingSpinner title={locale.ui.edit} /> }
+  if (loading) {
+    return <LoadingSpinner title={locale.ui.edit} />
+  }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <PageHeader
-        hasBack={true}
-        title={locale.ui.edit}
-      />
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-5xl mx-auto p-6">
+      <PageHeader hasBack title={locale.ui.edit} />
 
-        <TextInput
-          label={locale.forms.labels.name}
-          name="name"
-          value={String(form?.name)}
-          onChange={handleChange}
-          placeholder={locale.forms.labels.name}
-        />
-        <TextInput
-          label={form?.type === 'CUSTOM' ? locale.forms.labels.webhook_type.url : locale.forms.labels.webhook_type.token}
-          name="url"
-          value={String(form?.url)}
-          onChange={handleChange}
-          placeholder={form?.type === 'CUSTOM' ? 'https://example.com/webhook' : 'xxxxxxxxxxxxxxxxxx'}
-        />
-
-        <div className="flex items-center gap-2 justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={handleTest}
-              disabled={testing}
-              className="px-4 py-2 rounded border transition
-                bg-gray-100 dark:bg-gray-800
-                border-gray-300 dark:border-gray-600
-                text-gray-800 dark:text-gray-100
-                disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {testing ? locale.buttons.states.testing : locale.buttons.test}
-            </button>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+          <div className="px-5 pt-5 pb-1">
+            <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100">
+              {locale.forms.sections.type}
+            </h2>
           </div>
 
+          <div className="px-5 pb-5 space-y-4">
+            <TextInput
+              label={locale.forms.labels.name}
+              name="name"
+              value={String(form?.name ?? '')}
+              onChange={handleChange}
+              placeholder={locale.forms.labels.name}
+              required
+              autoComplete="off"
+              inputMode="text"
+              aria-describedby="whNameHelp"
+            />
+            <p id="whNameHelp" className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+              {locale.forms.help.webhookName}
+            </p>
 
-          <FormButtons
-            cancelLabel={locale.buttons.cancel}
-            saveLabel={locale.buttons.update}
-          />
-        </div>
+            <TextInput
+              label={locale.forms.labels.webhook_type.url}
+              name="url"
+              value={String(form?.url ?? '')}
+              onChange={handleChange}
+              placeholder="https://example.com/webhook/xxxxxxxxxxxxxxxxxx"
+              required
+              inputMode="url"
+              autoComplete="url"
+              aria-describedby="whUrlHelp"
+            />
+            <p id="whUrlHelp" className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+              {locale.forms.help.webhookUrl}
+            </p>
+          </div>
+        </section>
+
+
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-5 py-4">
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={handleTest}
+                disabled={testing || !form}
+                className="px-4 py-2 rounded-md text-sm font-medium transition-colors
+                          text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700
+                          hover:bg-gray-200 dark:hover:bg-gray-600"
+              >
+                {testing ? locale.buttons.states.testing : locale.buttons.test}
+              </button>
+            </div>
+
+            <FormButtons
+              cancelLabel={locale.buttons.cancel}
+              saveLabel={locale.buttons.update}
+            />
+          </div>
+        </section>
       </form>
     </div>
   )

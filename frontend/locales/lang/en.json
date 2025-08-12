@@ -10,6 +10,7 @@
     "changepassword": "Change Password",
     "logs": "Logs",
     "adminSection": "Admin",
+    "systemSection": "System",
     "admin": {
       "users": "Users",
       "logs": "Logs",
@@ -18,6 +19,7 @@
     }
   },
   "buttons": {
+    "change_password": "Change password",
     "logs": "Logs",
     "deactivate": "Deactivate",
     "activate": "Activate",
@@ -42,7 +44,24 @@
     }
   },
   "forms": {
+    "sections": {
+      "profile": "Profile",
+      "user": "User",
+      "general": "General",
+      "config": "Config",
+      "recipients": "Recipients",
+      "sender": "Sender",
+      "smtp_host": "SMTP Host",
+      "type": "Type"
+    },
     "labels": {
+      "password": {
+        "password": "Password",
+        "current": "Current Password",
+        "new": "New Password",
+        "confirm": "Confirm Password"
+      },
+      "language": "Language",
       "role": "Role",
       "login": {
         "username": "Username",
@@ -76,7 +95,6 @@
       },
       "hostname": "Hostname",
       "username": "Username",
-      "password": "Password",
       "type": "Type",
       "name": "Name",
       "description": "Description",
@@ -85,7 +103,7 @@
       "day": "Day",
       "webhook_recipients": "Webhook Recipients",
       "report": "Report",
-      "execution_time": "Execution time"
+      "execution_time": "Execution time (UTC)"
     },
     "placeholders": {
       "choose_website": "– Choose website –",
@@ -98,10 +116,23 @@
       "choose_day": "- Choose day -",
       "choose_report": "- Choose report -",
       "choose_role": "- Choose role -",
-      "loading": "– Loading... –"
+      "loading": "– Loading... –",
+      "no_senders_or_webhooks": "- No data -",
+      "choose_language": "- Choose language -"
     },
     "errors": {
       "max_items": "Maximum of {max} items allowed"
+    },
+    "help": {
+      "userEditHint": "Leave the password empty to keep it unchanged.",
+      "userCreateHint": "Create a user with a role and password.",
+      "instanceName": "Unique display name for this instance.",
+      "cloud": "For Umami Cloud, your API key is sufficient.",
+      "selfhost": "We use host, username, and password once to obtain a token.",
+      "webhookName": "Internal name for identification.",
+      "webhookUrl": "Full target URL that receives POST payloads.",
+      "hint_general": "Please fill in the general fields first.",
+      "hint_config": "Please complete the configuration first."
     }
   },
   "enums": {
@@ -201,5 +232,9 @@
     "template_preview": "Template Preview",
     "preview": "Preview",
     "preview_refreshed": "Preview refreshed"
+  },
+  "common": {
+    "active": "Active",
+    "inactive": "Inactive"
   }
 }

@@ -3,12 +3,11 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import TextInput from '@/components/TextInput'
+import TextInput from '@/components/inputs/TextInput'
 import { login } from '@/lib/api/account'
 
 export default function LoginPage() {
   const { locale } = useI18n()
-
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -47,18 +46,24 @@ export default function LoginPage() {
     }
   }
 
-
   return (
-    <div className="flex items-center justify-center min-h-screen px-4">
-      <div className="w-full max-w-sm space-y-6">
+    <div className="flex min-h-screen items-center justify-center px-4
+                    bg-gradient-to-br from-gray-50 to-gray-100
+                    dark:from-gray-950 dark:to-gray-900">
+      <div className="w-full max-w-sm space-y-6
+                      rounded-2xl p-6 shadow-xl
+                      bg-white/55 dark:bg-gray-900/35
+                      backdrop-blur-xl">
         <div className="text-center">
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            {'Login'}
+            {locale.ui.login}
           </h1>
         </div>
 
         {error && (
-          <div className="text-red-600 text-sm bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 p-2 rounded">
+          <div className="text-sm rounded-lg p-3
+                          text-red-700 dark:text-red-300
+                          bg-red-500/10 dark:bg-red-500/10">
             {error}
           </div>
         )}
@@ -71,6 +76,7 @@ export default function LoginPage() {
             value={username}
             onChange={e => setUsername(e.target.value)}
             required
+            autoComplete="username"
           />
           <TextInput
             type="password"
@@ -79,22 +85,22 @@ export default function LoginPage() {
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded py-2.5 px-4 font-medium transition
-              bg-black hover:bg-gray-900 text-white
-              focus:outline-none focus:ring-2 focus:ring-black/50 dark:focus:ring-white/30
-              disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-medium
+                       bg-blue-600 text-white transition
+                       hover:bg-blue-700
+                       focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                       disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? locale.buttons.states.signingin : locale.buttons.signin}
           </button>
-
         </form>
       </div>
     </div>
   )
-
 }

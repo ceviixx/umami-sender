@@ -10,6 +10,7 @@
     "changepassword": "",
     "logs": "",
     "adminSection": "",
+    "systemSection": "",
     "admin": {
       "users": "",
       "logs": "",
@@ -18,6 +19,7 @@
     }
   },
   "buttons": {
+    "change_password": "",
     "logs": "",
     "deactivate": "",
     "activate": "",
@@ -42,7 +44,24 @@
     }
   },
   "forms": {
+    "sections": {
+      "profile": "",
+      "user": "",
+      "general": "",
+      "config": "",
+      "recipients": "",
+      "sender": "",
+      "smtp_host": "",
+      "type": ""
+    },
     "labels": {
+      "password": {
+        "password": "",
+        "current": "",
+        "new": "",
+        "confirm": ""
+      },
+      "language": "",
       "role": "",
       "login": {
         "username": "",
@@ -76,7 +95,6 @@
       },
       "hostname": "",
       "username": "",
-      "password": "",
       "type": "",
       "name": "",
       "description": "",
@@ -91,17 +109,30 @@
       "choose_website": "",
       "choose_weekday": "",
       "choose_sender": "",
-      "choose_sender_type": "",
       "choose_umami": "",
       "choose_webhook_type": "",
+      "choose_sender_type": "",
       "choose_webhook": "",
       "choose_day": "",
       "choose_report": "",
       "choose_role": "",
-      "loading": ""
+      "loading": "",
+      "no_senders_or_webhooks": "",
+      "choose_language": ""
     },
     "errors": {
       "max_items": ""
+    },
+    "help": {
+      "userEditHint": "",
+      "userCreateHint": "",
+      "instanceName": "",
+      "cloud": "",
+      "selfhost": "",
+      "webhookName": "",
+      "webhookUrl": "",
+      "hint_general": "",
+      "hint_config": ""
     }
   },
   "enums": {
@@ -201,5 +232,9 @@
     "template_preview": "",
     "preview": "",
     "preview_refreshed": ""
+  },
+  "common": {
+    "active": "",
+    "inactive": ""
   }
 }

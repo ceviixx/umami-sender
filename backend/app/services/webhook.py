@@ -3,7 +3,7 @@ from app.schemas.webhooks import WebhookRecipientCreate
 from sqlalchemy.orm import Session
 
 def send_test_webhook(data: WebhookRecipientCreate):
-    url = build_webhook_url(data)
+    url = data.url
     payload = build_payload(data)
     try:
         response = requests.post(
@@ -18,30 +18,6 @@ def send_test_webhook(data: WebhookRecipientCreate):
         response.raise_for_status()
     except Exception as e:
         raise Exception(f"Webhook failed for {data.name} ({data.type}): {e}")
-
-
-def build_webhook_url(webhook: WebhookRecipientCreate) -> str:
-    """Builds the full webhook URL depending on type."""
-
-    token = webhook.url.strip()
-
-    if webhook.type == "DISCORD":
-        return f"https://discord.com/api/webhooks/{token}"
-
-    elif webhook.type == "SLACK":
-        return f"https://hooks.slack.com/services/{token}"
-
-    elif webhook.type == "MATTERMOST":
-        return f"https://mattermost.com/hooks/{token}"
-
-    elif webhook.type == "MS_TEAMS":
-        return f"https://mattermost.com/hooks/{token}"
-    
-    elif webhook.type == "CUSTOM":
-        return token  # full URL already
-
-    raise ValueError(f"Unsupported webhook type: {webhook.type}")
-
 
 def build_payload(webhook: WebhookRecipientCreate) -> dict:
     """Generates the webhook message payload based on the webhook type."""

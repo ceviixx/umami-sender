@@ -3,18 +3,15 @@
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { UmamiInstance, UmamiType } from '@/types'
-import {
-  fetchUmami,
-  updateUmami
-} from '@/lib/api/umami'
+import { UmamiType } from '@/types'
+import { fetchUmami, updateUmami } from '@/lib/api/umami'
 import LoadingSpinner from "@/components/LoadingSpinner";
-import PageHeader from '@/components/PageHeader'
+import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
-import TextInput from '@/components/TextInput'
+import TextInput from '@/components/inputs/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
 
-export default function Edit_Umami({ params }: { params: { id: string } }) {
+export default function HostEditPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const { locale } = useI18n()
 
@@ -72,71 +69,128 @@ export default function Edit_Umami({ params }: { params: { id: string } }) {
 
   if (loading) { return <LoadingSpinner title={locale.ui.edit} /> }
 
+  const isCloud = form.type === 'cloud'
+  const isSelfHosted = form.type === 'self_hosted'
+
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <PageHeader
-        hasBack={true}
-        title={locale.ui.edit}
-      />
+    <div className="max-w-5xl mx-auto p-6">
+      <PageHeader hasBack={true} title={locale.ui.edit} />
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <TextInput
-          label={locale.forms.labels.name}
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder={locale.forms.labels.name}
-          disabled={loading}
-        />
+      <form onSubmit={handleSubmit} className="space-y-8">
 
-        {form.type === 'cloud' && (
-          <TextInput
-            label={locale.forms.labels.apikey}
-            name="api_key"
-            value={form.api_key ?? ''}
-            onChange={handleChange}
-            placeholder="xxxxxxxxxxxxxxxxxxxxxxxxx"
-            disabled={loading}
-          />
-        )}
-
-        {form.type === 'self_hosted' && (
-          <>
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+          <div className="px-5 pt-5 pb-1">
+            <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100">
+              {locale.forms.labels.name}
+            </h2>
+          </div>
+          <div className="px-5 pb-5">
             <TextInput
-              label={locale.forms.labels.hostname}
-              name="hostname"
-              value={String(form.hostname)}
+              label=""
+              name="name"
+              value={form.name}
               onChange={handleChange}
-              placeholder="https://example.com"
+              placeholder={locale.forms.labels.name}
               disabled={loading}
+              required
+              autoComplete="off"
+              inputMode="text"
+              aria-describedby="instNameHelp"
             />
-            <div className="flex items-center gap-2">
-              <TextInput
-                label={locale.forms.labels.username}
-                name="username"
-                value={form.username ?? ''}
-                onChange={handleChange}
-                placeholder="admin"
-                disabled={loading}
-              />
-              <TextInput
-                type='password'
-                label={locale.forms.labels.password}
-                name="password"
-                value={form.password ?? ''}
-                onChange={handleChange}
-                placeholder="umami"
-                disabled={loading}
-              />
+            <p id="instNameHelp" className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              {locale.forms.help.instanceName}
+            </p>
+          </div>
+        </section>
+
+        {isCloud && (
+          <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+            <div className="px-5 pt-5 pb-1">
+              <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100">
+                {locale.forms.labels.apikey}
+              </h2>
             </div>
-          </>
+            <div className="px-5 pb-5">
+              <TextInput
+                label=""
+                name="api_key"
+                value={form.api_key ?? ''}
+                onChange={handleChange}
+                placeholder="xxxxxxxxxxxxxxxxxxxxxxxxx"
+                disabled={loading}
+                required
+                autoComplete="off"
+                inputMode="text"
+                aria-describedby="apiKeyHelp"
+              />
+              <p id="apiKeyHelp" className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {locale.forms.help.cloud}
+              </p>
+            </div>
+          </section>
         )}
 
-        <FormButtons
-          cancelLabel={locale.buttons.cancel}
-          saveLabel={locale.buttons.update}
-          isSubmitting={loading}
-        />
+        {isSelfHosted && (
+          <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+            <div className="px-5 pt-5 pb-1">
+              <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-gray-100">
+                {locale.forms.labels.hostname}
+              </h2>
+            </div>
+            <div className="px-5 pb-5 space-y-4">
+              <TextInput
+                label=""
+                name="hostname"
+                value={form.hostname ?? ''}
+                onChange={handleChange}
+                placeholder="https://example.com"
+                disabled={loading}
+                required
+                inputMode="url"
+                autoComplete="url"
+                aria-describedby="hostHelp"
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <TextInput
+                  label={locale.forms.labels.username}
+                  name="username"
+                  value={form.username ?? ''}
+                  onChange={handleChange}
+                  placeholder="admin"
+                  disabled={loading}
+                  required
+                  autoComplete="username"
+                  inputMode="text"
+                />
+                <TextInput
+                  type="password"
+                  label={locale.forms.labels.password.password}
+                  name="password"
+                  value={form.password ?? ''}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  disabled={loading}
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+              <p id="hostHelp" className="text-xs text-gray-500 dark:text-gray-400">
+                {locale.forms.help.selfhost}
+              </p>
+            </div>
+          </section>
+        )}
+
+        <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400"></p>
+            <FormButtons
+              cancelLabel={locale.buttons.cancel}
+              saveLabel={locale.buttons.update}
+              isSubmitting={loading}
+            />
+          </div>
+        </section>
       </form>
     </div>
   )

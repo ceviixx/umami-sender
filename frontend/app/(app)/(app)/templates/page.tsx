@@ -7,16 +7,11 @@ import { fetchTemplatePreview, fetchTemplates } from '@/lib/api/templates'
 import { Template } from '@/types'
 import EmptyState from '@/components/EmptyState'
 import NetworkError from "@/components/NetworkError";
-import PageHeader from '@/components/PageHeader'
+import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import { showSuccess, showError } from "@/lib/toast";
-import { Button } from "@headlessui/react";
-import {
-  EyeIcon,
-  XMarkIcon,
-  ArrowPathIcon
-} from '@heroicons/react/20/solid'
-import CardItem from "@/components/CardItem";
+import { EyeIcon, XMarkIcon, ArrowPathIcon } from '@heroicons/react/20/solid'
+import CardList from "@/components/cardlist/CardList";
 
 function Modal({
   isOpen,
@@ -34,60 +29,74 @@ function Modal({
   const { locale } = useI18n()
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'auto'
+    return () => { document.body.style.overflow = 'auto' }
+  }, [isOpen])
 
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [isOpen]);
-
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-gray-900 bg-opacity-50 backdrop-blur-sm z-50">
-      <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-        <div className="flex justify-between items-center">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10 w-full max-w-4xl max-h-[90vh] mx-4 rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/80 dark:bg-gray-900/60 backdrop-blur-sm shadow-xl">
+        <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-gray-200/70 dark:border-gray-800/60">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
             {locale.ui.template_preview}
           </h3>
-          <div className="flex gap-2 items-center">
+
+          <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => onRefresh(templateType)}
-              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-bold"
-              title={locale.buttons.refresh}
+              aria-label={locale?.buttons.refresh}
+              title={locale?.buttons.refresh}
+              className="group/button inline-flex h-9 w-9 items-center justify-center rounded-full
+                         bg-white/70 dark:bg-gray-900/40 backdrop-blur-sm
+                         border border-gray-200/70 dark:border-gray-800/60
+                         text-gray-600 dark:text-gray-300
+                         hover:bg-gray-100/70 dark:hover:bg-gray-800/60
+                         transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
             >
-              <ArrowPathIcon className="w-4 h-4" />
+              <ArrowPathIcon className="w-5 h-5 group-hover:rotate-180 transition-transform" />
             </button>
+
             <button
+              type="button"
               onClick={onClose}
-              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-bold"
-              title={locale.buttons.close}
+              aria-label={locale?.buttons.close}
+              title={locale?.buttons.close}
+              className="group inline-flex h-9 w-9 items-center justify-center rounded-full
+                         bg-white/70 dark:bg-gray-900/40 backdrop-blur-sm
+                         border border-gray-200/70 dark:border-gray-800/60
+                         text-gray-600 dark:text-gray-300
+                         hover:bg-gray-100/70 dark:hover:bg-gray-800/60
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 transition"
             >
-              <XMarkIcon className="w-6 h-6" />
+              <XMarkIcon className="w-6 h-6 group-hover:rotate-90 transition-transform" />
             </button>
           </div>
         </div>
 
         <div
-          className="mt-4 overflow-auto max-h-[70vh] text-gray-900 dark:text-gray-100"
+          className="px-5 py-4 overflow-auto max-h-[70vh] text-gray-900 dark:text-gray-100"
           dangerouslySetInnerHTML={{ __html: content }}
         />
       </div>
     </div>
-  );
+  )
 }
 
-export default function SettingsPage() {
+export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState<string>("")
   const [currentTemplateType, setCurrentTemplateType] = useState<string | null>(null)
-  const router = useRouter()
   const { locale } = useI18n()
   const [networkError, setHasNetworkError] = useState<string | null>(null)
 
@@ -127,42 +136,41 @@ export default function SettingsPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6">
       <PageHeader title={locale.pages.templates} />
 
       {templates.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 gap-3">
-          {templates.map(t => (
-            <CardItem
-              key={t.id}
-              rightSlot={
-                <Button
-                  onClick={() => openModal(t.sender_type)}
-                  className="w-5 h-5 m-2 rounded-full border-gray-600 text-gray-600 hover:bg-gray-600 hover:text-white flex items-center justify-center transition"
-                  title={locale.ui.preview}
-                >
-                  <EyeIcon className="w-4 h-4" />
-                </Button>
-              }
+        <CardList
+          items={templates}
+          keyField={(item) => item.id}
+          title={(item) => `${locale.enums.sender_report_template_type[item.sender_type as "EMAIL_SUMMARY"] || item.sender_type}`}
+          subtitle={(item) => (
+            <span className="">
+              {item.sender_type.includes("EMAIL") && <>{locale.ui.mail}</>}
+              {item.sender_type.includes("EMAIL") && item.sender_type.includes("WEBHOOK") && (
+                <span className="mx-1 text-gray-400">•</span>
+              )}
+              {item.sender_type.includes("WEBHOOK") && <>{locale.ui.webhook}</>}
+            </span>
+          )}
+          rightSlot={(item) => (
+            <button
+              onClick={() => openModal(item.sender_type)}
+              aria-label={locale?.buttons.create || "Create"}
+              title={locale?.buttons.create || "Create"}
+              className="group/button inline-flex h-9 w-9 items-center justify-center rounded-full
+                         bg-white/70 dark:bg-gray-900/40 backdrop-blur-sm
+                         border border-gray-200/70 dark:border-gray-800/60
+                         text-gray-600 dark:text-gray-300
+                         hover:bg-gray-100/70 dark:hover:bg-gray-800/60
+                         transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
             >
-              <div>
-                <div className="font-semibold whitespace-nowrap">
-                  {locale.enums.sender_report_template_type[t.sender_type as "EMAIL_SUMMARY"] || t.sender_type}
-                </div>
-                <div className="text-sm text-gray-600">
-                  {t.sender_type.includes("EMAIL") && (
-                    <span className="text-sm text-gray-500">{locale.ui.mail}</span>
-                  )}
-                  {t.sender_type.includes("WEBHOOK") && (
-                    <span className="text-sm text-gray-500">{locale.ui.webhook}</span>
-                  )}
-                </div>
-              </div>
-            </CardItem>
-          ))}
-        </div>
+              <EyeIcon className="h-5 w-5 group-hover transition-transform" aria-hidden="true" />
+            </button>
+          )}
+        />
       )}
       <Modal
         isOpen={isModalOpen}
