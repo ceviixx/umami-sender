@@ -11,7 +11,9 @@ from app.utils.security import Security
 router = APIRouter(prefix="/mailer", tags=["mailer"])
 
 @router.post("/test")
-def test_sender(data: SenderCreate):
+def test_sender(request: Request, data: SenderCreate):
+    _ = Security(request).get_user()
+
     try:
         test_smtp_connection(data)
         return {"success": True, "message": "Connection successful"}

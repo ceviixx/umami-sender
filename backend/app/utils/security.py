@@ -14,7 +14,7 @@ class Security:
         self._user = None
 
     def _get_token(self) -> str:
-        """Extrahiert Bearer Token aus dem Authorization-Header."""
+        """Extracts the Bearer token from the Authorization header."""
         auth_header = self.request.headers.get("Authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
             raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
@@ -22,7 +22,7 @@ class Security:
         return auth_header.split(" ")[1]
 
     def _decode_token(self) -> dict:
-        """Dekodiert JWT und validiert es."""
+        """Decodes the JWT and validates it."""
         token = self._get_token()
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -31,7 +31,7 @@ class Security:
             raise HTTPException(status_code=401, detail="Invalid or expired token")
 
     def get_user_id(self) -> str:
-        """Gibt die user_id aus dem JWT zurück."""
+        """Returns the user_id from the JWT."""
         payload = self._decode_token()
         user_id = payload.get("sub")
         if not user_id:
@@ -39,7 +39,7 @@ class Security:
         return user_id
 
     def get_user(self) -> User:
-        """Lädt den vollständigen User aus der DB."""
+        """Loads the complete user from the database."""
         if self._user:
             return self._user
 

@@ -13,7 +13,9 @@ from app.utils.security import Security
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
 @router.post("/test")
-def test_webhook(data: WebhookRecipientCreate):
+def test_webhook(request: Request, data: WebhookRecipientCreate):
+    _ = Security(request).get_user()
+    
     try:
         send_test_webhook(data)
         return {"success": True, "message": "Connection successful"}

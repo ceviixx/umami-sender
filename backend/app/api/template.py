@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.template import MailTemplate
@@ -12,15 +12,19 @@ from app.utils.response_clean import process_api_response
 from fastapi.responses import HTMLResponse
 from jinja2 import UndefinedError
 
+from app.utils.security import Security
+
 router = APIRouter(prefix="/templates", tags=["templates"])
 
 
 @router.get("", response_model=list[MailTemplateList])
-def list_templates(db: Session = Depends(get_db)):
+def list_templates(request: Request, db: Session = Depends(get_db)):
+    _ = Security(request).get_user()
     return db.query(MailTemplate).filter(MailTemplate.sender_type.contains('EMAIL')).order_by(MailTemplate.id.asc()).all()
 
 @router.get("/{template_type}", response_model=MailTemplateOut)
-def get_template(template_type: str, db: Session = Depends(get_db)):
+def get_template(request: Request, template_type: str, db: Session = Depends(get_db)):
+    _ = Security(request).get_user()
     template = db.query(MailTemplate).filter(MailTemplate.sender_type == template_type).first()
     if not template:
         return send_status_response(
@@ -32,7 +36,8 @@ def get_template(template_type: str, db: Session = Depends(get_db)):
     return template
 
 @router.get("/{template_type}/preview", response_class=HTMLResponse)
-def get_preview(template_type: str, db: Session = Depends(get_db)):
+def get_preview(request: Request, template_type: str, db: Session = Depends(get_db)):
+    _ = Security(request).get_user()
     template = db.query(MailTemplate).filter(MailTemplate.sender_type == template_type).first()
     if not template:
         return send_status_response(
@@ -75,7 +80,8 @@ def get_preview(template_type: str, db: Session = Depends(get_db)):
         )
 
 @router.put("/{template_type}", response_model=MailTemplateOut)
-def update_template(template_type: str, data: MailTemplateUpdate, db: Session = Depends(get_db)):
+def update_template(request: Request, template_type: str, data: MailTemplateUpdate, db: Session = Depends(get_db)):
+    _ = Security(request).get_user()
     template = db.query(MailTemplate).filter(
         and_(
             MailTemplate.type == 'custom',
@@ -98,7 +104,8 @@ def update_template(template_type: str, data: MailTemplateUpdate, db: Session = 
     return template
 
 @router.delete("/{template_type}")
-def delete_template(template_type: str, db: Session = Depends(get_db)):
+def delete_template(request: Request, template_type: str, db: Session = Depends(get_db)):
+    _ = Security(request).get_user()
     template = db.query(MailTemplate).filter(
         and_(
             MailTemplate.type == 'custom',
