@@ -15,6 +15,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { format, subDays, parseISO } from 'date-fns';
+import { useI18n } from "@/locales/I18nContext";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
@@ -57,6 +58,8 @@ const hoverLine: Plugin<'line'> = {
 };
 
 export default function JobLineChart({ jobData, height = 300, className = '' }: Props) {
+  const { locale } = useI18n()
+
   const filled = useMemo(() => fillMissing(jobData), [jobData]);
   const labels = useMemo(() => filled.map(d => d.date), [filled]);
 
@@ -81,7 +84,7 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
       labels,
       datasets: [
         {
-          label: 'Success',
+          label: locale.common.status.success,
           data: filled.map(e => e.success),
           borderColor: colSuccess,
           backgroundColor: gradient(colSuccess),
@@ -94,7 +97,7 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
           fill: true,
         },
         {
-          label: 'Skipped',
+          label: locale.common.status.skipped,
           data: filled.map(e => e.skipped),
           borderColor: colSkipped,
           backgroundColor: gradient(colSkipped),
@@ -108,7 +111,7 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
           fill: true,
         },
         {
-          label: 'Failed',
+          label: locale.common.status.failed,
           data: filled.map(e => e.failed),
           borderColor: colFailed,
           backgroundColor: gradient(colFailed),

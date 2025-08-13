@@ -235,6 +235,11 @@
   },
   "common": {
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "status": {
+      "success": "Success",
+      "skipped": "Skipped",
+      "failed": "Failed"
+    }
   }
 }

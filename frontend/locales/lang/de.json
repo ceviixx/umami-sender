@@ -235,6 +235,11 @@
   },
   "common": {
     "active": "Aktiv",
-    "inactive": "Inaktiv"
+    "inactive": "Inaktiv",
+    "status": {
+      "success": "Erfolgreich",
+      "skipped": "Übersprungen",
+      "failed": "Fehlgeschlagen"
+    }
   }
 }

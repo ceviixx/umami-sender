@@ -36,8 +36,8 @@ export default function PageHeader({ hasBack = false, title, href }: PageHeaderP
         <button
           type="button"
           onClick={() => router.push(href)}
-          aria-label={locale?.buttons.create || "Create"}
-          title={locale?.buttons.create || "Create"}
+          aria-label={locale.buttons.create}
+          title={locale.buttons.create}
           className={[
             "group inline-flex h-9 w-9 items-center justify-center rounded-full",
             "bg-white/70 dark:bg-gray-900/40 backdrop-blur-sm",
