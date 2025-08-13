@@ -26,21 +26,22 @@ def list_mailer_jobs(request: Request, db: Session = Depends(get_db)):
 @router.delete("/{job_id}")
 def delete_mailer_job(request: Request, job_id: str, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-
     job = db.query(Job).filter(Job.id == job_id).first()
-    if not job:
-        return send_status_response(
-            code="DELETE_FAILED",
-            message="Cannot delete: job not found",
-            status=404,
-            detail=f"Job with id {job_id} does not exist."
-        )
+
     if job.user_id != user.id:
         return send_status_response(
             code="UNAUTHORIZED",
             message="Cannot delete: unauthorized",
             status=403,
             detail=f"User {user.id} is not the owner of job {job_id}."
+        )
+    
+    if not job:
+        return send_status_response(
+            code="DELETE_FAILED",
+            message="Cannot delete: job not found",
+            status=404,
+            detail=f"Job with id {job_id} does not exist."
         )
     
     db.delete(job)
@@ -50,8 +51,16 @@ def delete_mailer_job(request: Request, job_id: str, db: Session = Depends(get_d
 @router.get("/{job_id}", response_model=MailerJobOut)
 def get_mailer_job(request: Request, job_id: str, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-
     job = db.query(Job).filter(Job.id == job_id).first()
+
+    if job.user_id != user.id:
+        return send_status_response(
+            code="UNAUTHORIZED",
+            message="Unauthorized access to job",
+            status=403,
+            detail=f"User {user.id} is not allowed to access job {job_id}."
+        )
+    
     if not job:
         return send_status_response(
             code="JOB_NOT_FOUND",
@@ -60,34 +69,27 @@ def get_mailer_job(request: Request, job_id: str, db: Session = Depends(get_db))
             detail=f"No job with id {job_id} exists."
         )
     
-    if job.user_id != user.id:
-        return send_status_response(
-            code="UNAUTHORIZED",
-            message="Unauthorized access to job",
-            status=403,
-            detail=f"User {user.id} is not allowed to access job {job_id}."
-        )
     return job
 
 @router.put("/{job_id}", response_model=MailerJobOut)
 def update_mailer_job(request: Request, job_id: str, data: MailerJobUpdate, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-
     job = db.query(Job).filter(Job.id == job_id).first()
-    if not job:
-        return send_status_response(
-            code="UPDATE_FAILED",
-            message="Cannot update: job not found",
-            status=404,
-            detail=f"Job with id {job_id} does not exist."
-        )
-    
+
     if job.user_id != user.id:
         return send_status_response(
             code="UNAUTHORIZED",
             message="Unauthorized access to job",
             status=403,
             detail=f"User {user.id} is not allowed to update job {job_id}."
+        )
+    
+    if not job:
+        return send_status_response(
+            code="UPDATE_FAILED",
+            message="Cannot update: job not found",
+            status=404,
+            detail=f"Job with id {job_id} does not exist."
         )
     
     for key, value in data.dict().items():
@@ -99,8 +101,16 @@ def update_mailer_job(request: Request, job_id: str, data: MailerJobUpdate, db: 
 @router.put("/{job_id}/status")
 def update_mailer_job(request: Request, job_id: str, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-
     job = db.query(Job).filter(Job.id == job_id).first()
+
+    if job.user_id != user.id:
+        return send_status_response(
+            code="UNAUTHORIZED",
+            message="Unauthorized access to job",
+            status=403,
+            detail=f"User {user.id} is not allowed to update job {job_id}."
+        )
+    
     if not job:
         return send_status_response(
             code="UPDATE_FAILED",
@@ -109,14 +119,6 @@ def update_mailer_job(request: Request, job_id: str, db: Session = Depends(get_d
             detail=f"Job with id {job_id} does not exist."
         )
     
-    if job.user_id != user.id:
-        return send_status_response(
-            code="UNAUTHORIZED",
-            message="Unauthorized access to job",
-            status=403,
-            detail=f"User {user.id} is not allowed to update job {job_id}."
-        )
-
     job.is_active = not job.is_active
     db.commit()
     db.refresh(job)

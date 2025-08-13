@@ -37,16 +37,34 @@ export default function JobLogsPage({ params }: { params: { id: string } }) {
           items={logs}
           keyField={(item) => item.id}
           title={(item) => item.name}
-          subtitle={(item) => item.error}
           badge={(item) => item.status}
           badgeTone={(item) => item.status}
           rightSlot={(item) => (
             <>
               <span className="text-xs text-gray-400">
-                {new Date(item.timestamp).toLocaleString()}
+                run:{item.run}
               </span>
             </>
           )}
+          bottomSlot={(item) => 
+            <CardList 
+              items={item.details}
+              keyField={(item) => item.timestamp}
+              title={(item) => item.channel}
+              subtitle={(item) => (
+                <code className='text-xs'>{item.error}</code>
+              )}
+              badge={(item) => item.status}
+              badgeTone={(item) => item.status}
+              rightSlot={(item) => (
+                <>
+                  <span className="text-xs text-gray-400">
+                    {new Date(item.timestamp).toLocaleString()}
+                  </span>
+                </>
+              )}
+            />
+          }
         />
       )}
     </div>

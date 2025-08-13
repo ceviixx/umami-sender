@@ -13,6 +13,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
 import { PaperAirplaneIcon, PuzzlePieceIcon } from '@heroicons/react/20/solid';
 import { useRouter } from 'next/navigation'
+import { showError } from "@/lib/toast";
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<MailerJob[]>([])
@@ -34,8 +35,15 @@ export default function JobsPage() {
   const handleDelete = async () => {
     if (deleteId !== null) {
       await deleteJob(deleteId)
-      setDeleteId(null)
-      setJobs(prev => prev.filter(w => w.id !== deleteId))
+      .then(() => {
+        setJobs(prev => prev.filter(w => w.id !== deleteId))
+      })
+      .catch((error) => {
+        showError(error.message)
+      })
+      .finally(() => {
+        setDeleteId(null)
+      })
     }
   }
 

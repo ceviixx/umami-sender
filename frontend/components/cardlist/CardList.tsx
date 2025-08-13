@@ -26,6 +26,9 @@ type ToneAccessor<T> =
   | string
   | ((item: T) => string)
 
+type HtmlMarkup = { __html: string }
+type HtmlAccessor<T> = Accessor<T, HtmlMarkup | undefined>
+
 function getByPath(obj: any, path: string) {
   return path.split('.').reduce((acc, k) => (acc == null ? acc : acc[k]), obj)
 }
@@ -42,9 +45,9 @@ function resolveTone<T>(item: T, tone?: ToneAccessor<T>): BadgeTone | undefined 
   const val = typeof tone === 'function' ? (tone as any)(item) : tone
   switch (String(val)) {
     case 'success': return 'success'
-    case 'warning': return 'warning'
+    case 'warning':
     case 'skipped': return 'warning'
-    case 'danger':  return 'danger'
+    case 'danger':
     case 'failed':  return 'danger'
     default:        return 'neutral'
   }
@@ -64,6 +67,11 @@ export type CardListProps<T> = {
   href?: HrefAccessor<T>
   rightSlot?: SlotAccessor<T>
 
+  /** optionaler Slot unten als ReactNode */
+  bottomSlot?: SlotAccessor<T>
+  /** optional rohes HTML – muss als {__html: string} geliefert werden */
+  bottomHtml?: HtmlAccessor<T>
+
   className?: string
   listClassName?: string
   emptyState?: React.ReactNode
@@ -79,6 +87,8 @@ export default function CardList<T>({
   icon,
   href,
   rightSlot,
+  bottomSlot,
+  bottomHtml,
   className,
   listClassName = 'space-y-3',
   emptyState = null,
@@ -97,6 +107,18 @@ export default function CardList<T>({
 
         const IconCmp = icon?.(item)
 
+        let bottom: React.ReactNode | undefined = bottomSlot?.(item)
+        if (!bottom && bottomHtml) {
+          const markup = resolve<T, HtmlMarkup | undefined>(item, bottomHtml)
+          if (markup) {
+            bottom = (
+              <div
+                dangerouslySetInnerHTML={markup}
+              />
+            )
+          }
+        }
+
         return (
           <CardItem
             key={key}
@@ -107,6 +129,7 @@ export default function CardList<T>({
             icon={IconCmp}
             href={href?.(item)}
             rightSlot={rightSlot?.(item)}
+            bottomSlot={bottom}
           />
         )
       })}

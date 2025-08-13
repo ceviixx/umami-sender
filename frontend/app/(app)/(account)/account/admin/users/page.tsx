@@ -38,8 +38,8 @@ export default function UsersPage() {
     }
   }
 
-  if (loading) { return <LoadingSpinner title={locale.pages.webhook} /> }
-  if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
+  if (loading) { return <LoadingSpinner title={locale.pages.admin.users} /> }
+  if (networkError) { return <NetworkError page={locale.pages.admin.users} message={networkError} /> }
 
   return (
     <div className="max-w-5xl mx-auto p-6">

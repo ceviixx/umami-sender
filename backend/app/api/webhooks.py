@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from app.database import get_db
+from sqlalchemy import and_, exists
 from app.models.webhooks import WebhookRecipient
 from app.schemas.webhooks import WebhookRecipientCreate, WebhookRecipientUpdate, WebhookRecipientOut
+from app.models.jobs import Job
 from app.services.webhook import send_test_webhook
 from app.utils.responses import send_status_response
 
@@ -49,15 +51,7 @@ def create_webhook(request: Request, webhook: WebhookRecipientCreate, db: Sessio
 @router.get("/{webhook_id}", response_model=WebhookRecipientOut)
 def get_webhook(request: Request, webhook_id: str, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-
     webhook = db.query(WebhookRecipient).get(webhook_id)
-    if not webhook:
-        return send_status_response(
-            code="WEBHOOK_NOT_FOUND",
-            message="Webhook not found",
-            status=404,
-            detail=f"No webhook with ID {webhook_id}"
-        )
     
     if webhook.user_id != user.id:
         return send_status_response(
@@ -67,13 +61,6 @@ def get_webhook(request: Request, webhook_id: str, db: Session = Depends(get_db)
             detail=f"User {user.id} is not allowed to access webhook {webhook_id}."
         )
     
-    return webhook
-
-@router.put("/{webhook_id}", response_model=WebhookRecipientOut)
-def update_webhook(request: Request, webhook_id: str, data: WebhookRecipientUpdate, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-
-    webhook = db.query(WebhookRecipient).get(webhook_id)
     if not webhook:
         return send_status_response(
             code="WEBHOOK_NOT_FOUND",
@@ -81,6 +68,13 @@ def update_webhook(request: Request, webhook_id: str, data: WebhookRecipientUpda
             status=404,
             detail=f"No webhook with ID {webhook_id}"
         )
+    
+    return webhook
+
+@router.put("/{webhook_id}", response_model=WebhookRecipientOut)
+def update_webhook(request: Request, webhook_id: str, data: WebhookRecipientUpdate, db: Session = Depends(get_db)):
+    user = Security(request).get_user()
+    webhook = db.query(WebhookRecipient).get(webhook_id)
 
     if webhook.user_id != user.id:
         return send_status_response(
@@ -90,6 +84,13 @@ def update_webhook(request: Request, webhook_id: str, data: WebhookRecipientUpda
             detail=f"User {user.id} is not allowed to update webhook {webhook_id}."
         )
 
+    if not webhook:
+        return send_status_response(
+            code="WEBHOOK_NOT_FOUND",
+            message="Webhook not found",
+            status=404,
+            detail=f"No webhook with ID {webhook_id}"
+        )
 
     for key, value in data.dict(exclude_unset=True).items():
         setattr(webhook, key, value)
@@ -101,16 +102,8 @@ def update_webhook(request: Request, webhook_id: str, data: WebhookRecipientUpda
 @router.delete("/{webhook_id}")
 def delete_webhook(request: Request, webhook_id: str, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-
     webhook = db.query(WebhookRecipient).get(webhook_id)
-    if not webhook:
-        return send_status_response(
-            code="WEBHOOK_NOT_FOUND",
-            message="Webhook not found",
-            status=404,
-            detail=f"No webhook with ID {webhook_id}"
-        )
-    
+
     if webhook.user_id != user.id:
         return send_status_response(
             code="UNAUTHORIZED",
@@ -118,7 +111,44 @@ def delete_webhook(request: Request, webhook_id: str, db: Session = Depends(get_
             status=403,
             detail=f"User {user.id} is not the owner of webhook {webhook_id}."
         )
+    
+    if not webhook:
+        return send_status_response(
+            code="WEBHOOK_NOT_FOUND",
+            message="Webhook not found",
+            status=404,
+            detail=f"No webhook with ID {webhook_id}"
+        )
 
+    in_use = db.query(
+        exists().where(
+            and_(
+                Job.user_id == user.id,
+                Job.webhook_recipients.any(webhook_id) 
+            )
+        )
+    ).scalar()
+
+    if in_use:
+        job_ids = [
+            str(j.id) for j in db.query(Job.id)
+            .filter(
+                Job.user_id == user.id,
+                Job.webhook_recipients.any(webhook_id)
+            )
+            .limit(5)
+            .all()
+        ]
+
+        return send_status_response(
+            code="WEBHOOK_IN_USE",
+            message="Cannot delete: webhook is used by one or more jobs",
+            status=409,
+            detail=(
+                f"Webhook {webhook_id} is referenced by existing jobs "
+                f"(e.g. {', '.join(job_ids)}). Remove it from all jobs first."
+            )
+        )
 
     db.delete(webhook)
     db.commit()

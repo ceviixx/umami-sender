@@ -6,13 +6,13 @@ from typing import Any
 def send_webhook(webhook: WebhookRecipient, summary: dict, job: Job):
     """Sends a report summary via webhook to the given recipient."""
 
-    url = webhook.url.strip()
+    url = webhook.url
     if not url:
         raise ValueError(f"skipped|Webhook URL is empty for {webhook.name} ({webhook.type})")
     payload = build_payload(webhook, summary, job)
 
     if not summary:
-        Exception("Summary is empty")
+        raise Exception(f"Summary is empty for {webhook.name} ({webhook.type})")
 
     try:
         response = requests.post(
@@ -20,7 +20,7 @@ def send_webhook(webhook: WebhookRecipient, summary: dict, job: Job):
             json=payload,
             headers={
                 "Content-Type": "application/json",
-                "User-Agent": "UmamiSender/1.0 (+https://github.com/ceviixx/UmamiSender)"
+                "User-Agent": "UmamiSender/1.0 (+https://github.com/ceviixx/umami-sender)"
             },
             timeout=10
         )

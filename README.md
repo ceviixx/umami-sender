@@ -10,12 +10,12 @@
 
 <p align="center">
 
-  [![Release](https://img.shields.io/github/release/ceviixx/UmamiSender.svg)](https://github.com/ceviixx/UmamiSender/releases)
-  [![CI](https://img.shields.io/github/actions/workflow/status/ceviixx/UmamiSender/ci.yml)](https://github.com/ceviixx/UmamiSender/actions)
+  [![Release](https://img.shields.io/github/release/ceviixx/umami-sender.svg)](https://github.com/ceviixx/umami-sender/releases)
+  [![CI](https://img.shields.io/github/actions/workflow/status/ceviixx/umami-sender/ci.yml)](https://github.com/ceviixx/umami-sender/actions)
   ![Node](https://img.shields.io/badge/node-20.19.x-brightgreen)
   ![Next.js](https://img.shields.io/badge/Next.js-14.2.30-blue)
   [![Umami](https://img.shields.io/badge/umami-2.19.x-black)](https://umami.is)
-  ![Last commit](https://img.shields.io/github/last-commit/ceviixx/UmamiSender)
+  ![Last commit](https://img.shields.io/github/last-commit/ceviixx/umami-sender)
 
 </p>
 

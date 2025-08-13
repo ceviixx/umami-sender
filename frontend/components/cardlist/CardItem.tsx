@@ -41,6 +41,8 @@ type CardItemProps = {
 
   rightSlot?: React.ReactNode
   className?: string
+
+  bottomSlot?: React.ReactNode
 }
 
 export default function CardItem({
@@ -54,6 +56,7 @@ export default function CardItem({
   href,
   rightSlot,
   className = '',
+  bottomSlot,
 }: CardItemProps) {
   const router = useRouter()
 
@@ -76,12 +79,8 @@ export default function CardItem({
 
   return (
     <li
-      role={clickable ? 'link' : undefined}
-      tabIndex={clickable ? 0 : undefined}
-      onClick={handleRowClick}
-      onKeyDown={handleKey}
       className={clsx(
-        'relative flex items-start gap-3 px-4 py-3 sm:px-5 sm:py-4 rounded-2xl',
+        'relative px-4 py-3 sm:px-5 sm:py-4 rounded-2xl',
         'ring-1 ring-gray-200/70 dark:ring-gray-800/60',
         'bg-white/70 dark:bg-gray-900/40 backdrop-blur-sm shadow-sm',
         clickable && 'cursor-pointer hover:bg-gray-50/70 dark:hover:bg-gray-800/50',
@@ -89,67 +88,71 @@ export default function CardItem({
         clickable ? 'group/row' : undefined,
         className
       )}
+      role={clickable ? 'link' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={handleRowClick}
+      onKeyDown={handleKey}
     >
-      {Icon && (
-        <span
-          className={clsx(
+      <div className="flex items-start gap-3">
+        {Icon && (
+          <span className={clsx(
             'h-10 w-10 shrink-0 grid place-items-center rounded-full',
             'bg-gray-100/70 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300',
             'ring-1 ring-gray-200/70 dark:ring-gray-800/60',
             iconContainerClassName
-          )}
-          aria-hidden="true"
-        >
-          <Icon className={clsx('h-5 w-5', iconClassName)} />
-        </span>
-      )}
+          )}>
+            <Icon className={clsx('h-5 w-5', iconClassName)} />
+          </span>
+        )}
 
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="truncate font-medium text-gray-900 dark:text-gray-100">
-            {title}
-          </p>
-
-          {typeof badge === 'string' ? (
-            <span
-              className={clsx(
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-gray-900 dark:text-gray-100 whitespace-normal break-words">
+              {title}
+            </p>
+            {typeof badge === 'string' ? (
+              <span className={clsx(
                 'shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs ring-1',
                 badgeToneClasses[badgeTone]
-              )}
-              title={badge}
-            >
-              {badge}
-            </span>
-          ) : (
-            badge && <span className="shrink-0">{badge}</span>
+              )}>
+                {badge}
+              </span>
+            ) : (
+              badge && <span className="shrink-0">{badge}</span>
+            )}
+          </div>
+          {subtitle && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 whitespace-normal break-words">
+              {subtitle}
+            </p>
           )}
         </div>
 
-        {subtitle && (
-          <p className="truncate text-sm text-gray-500 dark:text-gray-400">
-            {subtitle}
-          </p>
+        {(rightSlot || clickable) && (
+          <div
+            className="ml-2 flex items-center gap-2 pl-2 sm:pl-3 shrink-0 whitespace-nowrap"
+            data-row-link-ignore
+          >
+            {rightSlot}
+            {clickable && (
+              <ChevronRightIcon
+                className={clsx(
+                  'h-5 w-5 text-gray-300 dark:text-gray-500 transition-transform',
+                  'group-hover/row:translate-x-0.5'
+                )}
+                aria-hidden="true"
+              />
+            )}
+          </div>
         )}
       </div>
 
-      {(rightSlot || clickable) && (
-        <div
-          className="ml-2 flex items-center gap-2 pl-2 sm:pl-3 shrink-0 whitespace-nowrap"
-          data-row-link-ignore
-        >
-          {rightSlot}
-
-          {clickable && (
-            <ChevronRightIcon
-              className={clsx(
-                'h-5 w-5 text-gray-300 dark:text-gray-500 transition-transform',
-                'group-hover/row:translate-x-0.5'
-              )}
-              aria-hidden="true"
-            />
-          )}
+      {bottomSlot ? (
+        <div className="mt-3 space-y-4 rounded-xl border border-gray-200 dark:border-gray-800/60 bg-gray-50/60 dark:bg-gray-800/40 p-4">
+          {bottomSlot}
         </div>
-      )}
+      ) : null}
     </li>
+
   )
 }

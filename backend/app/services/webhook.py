@@ -11,7 +11,7 @@ def send_test_webhook(data: WebhookRecipientCreate):
             json=payload,
             headers={
                 "Content-Type": "application/json",
-                "User-Agent": "UmamiSender/1.0 (+https://github.com/ceviixx/UmamiSender)"
+                "User-Agent": "UmamiSender/1.0 (+https://github.com/ceviixx/umami-sender)"
             },
             timeout=10
         )
@@ -33,7 +33,7 @@ def build_payload(webhook: WebhookRecipientCreate) -> dict:
     elif webhook.type == "DISCORD":
         return {
             "username": "UmamiSender",
-            "avatar_url": "https://github.com/ceviixx/UmamiSender/blob/9b077046e4e35113f70591071d9447150536c6cb/frontend/public/umamisender.png",
+            "avatar_url": "https://github.com/ceviixx/umami-sender/blob/9b077046e4e35113f70591071d9447150536c6cb/frontend/public/umamisender.png",
             "content": "Test message",
             "embeds": [],
             "attachments": []

@@ -327,7 +327,7 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
               value={form.website_id}
               onChange={(value) => handleChange({ name: 'website_id', value })}
               options={websites.map(w => ({ value: w.id, label: w.name }))}
-              placeholder={form.umami_id ? websites.length ? locale.forms.placeholders.choose_webhook : locale.forms.placeholders.loading : locale.forms.placeholders.choose_umami}
+              placeholder={form.umami_id ? websites.length ? locale.forms.placeholders.choose_website : locale.forms.placeholders.loading : locale.forms.placeholders.choose_umami}
               disabled={!form.umami_id || !websites.length}
             />
           </div>

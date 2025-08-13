@@ -11,7 +11,7 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
-
+import { showError } from "@/lib/toast";
 import { useRouter } from 'next/navigation'
 
 export default function MailersPage() {
@@ -34,8 +34,15 @@ export default function MailersPage() {
   const handleDelete = async () => {
     if (deleteId !== null) {
       await deleteMailer(deleteId)
-      setDeleteId(null)
-      setSenders(prev => prev.filter(w => w.id !== deleteId))
+        .then(() => {
+          setSenders(prev => prev.filter(w => w.id !== deleteId))
+        })
+        .catch((error) => {
+          showError(error.message)
+        })
+        .finally(() => {
+          setDeleteId(null)
+        })
     }
   }
 

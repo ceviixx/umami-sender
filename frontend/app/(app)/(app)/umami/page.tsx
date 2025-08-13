@@ -12,6 +12,7 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
+import { showError } from "@/lib/toast";
 
 export default function HostsPage() {
   const [instances, setInstances] = useState<UmamiInstance[]>([])
@@ -33,8 +34,15 @@ export default function HostsPage() {
   const handleDelete = async () => {
     if (deleteId !== null) {
       await deleteUmami(deleteId)
-      setDeleteId(null)
-      setInstances(prev => prev.filter(w => w.id !== deleteId))
+        .then(() => {
+          setInstances(prev => prev.filter(w => w.id !== deleteId))
+        })
+        .catch((error) => {
+          showError(error.message)
+        })
+        .finally(() => {
+          setDeleteId(null)
+        })
     }
   }
 
@@ -54,8 +62,8 @@ export default function HostsPage() {
         <CardList
           items={instances}
           keyField={(item) => item.id}
-          title={(item) => item.id}
-          subtitle={(item) => item.type }
+          title={(item) => item.name}
+          subtitle={(item) => locale.enums.service_type[item.type]}
           rightSlot={(item) => (
             <ContextMenu
               items={[

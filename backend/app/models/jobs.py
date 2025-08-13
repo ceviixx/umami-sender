@@ -27,7 +27,7 @@ class Job(Base, TimestampMixin):
     report_id = Column(String, nullable=True, comment="Only needed when report_type = report")
     frequency = Column(Enum(Frequency), default="weekly", comment="hourly | daily | weekly | monthly | yearly")
     day = Column(Integer, nullable=True, comment="0 = Monday, 6 = Sunday")
-    execution_time = Column(Time, nullable=False, server_default=text("'08:00:00'"), comment="Execution time in UTC (e.g. 08:00 UTC = 10:00 Berlin time)")
+    execution_time = Column(Time, nullable=False, server_default=text("'06:00:00'"), comment="Execution time in UTC (e.g. 06:00 UTC = 08:00 Berlin time)")
     mailer_id = Column(UUID(as_uuid=True), ForeignKey("senders.id"), nullable=True)
     email_recipients = Column(ARRAY(String), default=[])
     webhook_recipients = Column(ARRAY(UUID(as_uuid=True)), default=[])

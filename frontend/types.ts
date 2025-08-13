@@ -32,13 +32,18 @@ export interface Website {
   domain: string
 }
 
-export type LogItem = {
-  id: string
-  name: string
+export type LogItemDetail = {
   timestamp: string
   status: string
-  error?: string
+  error?: string | null
   channel: string
+}
+export type LogItem = {
+  id: string
+  run: string
+  name: string
+  details: LogItemDetail[]
+  status: string
 }
 
 export type MailerJob = {

@@ -96,7 +96,7 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 
   </div>
   <div class="footer">
-    Sent with <a href="https://github.com/ceviixx/UmamiSender">UmamiSender</a>
+    Sent with <a href="https://github.com/ceviixx/umami-sender">UmamiSender</a>
   </div>
 </body>
 </html>"""

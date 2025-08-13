@@ -75,16 +75,24 @@ export async function apiFetch<T = any>(
   } catch (err: any) {
     clearTimeout(id)
 
-    if (err.name === 'AbortError') {
-      const error = new Error(`Timeout nach ${timeout}ms für Request: ${method} ${path}`)
-        ; (error as any).code = 'TIMEOUT'
-      throw error
+    if (err?.name === 'AbortError') {
+      const error = new Error(
+        `Request timed out after ${timeout}ms: ${method} ${path}`,
+        { cause: err as Error }
+      );
+      (error as any).code = 'TIMEOUT';
+      error.name = 'TimeoutError';
+      throw error;
     }
 
     if (err instanceof TypeError) {
-      const error = new Error(`Netzwerkfehler oder API nicht erreichbar: ${method} ${path}`)
-        ; (error as any).code = 'NETWORK_ERROR'
-      throw error
+      const error = new Error(
+        `Network error or API unreachable: ${method} ${path}`,
+        { cause: err as Error }
+      );
+      (error as any).code = 'NETWORK_ERROR';
+      error.name = 'NetworkError';
+      throw error;
     }
 
     throw err

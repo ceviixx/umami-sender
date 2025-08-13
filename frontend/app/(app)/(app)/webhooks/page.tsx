@@ -12,6 +12,7 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
+import { showError } from "@/lib/toast";
 
 export default function WebhooksPage() {
   const router = useRouter()
@@ -33,8 +34,15 @@ export default function WebhooksPage() {
   const handleDelete = async () => {
     if (deleteId !== null) {
       await deleteWebhook(deleteId)
-      setDeleteId(null)
-      setWebhooks(prev => prev.filter(w => w.id !== deleteId))
+        .then(() => {
+          setWebhooks(prev => prev.filter(w => w.id !== deleteId))
+        })
+        .catch((error) => {
+          showError(error.message)
+        })
+        .finally(() => {
+          setDeleteId(null)
+        })
     }
   }
 
