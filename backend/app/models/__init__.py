@@ -9,3 +9,4 @@ from .webhooks import WebhookRecipient
 from .template import MailTemplate
 from .template_styles import MailTemplateStyle
 from .value_mappings import ValueMappings
+from .user import User

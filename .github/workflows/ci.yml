@@ -62,7 +62,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: worker/Dockerfile
+          file: worker/beat.Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository }}-beat:latest

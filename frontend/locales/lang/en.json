@@ -5,9 +5,29 @@
     "jobs": "Jobs",
     "mailer": "Mailer",
     "webhook": "Webhook",
-    "templates": "Templates"
+    "templates": "Templates",
+    "account": "Account",
+    "changepassword": "Change Password",
+    "logs": "Logs",
+    "adminSection": "Admin",
+    "systemSection": "System",
+    "admin": {
+      "users": "Users",
+      "logs": "Logs",
+      "config": "Config",
+      "settings": "Settings"
+    }
   },
   "buttons": {
+    "try_again": "Try again",
+    "change_password": "Change password",
+    "logs": "Logs",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "account": "Account",
+    "signin": "Sign in",
+    "profile": "Profile",
+    "logout": "Logout",
     "close": "Close",
     "refresh": "Refresh",
     "save": "Save",
@@ -19,12 +39,35 @@
     "back": "Back",
     "test": "Test connection",
     "states": {
+      "signingin": "Signing in...",
       "loading": "Loading...",
       "testing": "Testing connection..."
     }
   },
   "forms": {
+    "sections": {
+      "profile": "Profile",
+      "user": "User",
+      "general": "General",
+      "config": "Config",
+      "recipients": "Recipients",
+      "sender": "Sender",
+      "smtp_host": "SMTP Host",
+      "type": "Type"
+    },
     "labels": {
+      "password": {
+        "password": "Password",
+        "current": "Current Password",
+        "new": "New Password",
+        "confirm": "Confirm Password"
+      },
+      "language": "Language",
+      "role": "Role",
+      "login": {
+        "username": "Username",
+        "password": "Password"
+      },
       "apikey": "API key",
       "smtp": {
         "host": "SMTP host",
@@ -53,7 +96,6 @@
       },
       "hostname": "Hostname",
       "username": "Username",
-      "password": "Password",
       "type": "Type",
       "name": "Name",
       "description": "Description",
@@ -62,7 +104,7 @@
       "day": "Day",
       "webhook_recipients": "Webhook Recipients",
       "report": "Report",
-      "execution_time": "Execution time"
+      "execution_time": "Execution time (UTC)"
     },
     "placeholders": {
       "choose_website": "– Choose website –",
@@ -74,13 +116,31 @@
       "choose_webhook": "- Choose webhook(s) -",
       "choose_day": "- Choose day -",
       "choose_report": "- Choose report -",
-      "loading": "– Loading... –"
+      "choose_role": "- Choose role -",
+      "loading": "– Loading... –",
+      "no_senders_or_webhooks": "- No data -",
+      "choose_language": "- Choose language -"
     },
     "errors": {
       "max_items": "Maximum of {max} items allowed"
+    },
+    "help": {
+      "userEditHint": "Leave the password empty to keep it unchanged.",
+      "userCreateHint": "Create a user with a role and password.",
+      "instanceName": "Unique display name for this instance.",
+      "cloud": "For Umami Cloud, your API key is sufficient.",
+      "selfhost": "We use host, username, and password once to obtain a token.",
+      "webhookName": "Internal name for identification.",
+      "webhookUrl": "Full target URL that receives POST payloads.",
+      "hint_general": "Please fill in the general fields first.",
+      "hint_config": "Please complete the configuration first."
     }
   },
   "enums": {
+    "userrole": {
+      "admin": "Admin",
+      "user": "User"
+    },
     "template_insert_placeholder": {
       "job_name": "Job name",
       "period": "Period",
@@ -146,7 +206,10 @@
   },
   "messages": {
     "confirm_delete": "Confirm deletion",
-    "no_webhooks": "No webhooks configured"
+    "no_webhooks": "No webhooks configured",
+    "saved": "Saved successfully",
+    "updated": "Updated successfully",
+    "test_success": "Test successful"
   },
   "weekdays": {
     "monday": "Monday",
@@ -158,6 +221,8 @@
     "sunday": "Sunday"
   },
   "ui": {
+    "back_to_app": "Back to app",
+    "login": "Log in",
     "context_menu": "Menu",
     "edit": "Edit",
     "create": "Create",
@@ -171,5 +236,56 @@
     "template_preview": "Template Preview",
     "preview": "Preview",
     "preview_refreshed": "Preview refreshed"
+  },
+  "common": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "status": {
+      "success": "Success",
+      "skipped": "Skipped",
+      "failed": "Failed"
+    }
+  },
+  "api_messages": {
+    "API_KEY_REQUIRED": "API key required",
+    "BAD_REQUEST": "Bad request",
+    "CREATE_FAILED": "Creation failed",
+    "DATA_ERROR": "Data error",
+    "DATABASE_ERROR": "Database error",
+    "DELETE_FAILED": "Deletion failed",
+    "FETCH_REPORTS_FAILED": "Failed to load reports",
+    "FETCH_WEBSITES_FAILED": "Failed to load websites",
+    "FORBIDDEN": "Access denied",
+    "INTERNAL_ERROR": "Internal error",
+    "INTEGRITY_ERROR": "Integrity error",
+    "INSTANCE_NOT_FOUND": "Instance not found",
+    "INVALID_API_KEY": "Invalid API key",
+    "INVALID_INPUT": "Invalid input",
+    "INVALID_PASSWORD": "Invalid password",
+    "JOB_NOT_FOUND": "Job not found",
+    "LOGS_ERROR": "Log error",
+    "LOG_STATS_ERROR": "Log stats error",
+    "LOGIN_REMOTE_ERROR": "Remote login failed",
+    "LOGIN_SUCCESS_NO_TOKEN": "Login succeeded, no token",
+    "MAILER_NOT_FOUND": "Mailer not found",
+    "NOT_AUTHENTICATED": "Not authenticated",
+    "NOT_FOUND": "Not found",
+    "OK": "Success",
+    "PASSWORD_MISMATCH": "Passwords do not match",
+    "SELF_HOSTED_CREDENTIALS_REQUIRED": "Self-hosted credentials required",
+    "SMTP_TEST_FAILED": "SMTP test failed",
+    "STATS_ERROR": "Stats error",
+    "TEMPLATE_NOT_FOUND": "Template not found",
+    "TEMPLATE_RENDER_ERROR": "Template render error",
+    "TEMPLATE_STRUCTURE_ERROR": "Template structure error",
+    "UNAUTHORIZED": "Unauthorized",
+    "UNAUTHORIZED_ACCESS": "Unauthorized access",
+    "UNKNOWN_INSTANCE_TYPE": "Unknown instance type",
+    "UPDATE_FAILED": "Update failed",
+    "USERNAME_EXISTS": "Username already exists",
+    "WEBHOOK_IN_USE": "Webhook in use",
+    "WEBHOOK_NOT_FOUND": "Webhook not found",
+    "WEBHOOK_TEST_FAILED": "Webhook test failed",
+    "WEAK_PASSWORD": "Password too weak"
   }
 }

@@ -6,11 +6,13 @@ from typing import Any
 def send_webhook(webhook: WebhookRecipient, summary: dict, job: Job):
     """Sends a report summary via webhook to the given recipient."""
 
-    url = build_webhook_url(webhook)
+    url = webhook.url
+    if not url:
+        raise ValueError(f"skipped|Webhook URL is empty for {webhook.name} ({webhook.type})")
     payload = build_payload(webhook, summary, job)
 
     if not summary:
-        Exception("Summary is empty")
+        raise Exception(f"Summary is empty for {webhook.name} ({webhook.type})")
 
     try:
         response = requests.post(
@@ -18,7 +20,7 @@ def send_webhook(webhook: WebhookRecipient, summary: dict, job: Job):
             json=payload,
             headers={
                 "Content-Type": "application/json",
-                "User-Agent": "UmamiSender/1.0 (+https://github.com/ceviixx/UmamiSender)"
+                "User-Agent": "UmamiSender/1.0 (+https://github.com/ceviixx/umami-sender)"
             },
             timeout=10
         )
@@ -26,29 +28,6 @@ def send_webhook(webhook: WebhookRecipient, summary: dict, job: Job):
         
     except Exception as e:
         raise Exception(f"Webhook failed for {webhook.name} ({webhook.type}): {e}")
-
-
-def build_webhook_url(webhook: WebhookRecipient) -> str:
-    """Builds the full webhook URL depending on type."""
-
-    token = webhook.url.strip()
-
-    if webhook.type == "DISCORD":
-        return f"https://discord.com/api/webhooks/{token}"
-
-    elif webhook.type == "SLACK":
-        return f"https://hooks.slack.com/services/{token}"
-
-    elif webhook.type == "MATTERMOST":
-        return f"https://mattermost.com/hooks/{token}"
-
-    elif webhook.type == "MS_TEAMS":
-        return f"https://mattermost.com/hooks/{token}"
-    
-    elif webhook.type == "CUSTOM":
-        return token  # full URL already
-
-    raise ValueError(f"Unsupported webhook type: {webhook.type}")
 
 
 def build_payload(webhook: WebhookRecipient, summary: dict, job: Job) -> dict:

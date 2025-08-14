@@ -1,52 +1,34 @@
 import requests
 from app.schemas.webhooks import WebhookRecipientCreate
 from sqlalchemy.orm import Session
+from app.utils.responses import send_status_response
+from requests.exceptions import HTTPError, RequestException
 
-def send_test_webhook(data: WebhookRecipientCreate):
-    url = build_webhook_url(data)
+def send_test_webhook(data: WebhookRecipientCreate) -> None:
+    url = data.url
     payload = build_payload(data)
+
     try:
-        response = requests.post(
+        resp = requests.post(
             url,
             json=payload,
             headers={
                 "Content-Type": "application/json",
-                "User-Agent": "UmamiSender/1.0 (+https://github.com/ceviixx/UmamiSender)"
+                "User-Agent": "UmamiSender/1.0 (+https://github.com/ceviixx/umami-sender)"
             },
             timeout=10
         )
-        response.raise_for_status()
-    except Exception as e:
-        raise Exception(f"Webhook failed for {data.name} ({data.type}): {e}")
-
-
-def build_webhook_url(webhook: WebhookRecipientCreate) -> str:
-    """Builds the full webhook URL depending on type."""
-
-    token = webhook.url.strip()
-
-    if webhook.type == "DISCORD":
-        return f"https://discord.com/api/webhooks/{token}"
-
-    elif webhook.type == "SLACK":
-        return f"https://hooks.slack.com/services/{token}"
-
-    elif webhook.type == "MATTERMOST":
-        return f"https://mattermost.com/hooks/{token}"
-
-    elif webhook.type == "MS_TEAMS":
-        return f"https://mattermost.com/hooks/{token}"
-    
-    elif webhook.type == "CUSTOM":
-        return token  # full URL already
-
-    raise ValueError(f"Unsupported webhook type: {webhook.type}")
-
+        resp.raise_for_status()
+    except HTTPError as e:
+        status = e.response.status_code if e.response is not None else 502
+        body   = e.response.text if e.response is not None else ""
+        raise RuntimeError(f"{status} {getattr(e.response, 'reason', '')} {body}".strip())
+    except RequestException as e:
+        raise RuntimeError(str(e))
 
 def build_payload(webhook: WebhookRecipientCreate) -> dict:
     """Generates the webhook message payload based on the webhook type."""
 
-    # Fallback title/summary
     title = f"Test UmamiSender"
 
     if webhook.type == "SLACK":
@@ -57,7 +39,7 @@ def build_payload(webhook: WebhookRecipientCreate) -> dict:
     elif webhook.type == "DISCORD":
         return {
             "username": "UmamiSender",
-            "avatar_url": "https://github.com/ceviixx/UmamiSender/blob/9b077046e4e35113f70591071d9447150536c6cb/frontend/public/umamisender.png",
+            "avatar_url": "https://github.com/ceviixx/umami-sender/blob/9b077046e4e35113f70591071d9447150536c6cb/frontend/public/umamisender.png",
             "content": "Test message",
             "embeds": [],
             "attachments": []
@@ -77,7 +59,7 @@ def build_payload(webhook: WebhookRecipientCreate) -> dict:
             }]
         }
 
-    else:  # CUSTOM – send raw summary
+    else:
         return {
             "summary": "",
             "job": {

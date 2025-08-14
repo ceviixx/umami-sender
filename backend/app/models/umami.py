@@ -1,5 +1,5 @@
-# app/models/umami.py
-
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, Integer, String, Enum as SqlEnum
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -13,20 +13,18 @@ class UmamiType(enum.Enum):
 class Umami(Base, TimestampMixin):
     __tablename__ = "umami"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    user_id = Column(UUID(as_uuid=True), nullable=False, comment="user.id")
     name = Column(String, nullable=False)
     type = Column(SqlEnum(UmamiType), nullable=False)
 
-    # Für Cloud-Instanzen
     api_key = Column(String, nullable=True)
 
-    # Für Self-hosted
     hostname = Column(String, nullable=True)
     username = Column(String, nullable=True)
     password_hash = Column(String, nullable=True)
     bearer_token = Column(String, nullable=True)
-
-    # Beziehung zu MailerJobs
+    
     mailer_jobs = relationship("Job", back_populates="host", cascade="all, delete-orphan")
 
 

@@ -349,10 +349,8 @@ def seed():
     for mapping_type, items in SEED_MAPPINGS.items():
         for key, value in items.items():
             exists = db.query(ValueMappings).filter_by(type=mapping_type, key=key).first()
-            if exists:
-                print(f"🔁 Skipping existing mapping: {mapping_type} -> {key}")
-            else:
-                print(f"➕ Adding mapping: {mapping_type} -> {key} = {value}")
+            if not exists:
+                # print(f"➕ Adding mapping: {mapping_type} -> {key} = {value}")
                 db.add(ValueMappings(type=mapping_type, key=key, value=value))
 
     db.commit()

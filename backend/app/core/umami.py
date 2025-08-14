@@ -12,6 +12,8 @@ def fetch_website_summary(instance: Umami, job: Job):
         start = end - timedelta(days=7)
     elif job.frequency == Frequency.monthly:
         start = end - timedelta(days=30)
+    else: # only developement - always 30 days
+        start = end - timedelta(days=30)
         
     startAt = int(start.timestamp() * 1000)
     endAt = int(end.timestamp() * 1000)

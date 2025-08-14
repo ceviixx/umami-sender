@@ -9,38 +9,16 @@ TEMPLATE_CONTENT = """{
   "embeds": [
     {
       "title": "Umami Summary Report",
-      "description": "Here’s your summary with key metrics.\n\nReport: **{{ summary.name }}**\nPeriod: **{{ summary.period }}**",
+      "description": "Here’s your summary with key metrics. Report: **{{ summary.name }}** Period: **{{ summary.period }}**",
       "color": 5814783,
       "fields": [
-        {
-          "name": "Views",
-          "value": "{{ summary.stats.pageviews }}",
-          "inline": true
-        },
-        {
-          "name": "Visits",
-          "value": "{{ summary.stats.visits }}",
-          "inline": true
-        },
-        {
-          "name": "Visitors",
-          "value": "{{ summary.stats.visitors }}",
-          "inline": true
-        },
-        {
-          "name": "Bounce rate",
-          "value": "{{ summary.stats.bounces }}",
-          "inline": true
-        },
-        {
-          "name": "Visit duration",
-          "value": "{{ summary.stats.totaltime }}",
-          "inline": true
-        }
+        {"name": "Views","value": "{{ summary.stats.pageviews }}","inline": true},
+        {"name": "Visits","value": "{{ summary.stats.visits }}","inline": true},
+        {"name": "Visitors","value": "{{ summary.stats.visitors }}","inline": true},
+        {"name": "Bounce rate","value": "{{ summary.stats.bounces }}","inline": true},
+        {"name": "Visit duration","value": "{{ summary.stats.totaltime }}","inline": true}
       ],
-      "footer": {
-        "text": "Sent with UmamiSender"
-      }
+      "footer": {"text": "Sent with UmamiSender"}
     }
   ],
   "username": "Umami Sender",

@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel
 
 class WebhookRecipientCreate(BaseModel):
@@ -13,10 +14,10 @@ class WebhookRecipientUpdate(BaseModel):
 
 
 class WebhookRecipientOut(BaseModel):
-    id: int
+    id: UUID
     name: str
     url: str
     type: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True

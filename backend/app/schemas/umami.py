@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel
 from enum import Enum
 from typing import Optional
@@ -15,7 +16,7 @@ class UmamiInstanceCreate(BaseModel):
     password: Optional[str] = None  # Klartext nur zum Hashen
 
 class UmamiInstanceOut(BaseModel):
-    id: int
+    id: UUID
     name: str
     type: UmamiType
     hostname: Optional[str] = None

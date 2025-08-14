@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
@@ -12,13 +13,13 @@ class SenderCreate(BaseModel):
     use_ssl: bool
 
 class SenderResponse(SenderCreate):
-    id: int
+    id: UUID
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SenderOut(BaseModel):
-    id: int
+    id: UUID
     name: str
     email: str
     smtp_host: str

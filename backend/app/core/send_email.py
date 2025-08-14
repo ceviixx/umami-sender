@@ -18,7 +18,16 @@ def send_email(sender: Sender, to: list[str], subject: str, body: str, html: str
         if sender.use_tls:
             server.starttls()
 
-    server.login(sender.smtp_username, sender.smtp_password)
+    try:
+        server.login(sender.smtp_username, sender.smtp_password)
+    except smtplib.SMTPAuthenticationError as e:
+        raise Exception(f"SMTP Authentication Error: {e}")
+    except smtplib.SMTPConnectError as e:
+        raise Exception(f"SMTP Connection Error: {e}")
+    except smtplib.SMTPException as e:
+        raise Exception(f"SMTP Error: {e}")
+    except Exception as e:
+        raise Exception(f"An unexpected error occurred: {e}")
 
     for recipient in to:
         msg = MIMEMultipart("alternative")

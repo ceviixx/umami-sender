@@ -5,9 +5,29 @@
     "jobs": "",
     "mailer": "",
     "webhook": "",
-    "templates": ""
+    "templates": "",
+    "account": "",
+    "changepassword": "",
+    "logs": "",
+    "adminSection": "",
+    "systemSection": "",
+    "admin": {
+      "users": "",
+      "logs": "",
+      "config": "",
+      "settings": ""
+    }
   },
   "buttons": {
+    "try_again": "",
+    "change_password": "",
+    "logs": "",
+    "deactivate": "",
+    "activate": "",
+    "account": "",
+    "signin": "",
+    "profile": "",
+    "logout": "",
     "close": "",
     "refresh": "",
     "save": "",
@@ -19,12 +39,35 @@
     "back": "",
     "test": "",
     "states": {
+      "signingin": "",
       "loading": "",
       "testing": ""
     }
   },
   "forms": {
+    "sections": {
+      "profile": "",
+      "user": "",
+      "general": "",
+      "config": "",
+      "recipients": "",
+      "sender": "",
+      "smtp_host": "",
+      "type": ""
+    },
     "labels": {
+      "password": {
+        "password": "",
+        "current": "",
+        "new": "",
+        "confirm": ""
+      },
+      "language": "",
+      "role": "",
+      "login": {
+        "username": "",
+        "password": ""
+      },
       "apikey": "",
       "smtp": {
         "host": "",
@@ -53,7 +96,6 @@
       },
       "hostname": "",
       "username": "",
-      "password": "",
       "type": "",
       "name": "",
       "description": "",
@@ -68,19 +110,37 @@
       "choose_website": "",
       "choose_weekday": "",
       "choose_sender": "",
-      "choose_sender_type": "",
       "choose_umami": "",
       "choose_webhook_type": "",
+      "choose_sender_type": "",
       "choose_webhook": "",
       "choose_day": "",
       "choose_report": "",
-      "loading": ""
+      "choose_role": "",
+      "loading": "",
+      "no_senders_or_webhooks": "",
+      "choose_language": ""
     },
     "errors": {
       "max_items": ""
+    },
+    "help": {
+      "userEditHint": "",
+      "userCreateHint": "",
+      "instanceName": "",
+      "cloud": "",
+      "selfhost": "",
+      "webhookName": "",
+      "webhookUrl": "",
+      "hint_general": "",
+      "hint_config": ""
     }
   },
   "enums": {
+    "userrole": {
+      "admin": "",
+      "user": ""
+    },
     "template_insert_placeholder": {
       "job_name": "",
       "period": "",
@@ -146,7 +206,10 @@
   },
   "messages": {
     "confirm_delete": "",
-    "no_webhooks": ""
+    "no_webhooks": "",
+    "saved": "",
+    "updated": "",
+    "test_success": ""
   },
   "weekdays": {
     "monday": "",
@@ -158,6 +221,8 @@
     "sunday": ""
   },
   "ui": {
+    "back_to_app": "",
+    "login": "",
     "context_menu": "",
     "edit": "",
     "create": "",
@@ -171,5 +236,56 @@
     "template_preview": "",
     "preview": "",
     "preview_refreshed": ""
+  },
+  "common": {
+    "active": "",
+    "inactive": "",
+    "status": {
+      "success": "",
+      "skipped": "",
+      "failed": ""
+    }
+  },
+  "api_messages": {
+    "API_KEY_REQUIRED": "",
+    "BAD_REQUEST": "",
+    "CREATE_FAILED": "",
+    "DATA_ERROR": "",
+    "DATABASE_ERROR": "",
+    "DELETE_FAILED": "",
+    "FETCH_REPORTS_FAILED": "",
+    "FETCH_WEBSITES_FAILED": "",
+    "FORBIDDEN": "",
+    "INTERNAL_ERROR": "",
+    "INTEGRITY_ERROR": "",
+    "INSTANCE_NOT_FOUND": "",
+    "INVALID_API_KEY": "",
+    "INVALID_INPUT": "",
+    "INVALID_PASSWORD": "",
+    "JOB_NOT_FOUND": "",
+    "LOGS_ERROR": "",
+    "LOG_STATS_ERROR": "",
+    "LOGIN_REMOTE_ERROR": "",
+    "LOGIN_SUCCESS_NO_TOKEN": "",
+    "MAILER_NOT_FOUND": "",
+    "NOT_AUTHENTICATED": "",
+    "NOT_FOUND": "",
+    "OK": "",
+    "PASSWORD_MISMATCH": "",
+    "SELF_HOSTED_CREDENTIALS_REQUIRED": "",
+    "SMTP_TEST_FAILED": "",
+    "STATS_ERROR": "",
+    "TEMPLATE_NOT_FOUND": "",
+    "TEMPLATE_RENDER_ERROR": "",
+    "TEMPLATE_STRUCTURE_ERROR": "",
+    "UNAUTHORIZED": "",
+    "UNAUTHORIZED_ACCESS": "",
+    "UNKNOWN_INSTANCE_TYPE": "",
+    "UPDATE_FAILED": "",
+    "USERNAME_EXISTS": "",
+    "WEBHOOK_IN_USE": "",
+    "WEBHOOK_NOT_FOUND": "",
+    "WEBHOOK_TEST_FAILED": "",
+    "WEAK_PASSWORD": ""
   }
 }

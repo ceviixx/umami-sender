@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel
 from typing import Optional, Any
 
@@ -14,11 +15,11 @@ class MailTemplateUpdate(MailTemplateBase):
 
 
 class MailTemplateList(BaseModel):
-    id: int
+    id: UUID
     sender_type: str
 
 class MailTemplateOut(MailTemplateBase):
-    id: int
+    id: UUID
 
     class Config:
-        orm_mode = True
+        from_attributes = True

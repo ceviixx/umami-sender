@@ -8,9 +8,9 @@ from app.models.template_styles import MailTemplateStyle
 from app.utils.response_clean import process_api_response
 
 def send_email_report(db: Session, job: Job, summary: dict):
-    sender = db.query(Sender).filter_by(id=job.sender_id).first()
+    sender = db.query(Sender).filter_by(id=job.mailer_id).first()
     if not sender:
-        raise Exception(f"No sender found for ID {job.sender_id}")
+        raise Exception(f"No sender found for ID {job.mailer_id}")
 
     report_type = summary.get("type", "").upper()
     job_report_type = job.report_type.upper()
@@ -30,7 +30,8 @@ def send_email_report(db: Session, job: Job, summary: dict):
         style = db.query(MailTemplateStyle).filter_by(is_default=True).first()
     css = style.css if style else ""
 
-    
+    if not job.email_recipients:
+        raise Exception("skipped|No email recipients specified for the job.")
 
     html_body = render_template(template.content, {
         "summary": summary,

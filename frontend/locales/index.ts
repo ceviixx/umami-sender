@@ -6,7 +6,6 @@ export const translations = {
   de,
   en,
   fr,
-  
 };
 
 export type Language = keyof typeof translations;
