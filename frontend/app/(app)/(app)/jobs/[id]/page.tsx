@@ -17,10 +17,10 @@ import { fetchUmamis, fetchWebsitesByUmami, fetchReportsByWebsite } from '@/lib/
 import { fetchMailers } from '@/lib/api/mailers'
 import { fetchWebhooks } from '@/lib/api/webhook'
 import { fetchTemplates } from '@/lib/api/templates'
-import { showSuccess } from "@/lib/toast";
 import { useWeekdays, useOptions } from '@/lib/constants'
 import LoadingSpinner from "@/components/LoadingSpinner";
 import NetworkError from "@/components/NetworkError";
+import { showError, showSuccess } from "@/lib/toast";
 
 function Section({
   title,
@@ -201,10 +201,10 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
       fetchMailers().then(setSenders),
       fetchTemplates().then(setTemplates),
     ])
-      .catch(error => {
-        setHasNetworkError(error.message)
-      })
-      .finally(() => setLoading(false))
+    .catch(error => {
+      setHasNetworkError(error.message)
+    })
+    .finally(() => setLoading(false))
   }, [params.id])
 
   useEffect(() => {
@@ -214,7 +214,9 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
       try {
         const websites = await fetchWebsitesByUmami(form.umami_id ?? '')
         setWebsites(websites)
-      } catch (err) {
+      } catch (error: any) {
+        const message = error.message
+        showError(locale.api_messages[message as 'DATA_ERROR'] || message)
         setWebsites([])
       }
     }
@@ -243,9 +245,14 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
     e.preventDefault()
 
     const emailList = form.email_recipients.filter(Boolean)
-
-    await updateJob(params.id, form)
-    showSuccess('Updated')
+    
+    try {
+      await updateJob(params.id, form)
+      showSuccess(locale.messages.updated)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+    }
   }
 
   const [isStepValid, setIsStepValidState] = useState(false); // (nur um Imports/Logik nicht zu verändern)
@@ -363,7 +370,7 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
                 value={form.day}
                 onChange={(value) => handleChange({ name: 'day', value })}
                 options={Array.from({ length: 31 }, (_, i) => ({
-                  value: String(i + 1),
+                  value: i + 1,
                   label: String(i + 1)
                 }))}
                 placeholder={locale.forms.placeholders.choose_day}
@@ -477,7 +484,7 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
             <p className="text-xs text-gray-500 dark:text-gray-400"></p>
             <FormButtons
               cancelLabel={locale.buttons.cancel}
-              saveLabel={locale.buttons.save}
+              saveLabel={locale.buttons.update}
               isSubmitting={loading}
             />
           </div>

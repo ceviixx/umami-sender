@@ -78,8 +78,9 @@ export default function MailerNewPage() {
   }
 
   const handleTest = async () => {
+    if (!form) return
     setTesting(true)
-    setTestResult(null)
+
     try {
       const payload = {
         ...form,
@@ -87,9 +88,10 @@ export default function MailerNewPage() {
         smtp_password: form.use_auth ? form.smtp_password : '',
       }
       await testConnection(payload)
-      showSuccess('Test success!')
-    } catch (e: any) {
-      showError(`Error: ${e.message || 'Connection failure.'}`)
+      showSuccess(locale.messages.saved)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     } finally {
       setTesting(false)
     }

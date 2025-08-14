@@ -29,19 +29,20 @@ export default function MailerEditPage({ params }: { params: { id: string } }) {
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const load = async () => {
-      const sender = await fetchMailer(params.id)
-      setForm({
-        ...sender,
-        smtp_password: '',
-        use_auth: !!sender.smtp_username,
+    if (!params.id) return
+    
+    fetchMailer(params.id)
+      .then((sender) => {
+        setForm({
+          ...sender,
+          smtp_password: '',
+          use_auth: !!sender.smtp_username,
+        });
       })
-      setLoading(false)
-    }
-    load()
+      .finally(() => setLoading(false))
+      .catch((error) => showError(locale.api_messages[error as 'DATA_ERROR'] || error))
   }, [params.id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,8 +63,7 @@ export default function MailerEditPage({ params }: { params: { id: string } }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSaving(true)
-    setError(null)
+    if (!form) return
 
     const payload = {
       ...form,
@@ -73,19 +73,17 @@ export default function MailerEditPage({ params }: { params: { id: string } }) {
 
     try {
       await updateMailer(params.id, payload)
-      showSuccess('Updated')
-    } catch (err: any) {
-      setError('Speichern fehlgeschlagen. Bitte versuche es erneut.')
-      const message = err?.response?.data?.detail || err?.message || 'Fehler beim Speichern'
-      showError(message)
-    } finally {
-      setIsSaving(false)
+      showSuccess(locale.messages.updated)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     }
   }
 
   const handleTest = async () => {
+    if (!form) return
     setTesting(true)
-    setTestResult(null)
+
     try {
       const payload = {
         ...form,
@@ -93,9 +91,10 @@ export default function MailerEditPage({ params }: { params: { id: string } }) {
         smtp_password: form.use_auth ? form.smtp_password : '',
       }
       await testConnection(payload)
-      setTestResult('✅ Verbindung erfolgreich!')
-    } catch (e: any) {
-      setTestResult(`❌ Fehler: ${e.message || 'Verbindung fehlgeschlagen.'}`)
+      showSuccess(locale.messages.saved)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     } finally {
       setTesting(false)
     }

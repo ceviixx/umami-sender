@@ -29,7 +29,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange }) => {
   };
 
   return (
-    <div className="w-1/2">
+    <div className="w-2/3">
       {label && <label className="block text-sm font-medium mb-1">{label}</label>}
       <div className="flex items-center gap-2">
         <SelectBox

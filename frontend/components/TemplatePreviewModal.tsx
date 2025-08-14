@@ -7,10 +7,10 @@ import { useI18n } from "@/locales/I18nContext";
 type Props = {
   isOpen: boolean
   onClose: () => void
-  content: string            // vollständiger HTML-Body (ohne <html> nötig)
+  content: string
   templateType: string
   onRefresh: (templateType: string) => void
-  baseHref?: string          // optional, für relative Pfade in content (Bilder/CSS)
+  baseHref?: string
 }
 
 export default function Modal({
@@ -38,7 +38,6 @@ export default function Modal({
 <meta charset="utf-8">
 ${base}
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 </head>
 <body>
 ${content}
@@ -78,16 +77,30 @@ ${content}
           </h3>
           <div className="flex gap-2 items-center">
             <button
+              type="button"
               onClick={() => { setIframeLoading(true); onRefresh(templateType) }}
-              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-bold"
+              aria-label={locale.buttons.refresh}
               title={locale.buttons.refresh}
+              className="group/button inline-flex h-9 w-9 items-center justify-center rounded-full
+                         bg-white/70 dark:bg-gray-900/40 backdrop-blur-sm
+                         border border-gray-200/70 dark:border-gray-800/60
+                         text-gray-600 dark:text-gray-300
+                         hover:bg-gray-100/70 dark:hover:bg-gray-800/60
+                         transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60"
             >
               <ArrowPathIcon className="w-4 h-4" />
             </button>
             <button
+              type="button"
               onClick={onClose}
-              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-bold"
+              aria-label={locale.buttons.close}
               title={locale.buttons.close}
+              className="group inline-flex h-9 w-9 items-center justify-center rounded-full
+                         bg-white/70 dark:bg-gray-900/40 backdrop-blur-sm
+                         border border-gray-200/70 dark:border-gray-800/60
+                         text-gray-600 dark:text-gray-300
+                         hover:bg-gray-100/70 dark:hover:bg-gray-800/60
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 transition"
             >
               <XMarkIcon className="w-6 h-6" />
             </button>

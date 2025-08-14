@@ -4,6 +4,7 @@ import { useState } from 'react';
 import PageHeader from '@/components/navigation/PageHeader';
 import { useRouter } from 'next/navigation';
 import { ArrowPathIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
+import { useI18n } from "@/locales/I18nContext";
 
 type NetworkErrorProps = {
   page: string;
@@ -14,10 +15,11 @@ type NetworkErrorProps = {
 
 export default function NetworkError({
   page = '',
-  title = 'Network Error',
+  title = 'Something went wrong.',
   message = '',
   retryPath,
 }: NetworkErrorProps) {
+  const { locale } = useI18n()
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
@@ -75,7 +77,7 @@ export default function NetworkError({
                 className={`h-5 w-5 ${busy ? 'animate-spin' : 'group-hover:rotate-180 transition-transform'}`}
                 aria-hidden="true"
               />
-              <span>{'{Erneut versuchen}'}</span>
+              <span>{locale.buttons.try_again}</span>
             </button>
           </div>
         </div>

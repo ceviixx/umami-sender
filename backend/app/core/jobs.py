@@ -21,7 +21,6 @@ def run_due_jobs():
 
     db.close()
 
-
 def run_daily_jobs(db: Session, now: datetime):
     lower_bound = (now - timedelta(seconds=30)).time()
     upper_bound = (now + timedelta(seconds=30)).time()

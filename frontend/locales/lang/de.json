@@ -19,6 +19,7 @@
     }
   },
   "buttons": {
+    "try_again": "Erneut versuchen",
     "change_password": "Passwort ändern",
     "logs": "Protokolle",
     "deactivate": "Deaktivieren",
@@ -205,7 +206,10 @@
   },
   "messages": {
     "confirm_delete": "Löschen bestätigen",
-    "no_webhooks": "Keine Webhooks konfiguriert"
+    "no_webhooks": "Keine Webhooks konfiguriert",
+    "saved": "Erfolgreich gespeichert",
+    "updated": "Erfolgreich aktualisiert",
+    "test_success": "Test erfolgreich"
   },
   "weekdays": {
     "monday": "Montag",
@@ -241,5 +245,47 @@
       "skipped": "Übersprungen",
       "failed": "Fehlgeschlagen"
     }
+  },
+  "api_messages": {
+    "API_KEY_REQUIRED": "API-Schlüssel erforderlich",
+    "BAD_REQUEST": "Ungültige Anfrage",
+    "CREATE_FAILED": "Erstellen fehlgeschlagen",
+    "DATA_ERROR": "Datenfehler",
+    "DATABASE_ERROR": "Datenbankfehler",
+    "DELETE_FAILED": "Löschen fehlgeschlagen",
+    "FETCH_REPORTS_FAILED": "Berichte konnten nicht geladen werden",
+    "FETCH_WEBSITES_FAILED": "Websites konnten nicht geladen werden",
+    "FORBIDDEN": "Zugriff verweigert",
+    "INTERNAL_ERROR": "Interner Fehler",
+    "INTEGRITY_ERROR": "Integritätsfehler",
+    "INSTANCE_NOT_FOUND": "Instanz nicht gefunden",
+    "INVALID_API_KEY": "Ungültiger API-Schlüssel",
+    "INVALID_INPUT": "Ungültige Eingabe",
+    "INVALID_PASSWORD": "Ungültiges Passwort",
+    "JOB_NOT_FOUND": "Auftrag nicht gefunden",
+    "LOGS_ERROR": "Protokollfehler",
+    "LOG_STATS_ERROR": "Statistikprotokollfehler",
+    "LOGIN_REMOTE_ERROR": "Anmeldung am Remote fehlgeschlagen",
+    "LOGIN_SUCCESS_NO_TOKEN": "Anmeldung erfolgreich, kein Token",
+    "MAILER_NOT_FOUND": "Mailer nicht gefunden",
+    "NOT_AUTHENTICATED": "Nicht angemeldet",
+    "NOT_FOUND": "Nicht gefunden",
+    "OK": "Erfolgreich",
+    "PASSWORD_MISMATCH": "Passwörter stimmen nicht überein",
+    "SELF_HOSTED_CREDENTIALS_REQUIRED": "Zugangsdaten für Self-Hosted erforderlich",
+    "SMTP_TEST_FAILED": "SMTP-Test fehlgeschlagen",
+    "STATS_ERROR": "Statistikfehler",
+    "TEMPLATE_NOT_FOUND": "Vorlage nicht gefunden",
+    "TEMPLATE_RENDER_ERROR": "Vorlage konnte nicht gerendert werden",
+    "TEMPLATE_STRUCTURE_ERROR": "Vorlagenstrukturfehler",
+    "UNAUTHORIZED": "Nicht autorisiert",
+    "UNAUTHORIZED_ACCESS": "Unbefugter Zugriff",
+    "UNKNOWN_INSTANCE_TYPE": "Unbekannter Instanztyp",
+    "UPDATE_FAILED": "Aktualisierung fehlgeschlagen",
+    "USERNAME_EXISTS": "Benutzername existiert bereits",
+    "WEBHOOK_IN_USE": "Webhook in Verwendung",
+    "WEBHOOK_NOT_FOUND": "Webhook nicht gefunden",
+    "WEBHOOK_TEST_FAILED": "Webhook-Test fehlgeschlagen",
+    "WEAK_PASSWORD": "Passwort zu schwach"
   }
 }

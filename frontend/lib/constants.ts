@@ -38,3 +38,20 @@ export function useOptions() {
     { value: 'tag', label: locale.enums.metrics.tag },
   ];
 }
+
+export function useWebhookType() {
+  const { locale } = useI18n()
+
+  const types = [
+    { value: 'DISCORD', label: 'Discord' },
+    { value: 'SLACK', label: 'Slack' },
+    { value: 'CUSTOM', label: locale.forms.labels.custom },
+  ]
+
+  const getLabel = (value: string) => {
+    const found = types.find(t => t.value === value)
+    return found ? found.label : value
+  }
+
+  return { types, getLabel }
+}

@@ -1,12 +1,15 @@
 import requests
 from app.schemas.webhooks import WebhookRecipientCreate
 from sqlalchemy.orm import Session
+from app.utils.responses import send_status_response
+from requests.exceptions import HTTPError, RequestException
 
-def send_test_webhook(data: WebhookRecipientCreate):
+def send_test_webhook(data: WebhookRecipientCreate) -> None:
     url = data.url
     payload = build_payload(data)
+
     try:
-        response = requests.post(
+        resp = requests.post(
             url,
             json=payload,
             headers={
@@ -15,14 +18,17 @@ def send_test_webhook(data: WebhookRecipientCreate):
             },
             timeout=10
         )
-        response.raise_for_status()
-    except Exception as e:
-        raise Exception(f"Webhook failed for {data.name} ({data.type}): {e}")
+        resp.raise_for_status()
+    except HTTPError as e:
+        status = e.response.status_code if e.response is not None else 502
+        body   = e.response.text if e.response is not None else ""
+        raise RuntimeError(f"{status} {getattr(e.response, 'reason', '')} {body}".strip())
+    except RequestException as e:
+        raise RuntimeError(str(e))
 
 def build_payload(webhook: WebhookRecipientCreate) -> dict:
     """Generates the webhook message payload based on the webhook type."""
 
-    # Fallback title/summary
     title = f"Test UmamiSender"
 
     if webhook.type == "SLACK":
@@ -53,7 +59,7 @@ def build_payload(webhook: WebhookRecipientCreate) -> dict:
             }]
         }
 
-    else:  # CUSTOM – send raw summary
+    else:
         return {
             "summary": "",
             "job": {

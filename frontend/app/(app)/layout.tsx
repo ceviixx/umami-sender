@@ -44,7 +44,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                  text-sm font-medium">
                 <div className="flex items-center gap-2">
                   <UmamiSender className="h-5 w-5" />
-                  <span className="text-base font-semibold leading-none">UmamiSender</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <a

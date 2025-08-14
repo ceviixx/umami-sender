@@ -20,7 +20,10 @@ router = APIRouter(prefix="/templates", tags=["templates"])
 @router.get("", response_model=list[MailTemplateList])
 def list_templates(request: Request, db: Session = Depends(get_db)):
     _ = Security(request).get_user()
-    return db.query(MailTemplate).filter(MailTemplate.sender_type.contains('EMAIL')).order_by(MailTemplate.id.asc()).all()
+    return (db.query(MailTemplate)
+            .filter(MailTemplate.sender_type.contains('EMAIL'))
+            .order_by(MailTemplate.sender_type.asc())
+            .all())
 
 @router.get("/{template_type}", response_model=MailTemplateOut)
 def get_template(request: Request, template_type: str, db: Session = Depends(get_db)):

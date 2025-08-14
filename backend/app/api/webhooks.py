@@ -15,22 +15,31 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 @router.post("/test")
 def test_webhook(request: Request, data: WebhookRecipientCreate):
     _ = Security(request).get_user()
-    
+
     try:
         send_test_webhook(data)
-        return {"success": True, "message": "Connection successful"}
+        return send_status_response(
+            code="OK",
+            message="Connection successful",
+            status=200,
+            detail=None
+        )
     except RuntimeError as e:
+        status = 400 if str(e).lstrip().startswith(("400","401","403","404","405","409","422")) else 502
         return send_status_response(
             code="WEBHOOK_TEST_FAILED",
-            message="Webhook test failed",
-            status=400,
+            message=f"Testing webhook failed for {data.name} ({data.type})",
+            status=status,
             detail=str(e)
         )
 
 @router.get("", response_model=list[WebhookRecipientOut])
 def list_webhooks(request: Request, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-    return db.query(WebhookRecipient).filter(WebhookRecipient.user_id == user.id).all()
+    return (db.query(WebhookRecipient)
+            .filter(WebhookRecipient.user_id == user.id)
+            .order_by(WebhookRecipient.created_at.desc())
+            .all())
 
 @router.post("", response_model=WebhookRecipientOut)
 def create_webhook(request: Request, webhook: WebhookRecipientCreate, db: Session = Depends(get_db)):

@@ -9,10 +9,13 @@ import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
 import { showError, showSuccess } from '@/lib/toast'
+import { useWebhookType } from "@/lib/constants";
 
 export default function WebhookNewPage() {
   const router = useRouter()
   const { locale } = useI18n()
+  const { types } = useWebhookType()
+
   const [form, setForm] = useState<{
     name: string;
     url: String | null;
@@ -30,26 +33,27 @@ export default function WebhookNewPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!form) return
 
     try {
       await createWebhook(form)
-      showSuccess('Webhook recipient created successfully')
+      showSuccess('Success')
       router.push('/webhooks')
     } catch (error: any) {
-      const message = error?.response?.detail || error?.message || 'An unexpected error occurred'
-      showError(message)
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     }
   }
 
   const handleTest = async () => {
+    if (!form) return
     setTesting(true)
     try {
-      const payload = { ...form }
-      await testWebhook(payload)
-      showSuccess('Test success!')
-      console.log(payload)
-    } catch (e: any) {
-      showError(`Error: ${e.message || 'Connection failure.'}`)
+      await testWebhook({ ...form })
+      showSuccess(locale.messages.saved)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     } finally {
       setTesting(false)
     }
@@ -95,11 +99,7 @@ export default function WebhookNewPage() {
                 label=""
                 value={String(form.type ?? '')}
                 onChange={(value) => setForm({ ...form, type: value })}
-                options={[
-                  { value: 'DISCORD', label: 'Discord' },
-                  { value: 'SLACK', label: 'Slack' },
-                  { value: 'CUSTOM', label: locale.forms.labels.custom },
-                ]}
+                options={types}
                 placeholder={locale.forms.placeholders.choose_webhook_type}
               />
             </div>

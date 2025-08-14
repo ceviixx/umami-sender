@@ -13,6 +13,7 @@ import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
 import { showError } from "@/lib/toast";
+import { useWebhookType } from "@/lib/constants";
 
 export default function WebhooksPage() {
   const router = useRouter()
@@ -20,6 +21,7 @@ export default function WebhooksPage() {
   const [webhooks, setWebhooks] = useState<WebhookRecipient[]>([])
   const [loading, setLoading] = useState(true)
   const [networkError, setHasNetworkError] = useState<string | null>(null)
+  const { getLabel } = useWebhookType()
 
   useEffect(() => {
     fetchWebhooks()
@@ -63,7 +65,7 @@ export default function WebhooksPage() {
           items={webhooks}
           keyField={(item) => item.id}
           title={(item) => item.name}
-          subtitle={(item) => item.type}
+          subtitle={(item) => getLabel(item.type)}
           rightSlot={(item) => (
             <ContextMenu
               items={[

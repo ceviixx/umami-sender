@@ -5,6 +5,8 @@ from enum import Enum
 from datetime import time
 
 class Frequency(str, Enum):
+    minutely = "minutely"
+    hourly = "hourly"
     daily = "daily"
     weekly = "weekly"
     monthly = "monthly"

@@ -11,7 +11,8 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from app.database import Base
-from app.models import sender  # alle Modelle importieren, damit sie registriert sind
+from app.models import sender
+from app.models import jobs
 
 target_metadata = Base.metadata
 

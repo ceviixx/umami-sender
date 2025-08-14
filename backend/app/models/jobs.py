@@ -7,7 +7,6 @@ import enum
 from .base import TimestampMixin
 
 class Frequency(str, enum.Enum):
-    hourly = "hourly"
     daily = "daily"
     weekly = "weekly"
     monthly = "monthly"

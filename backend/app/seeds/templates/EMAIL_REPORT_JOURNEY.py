@@ -17,7 +17,6 @@ TEMPLATE_CONTENT = """<!DOCTYPE html>
 <div class="container">
   <div class="header">
     <img src="{{ summary.embedded_logo }}" alt="Logo" />
-    <h1>UmamiSender</h1>
   </div>
 
   <h2>We’ve crunched the numbers – here’s your summary.</h2>

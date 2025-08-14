@@ -35,11 +35,11 @@ export default function HostNewPage() {
 
     try {
       await createUmami(form)
-      showSuccess('Umami-Instanz erfolgreich gespeichert')
+      showSuccess(locale.messages.updated)
       router.push('/umami')
-    } catch (err: any) {
-      const message = err?.response?.data?.detail || err?.message || 'Fehler beim Speichern'
-      showError(message)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     } finally {
       setLoading(false)
     }

@@ -32,7 +32,6 @@ export default function HostEditPage({ params }: { params: { id: string } }) {
     password: null,
     api_key: null
   });
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -41,7 +40,7 @@ export default function HostEditPage({ params }: { params: { id: string } }) {
     fetchUmami(params.id)
       .then(setForm)
       .finally(() => setLoading(false))
-      .catch(() => setError('Fehler beim Laden der Instanz'))
+      .catch((error) => showError(locale.api_messages[error as 'DATA_ERROR'] || error))
   }, [params.id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -53,15 +52,12 @@ export default function HostEditPage({ params }: { params: { id: string } }) {
     e.preventDefault()
     if (!form) return
 
-    setLoading(true)
-    setError(null)
-
     try {
       await updateUmami(params.id, form)
-      showSuccess('Umami-Instanz erfolgreich aktualisiert')
-    } catch (err: any) {
-      const message = err?.response?.data?.detail || err?.message || 'Fehler beim Speichern'
-      showError(message)
+      showSuccess(locale.messages.updated)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     } finally {
       setLoading(false)
     }

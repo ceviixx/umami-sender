@@ -25,7 +25,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <header className="fixed top-0 left-0 w-full h-16 z-20 flex items-center justify-between px-6 text-lg font-semibold text-black-600 dark:text-white-400">
               <div className="flex items-center gap-2">
                 <UmamiSender className='h-5 w-5' />
-                <span className="text-base font-semibold leading-none">UmamiSender</span>
               </div>
             </header>
             {children}

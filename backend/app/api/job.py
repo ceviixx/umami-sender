@@ -21,7 +21,10 @@ def create_mailer_job(request: Request, data: MailerJobCreate, db: Session = Dep
 @router.get("", response_model=list[MailerJobOut])
 def list_mailer_jobs(request: Request, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-    return db.query(Job).filter(Job.user_id == user.id).all()
+    return (db.query(Job).
+            filter(Job.user_id == user.id)
+            .order_by(Job.created_at.desc())
+            .all())
 
 @router.delete("/{job_id}")
 def delete_mailer_job(request: Request, job_id: str, db: Session = Depends(get_db)):

@@ -19,6 +19,7 @@
     }
   },
   "buttons": {
+    "try_again": "",
     "change_password": "",
     "logs": "",
     "deactivate": "",
@@ -205,7 +206,10 @@
   },
   "messages": {
     "confirm_delete": "",
-    "no_webhooks": ""
+    "no_webhooks": "",
+    "saved": "",
+    "updated": "",
+    "test_success": ""
   },
   "weekdays": {
     "monday": "",
@@ -241,5 +245,47 @@
       "skipped": "",
       "failed": ""
     }
+  },
+  "api_messages": {
+    "API_KEY_REQUIRED": "",
+    "BAD_REQUEST": "",
+    "CREATE_FAILED": "",
+    "DATA_ERROR": "",
+    "DATABASE_ERROR": "",
+    "DELETE_FAILED": "",
+    "FETCH_REPORTS_FAILED": "",
+    "FETCH_WEBSITES_FAILED": "",
+    "FORBIDDEN": "",
+    "INTERNAL_ERROR": "",
+    "INTEGRITY_ERROR": "",
+    "INSTANCE_NOT_FOUND": "",
+    "INVALID_API_KEY": "",
+    "INVALID_INPUT": "",
+    "INVALID_PASSWORD": "",
+    "JOB_NOT_FOUND": "",
+    "LOGS_ERROR": "",
+    "LOG_STATS_ERROR": "",
+    "LOGIN_REMOTE_ERROR": "",
+    "LOGIN_SUCCESS_NO_TOKEN": "",
+    "MAILER_NOT_FOUND": "",
+    "NOT_AUTHENTICATED": "",
+    "NOT_FOUND": "",
+    "OK": "",
+    "PASSWORD_MISMATCH": "",
+    "SELF_HOSTED_CREDENTIALS_REQUIRED": "",
+    "SMTP_TEST_FAILED": "",
+    "STATS_ERROR": "",
+    "TEMPLATE_NOT_FOUND": "",
+    "TEMPLATE_RENDER_ERROR": "",
+    "TEMPLATE_STRUCTURE_ERROR": "",
+    "UNAUTHORIZED": "",
+    "UNAUTHORIZED_ACCESS": "",
+    "UNKNOWN_INSTANCE_TYPE": "",
+    "UPDATE_FAILED": "",
+    "USERNAME_EXISTS": "",
+    "WEBHOOK_IN_USE": "",
+    "WEBHOOK_NOT_FOUND": "",
+    "WEBHOOK_TEST_FAILED": "",
+    "WEAK_PASSWORD": ""
   }
 }

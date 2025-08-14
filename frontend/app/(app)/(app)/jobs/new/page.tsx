@@ -334,7 +334,7 @@ export default function JobNewPage() {
                 value={form.day}
                 onChange={(value) => handleChange({ name: 'day', value })}
                 options={Array.from({ length: 31 }, (_, i) => ({
-                  value: String(i + 1),
+                  value: i + 1,
                   label: String(i + 1)
                 }))}
                 placeholder={locale.forms.placeholders.choose_day}

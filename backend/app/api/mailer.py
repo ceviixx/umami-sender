@@ -11,9 +11,7 @@ from app.utils.security import Security
 router = APIRouter(prefix="/mailer", tags=["mailer"])
 
 @router.post("/test")
-def test_sender(request: Request, data: SenderCreate):
-    _ = Security(request).get_user()
-
+def test_sender(data: SenderCreate):
     try:
         test_smtp_connection(data)
         return {"success": True, "message": "Connection successful"}
@@ -46,7 +44,10 @@ def create_sender(request: Request, data: SenderCreate, db: Session = Depends(ge
 @router.get("", response_model=list[SenderOut])  # 👈 HIER
 def list_senders(request: Request, db: Session = Depends(get_db)):
     user = Security(request).get_user()
-    return db.query(Sender).filter(Sender.user_id == user.id).all()
+    return (db.query(Sender)
+            .filter(Sender.user_id == user.id)
+            .order_by(Sender.created_at.desc())
+            .all())
 
 @router.delete("/{mailer_id}")
 def delete_webhook(request: Request, mailer_id: str, db: Session = Depends(get_db)):

@@ -61,7 +61,10 @@ def list_users(request: Request, db: Session = Depends(get_db)):
             detail="Only admin users can view the list of users."
         )
     
-    return db.query(User).filter(User.id != user.id).all()
+    return (db.query(User)
+            .filter(User.id != user.id)
+            .order_by(User.created_at.desc())
+            .all())
 
 @router.delete("/{user_id}")
 def delete_user(request: Request, user_id: str, db: Session = Depends(get_db)):

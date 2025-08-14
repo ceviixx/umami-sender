@@ -19,11 +19,12 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
   const [testing, setTesting] = useState(false)
 
   useEffect(() => {
-    if (params.id) {
-      fetchWebhook(params.id)
-        .then(setForm)
-        .finally(() => setLoading(false))
-    }
+    if (!params.id) return
+
+    fetchWebhook(params.id)
+      .then(setForm)
+      .finally(() => setLoading(false))
+      .catch((error) => showError(locale.api_messages[error as 'DATA_ERROR'] || error))
   }, [params.id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,11 +41,11 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
         name: form.name,
         url: form.url,
       })
-      showSuccess('Updated')
+      showSuccess(locale.messages.updated)
       // router.back()
     } catch (error: any) {
-      const message = error?.response?.data?.detail || error?.message || 'Failed to update webhook'
-      showError(message)
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     }
   }
 
@@ -53,9 +54,10 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
     setTesting(true)
     try {
       await testWebhook({ ...form })
-      showSuccess('Test success!')
-    } catch (e: any) {
-      showError(`Error: ${e.message || 'Connection failure.'}`)
+      showSuccess(locale.messages.test_success)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
     } finally {
       setTesting(false)
     }

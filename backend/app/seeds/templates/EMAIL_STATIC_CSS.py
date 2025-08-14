@@ -5,7 +5,7 @@ from app.models.template_styles import MailTemplateStyle
 CSS_CONTENT = """body {margin: 0;padding: 0;background-color: #f5f7fa;font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;color: #333;}
 .container {max-width: 640px;margin: 40px auto;background-color: #fff;padding: 30px;border-radius: 12px;box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);}
 .header {display: flex;align-items: center;gap: 10px;margin-bottom: 30px;}
-.header img {width: 30px;height: 30px;}
+.header img {height: 25px;}
 .header h1 {font-size: 22px;color: #2563eb;margin: 0;}
 h2 {font-size: 18px;margin: 20px 0 10px;color: #111827;}
 p {margin: 4px 0 10px;font-size: 14px;}
