@@ -1,46 +1,46 @@
 <p align="center">
-  <img src="frontend/public/umamisender.svg" alt="UmamiSender Logo" width="100">
+  <img src="docs/umamisender.svg" alt="UmamiSender Logo" width="100">
 </p>
 
 <h1 align="center">UmamiSender</h1>
-
 
 <p align="center">
   <i>Automated reports for Umami – via email or webhook, right from your dashboard.</i>
 </p>
 
 <p align="center">
-  <a href="https://github.com/ceviixx/umami-sender/releases">
-    <img src="https://img.shields.io/github/release/ceviixx/umami-sender.svg" alt="Release">
-  </a>
-  <a href="https://github.com/ceviixx/umami-sender/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/ceviixx/umami-sender/ci.yml" alt="CI">
-  </a>
+  <a href="https://github.com/ceviixx/umami-sender/releases"><img src="https://img.shields.io/github/release/ceviixx/umami-sender.svg" alt="Release"></a>
+  <a href="https://github.com/ceviixx/umami-sender/actions"><img src="https://img.shields.io/github/actions/workflow/status/ceviixx/umami-sender/ci.yml" alt="CI"></a>
   <img src="https://img.shields.io/badge/node-20.19.x-brightgreen" alt="Node">
   <img src="https://img.shields.io/badge/Next.js-14.2.30-blue" alt="Next.js">
-  <a href="https://umami.is">
-    <img src="https://img.shields.io/badge/umami-2.19.x-black" alt="Umami">
-  </a>
+  <a href="https://umami.is"><img src="https://img.shields.io/badge/umami-2.19.x-black" alt="Umami"></a>
   <img src="https://img.shields.io/github/last-commit/ceviixx/umami-sender" alt="Last commit">
 </p>
-
 
 ---
 
 ## ✨ What is UmamiSender?
 
 **UmamiSender** is an open-source tool to automatically send scheduled reports from [Umami Analytics](https://umami.is) via email or webhook (e.g. Slack, Discord).
-Perfect for teams, client projects, or personal dashboards.
+Perfect for hobby projects, small teams, client work, or personal dashboards.
 
-> Works with both **Umami Cloud** and **Self‑Hosted Umami**.
+> Works with both **Umami Cloud** and **Self-Hosted Umami**.
 
 ---
 
-## 💎 Why teams love it
+## 🖼 Quick Preview
 
-* **No more manual check-ins** – get your key metrics delivered automatically.
-* **One place to manage everything** – instances, senders, webhooks and scheduled jobs.
-* **Shareable by default** – send to multiple recipients or channels at once.
+| Dashboard                              | Mailer                              | Webhook                              |
+| -------------------------------------- | ----------------------------------- | ------------------------------------ |
+| ![](docs/screenshots/01_dashboard.png) | ![](docs/screenshots/04_mailer.png) | ![](docs/screenshots/05_webhook.png) |
+
+---
+
+## 💎 Why I built it
+
+* I wanted my Umami stats without logging in every time.
+* It's fun to automate stuff and learn new tech along the way.
+* Maybe it’s useful for other people too – especially if you run multiple sites or share stats with a team. 🙂
 
 ---
 
@@ -48,19 +48,11 @@ Perfect for teams, client projects, or personal dashboards.
 
 * 📈 Automated reporting from Umami
 * 📬 Delivery via **email** or **webhook**
-* 🧰 Manage **multiple Umami instances** (Cloud & Self‑Hosted)
+* 🧰 Manage **multiple Umami instances** (Cloud & Self-Hosted)
 * 🗓 Scheduling: **daily, weekly, or monthly**
 * 👥 **Multiple recipients** per job
-* 🌍 **Multilingual interface** (i18n‑ready)
-* 🖼 Built‑in **HTML email template** & preview
-
----
-
-## 🖼 Screenshots
-
-| Dashboard                              | Mailer                              | Webhook                              |
-| -------------------------------------- | ----------------------------------- | ------------------------------------ |
-| ![](docs/screenshots/01_dashboard.png) | ![](docs/screenshots/04_mailer.png) | ![](docs/screenshots/05_webhook.png) |
+* 🌍 **Multilingual interface** (i18n-ready)
+* 🖼 Built-in **HTML email template** & preview
 
 ---
 
@@ -118,14 +110,17 @@ nginx/     # Reverse proxy for unified access
 ## 🧭 How it works
 
 1. **Add an Umami instance**
-   • Cloud: provide your Umami **API key**
-   • Self‑Hosted: provide **hostname + credentials** (a bearer token is stored for reuse)
+
+   * Cloud: provide your Umami **API key**
+   * Self-Hosted: provide **hostname + credentials** (a bearer token is stored for reuse)
 
 2. **Add recipients**
-   • Email sender(s) and/or **webhooks** (Slack, Discord, …)
+
+   * Email sender(s) and/or **webhooks** (Slack, Discord, …)
 
 3. **Create a report job**
-   • Choose website, frequency (daily/weekly/monthly), recipients
+
+   * Choose website, frequency (daily/weekly/monthly), recipients
 
 4. **Done** – UmamiSender will deliver reports on schedule.
 
@@ -157,4 +152,4 @@ MIT License – free to use in personal and commercial projects.
 
 ---
 
-> **Note**: UmamiSender is an independent open‑source project and is not affiliated with [Umami](https://umami.is).
+> **Note**: UmamiSender is an independent open-source project and is not affiliated with [Umami](https://umami.is).
