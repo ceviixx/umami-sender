@@ -8,7 +8,7 @@ import TextInput from '@/components/inputs/TextInput'
 import SelectBox from '@/components/inputs/SelectBox'
 import MultiSelectListbox from "@/components/inputs/MultiSelectListbox";
 import ListInput from "@/components/inputs/ListInput";
-import TimePicker from "@/components/TimePicker";
+import TimePicker from "@/components/inputs/TimePicker";
 import FormButtons from "@/components/FormButtons";
 import { UmamiInstance, Website, Sender, WebhookRecipient, Template } from '@/types'
 import CheckboxPicker from "@/components/inputs/CheckboxPicker";
