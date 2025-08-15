@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
-from sqlalchemy import func, cast, Date, select
+from sqlalchemy import func, cast, Date, select, case
 from app.database import get_db
 from app.models.sender import Sender
 from app.models.umami import Umami
@@ -44,25 +44,42 @@ def get_job_log_chart(request: Request, db: Session = Depends(get_db)):
     try:
         job_ids = select(Job.id).where(Job.user_id == user.id)
 
-        data = (
+        run_summary_sq = (
             db.query(
-                cast(JobLog.timestamp, Date).label("date"),
-                func.count(func.nullif(JobLog.status != "success", True)).label("success"),
-                func.count(func.nullif(JobLog.status != "failed", True)).label("failed"),
-                func.count(func.nullif(JobLog.status != "skipped", True)).label("skipped"),
+                cast(func.min(JobLog.timestamp), Date).label("date"),
+                JobLog.run.label("run"),
+                func.max(
+                    case(
+                        (JobLog.status == "failed", 3),
+                        (JobLog.status == "success", 2),
+                        (JobLog.status == "skipped", 1),
+                        else_=0,
+                    )
+                ).label("priority"),
             )
             .filter(JobLog.job_id.in_(job_ids))
-            .group_by(cast(JobLog.timestamp, Date))
-            .order_by(cast(JobLog.timestamp, Date))
+            .group_by(JobLog.run)
+            .subquery()
+        )
+
+        data = (
+            db.query(
+                run_summary_sq.c.date.label("date"),
+                func.sum(case((run_summary_sq.c.priority == 2, 1), else_=0)).label("success"),
+                func.sum(case((run_summary_sq.c.priority == 3, 1), else_=0)).label("failed"),
+                func.sum(case((run_summary_sq.c.priority == 1, 1), else_=0)).label("skipped"),
+            )
+            .group_by(run_summary_sq.c.date)
+            .order_by(run_summary_sq.c.date)
             .all()
         )
 
         return [
             {
                 "date": row.date.isoformat(),
-                "success": row.success,
-                "failed": row.failed,
-                "skipped": row.skipped,
+                "success": int(row.success or 0),
+                "failed": int(row.failed or 0),
+                "skipped": int(row.skipped or 0),
             }
             for row in data
         ]
@@ -72,5 +89,5 @@ def get_job_log_chart(request: Request, db: Session = Depends(get_db)):
             code="LOG_STATS_ERROR",
             message="Failed to load job log chart data",
             status=500,
-            detail=str(e)
+            detail=str(e),
         )

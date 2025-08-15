@@ -40,7 +40,6 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}-frontend:latest
             ghcr.io/${{ github.repository }}-frontend:${{ github.event.release.tag_name }}
-          platforms: linux/amd64,linux/arm64
 
       # Backend
       - name: Build and push backend
@@ -51,7 +50,6 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}-backend:latest
             ghcr.io/${{ github.repository }}-backend:${{ github.event.release.tag_name }}
-          platforms: linux/amd64,linux/arm64
 
       # Worker
       - name: Build and push worker
@@ -63,7 +61,6 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}-worker:latest
             ghcr.io/${{ github.repository }}-worker:${{ github.event.release.tag_name }}
-          platforms: linux/amd64,linux/arm64
 
       # Beat
       - name: Build and push beat
@@ -75,4 +72,3 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}-beat:latest
             ghcr.io/${{ github.repository }}-beat:${{ github.event.release.tag_name }}
-          platforms: linux/amd64,linux/arm64
