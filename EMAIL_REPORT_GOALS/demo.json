@@ -1,0 +1,22 @@
+{
+    "summary": {
+        "name": "Goals",
+        "period": "Last 90 days",
+        "type": "goals",
+        "result": [
+            {
+                "type": "url",
+                "value": "/",
+                "goal": 10000,
+                "result": 7202
+            },
+            {
+                "type": "event",
+                "value": "live-demo-button",
+                "goal": 10000,
+                "result": 11791
+            }
+        ],
+        "embedded_logo": ""
+    }
+}

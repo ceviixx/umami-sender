@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EMAIL_REPORT_ATTRIBUTION</title>
+  <style>{{ inline_css | safe }}</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="{{ summary.embedded_logo }}" alt="Logo" />
+  </div>
+
+  <h2>We’ve crunched the numbers – here’s your summary.</h2>
+  <p><strong>Report:</strong> {{ summary.name }}</p>
+  <p><strong>Period:</strong> {{ summary.period }}</p>
+
+  <table>
+  <tr>
+      <th>Total Pageviews</th>
+      <th>Total Visits</th>
+      <th>Total Visitors</th>
+  </tr>
+  <tr>
+      <td>{{ summary.result.total.pageviews }}</td>
+      <td>{{ summary.result.total.visits }}</td>
+      <td>{{ summary.result.total.visitors }}</td>
+  </tr>
+  </table>
+  
+  {% set tables = [
+    ('Referrer', summary.result.referrer),
+    ('Paid Ads', summary.result.paidAds),
+    ('UTM Source', summary.result.utm_source),
+    ('UTM Medium', summary.result.utm_medium),
+    ('UTM Campaign', summary.result.utm_campaign),
+    ('UTM Term', summary.result.utm_term),
+    ('UTM Content', summary.result.utm_content)
+  ] %}
+
+  {% for title, entries in tables %}
+    {% if entries %}
+      <h2>{{ title }}</h2>
+      <table>
+        <tr>
+          <th>Name</th>
+          <th style="width: 100px;">Revenue</th>
+        </tr>
+        {% for entry in entries %}
+          <tr>
+            <td>{{ entry.name or '–' }}</td>
+            <td>{{ entry.value }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<div class="footer">
+  Sent with <a href="https://github.com/ceviixx/umami-sender">UmamiSender</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EMAIL_REPORT_UTM</title>
+  <style>{{ inline_css | safe }}</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="{{ summary.embedded_logo }}" alt="Logo" />
+    </div>
+    <h2>We’ve crunched the numbers – here’s your summary.</h2>
+    <p><strong>Report:</strong> {{ summary.name }}</p>
+    <p><strong>Period:</strong> {{ summary.period }}</p>
+
+
+    <h2>Source</h2>
+    <table>
+      <tr><th></th><th style="width: 100px;">Views</th></tr>
+      {% if summary.result.utm_source %}
+      {% for value, count in summary.result.utm_source.items() %}
+        <tr>
+          <td>{{ value }}</td>
+          <td>{{ count }}</td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+    </table>
+    
+
+    <h2>Medium</h2>
+    <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+         {% if summary.result.utm_medium %}
+      {% for value, count in summary.result.utm_medium.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+    {% endif %}
+    </table>
+   
+    
+    <h2>Campaign</h2>
+    <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+        {% if summary.result.utm_campaign %}
+      {% for value, count in summary.result.utm_campaign.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+    {% endif %}
+      </table>
+    
+
+    <h2>Term</h2>
+    <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+        {% if summary.result.utm_term %}
+      {% for value, count in summary.result.utm_term.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+    {% endif %}
+      </table>
+    
+
+    <h2>Content</h2>
+    <table>
+        <tr><th></th><th style="width: 100px;">Views</th></tr>
+        {% if summary.result.utm_content %}
+      {% for value, count in summary.result.utm_content.items() %}
+          <tr>
+            <td>{{ value }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+    {% endif %}
+      </table>
+    
+
+
+  </div>
+  <div class="footer">
+    Sent with <a href="https://github.com/ceviixx/umami-sender">UmamiSender</a>
+  </div>
+</body>
+</html>

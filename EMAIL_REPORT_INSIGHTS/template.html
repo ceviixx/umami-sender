@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EMAIL_REPORT_INSIGHTS</title>
+  <style>{{ inline_css | safe }}</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="{{ summary.embedded_logo }}" alt="Logo" />
+  </div>
+
+  <h2>We’ve crunched the numbers – here’s your summary.</h2>
+  <p><strong>Report:</strong> {{ summary.name }}</p>
+  <p><strong>Period:</strong> {{ summary.period }}</p>
+
+</div>
+
+<div class="footer">
+  Sent with <a href="https://github.com/ceviixx/umami-sender">UmamiSender</a>
+</div>
+</body>
+</html>
