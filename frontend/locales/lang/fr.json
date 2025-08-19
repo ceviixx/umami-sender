@@ -7,6 +7,7 @@
     "mailer": "",
     "webhook": "",
     "templates": "",
+    "template_update": "",
     "account": "",
     "changepassword": "",
     "logs": "",
@@ -20,6 +21,7 @@
     }
   },
   "buttons": {
+    "execute_now": "",
     "try_again": "",
     "change_password": "",
     "logs": "",
@@ -211,7 +213,8 @@
     "saved": "",
     "updated": "",
     "test_success": "",
-    "stream_interrupted": ""
+    "stream_interrupted": "",
+    "job_started": ""
   },
   "weekdays": {
     "monday": "",
@@ -246,7 +249,7 @@
     "unhealthy": "",
     "status": {
       "success": "",
-      "skipped": "",
+      "warning": "",
       "failed": ""
     },
     "today": "",
@@ -319,6 +322,12 @@
       "end": ""
     },
     "templates_done": "",
-    "templates_error": ""
+    "templates_error": "",
+    "stat": {
+      "inserted": "",
+      "updated": "",
+      "skipped": "",
+      "invalid": ""
+    }
   }
 }

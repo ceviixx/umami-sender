@@ -10,8 +10,6 @@ import JobChart from '@/components/JobChart';
 import {
   fetchStats,
   fetchStatsLogs,
-  // TODO: ersetze Platzhalter später:
-  // fetchRecentRuns, fetchInstances
 } from '@/lib/api/stats'
 import {
   fetchJobs
@@ -20,22 +18,21 @@ import {
   fetchLogs
 } from '@/lib/api/logs'
 import {
-  fetchUmami,
   fetchUmamis
 } from '@/lib/api/umami'
 import {
   BriefcaseIcon, ChartBarIcon, PaperAirplaneIcon, PuzzlePieceIcon,
-  ExclamationTriangleIcon, ClockIcon, ArrowTrendingDownIcon, CpuChipIcon
+  ExclamationTriangleIcon, ClockIcon, ArrowTrendingDownIcon, CpuChipIcon,
+  ArchiveBoxIcon
 } from '@heroicons/react/20/solid'
 import Container from "@/components/layout/Container";
 
-type Stats = { senders: number|string; umami: number|string; jobs: number|string; webhooks: number|string }
-type LogPoint = { date: string; success: number; failed: number; skipped: number }
-type RangeKey = '7d'|'30d'|'90d'
+type Stats = { senders: number | string; umami: number | string; jobs: number | string; webhooks: number | string }
+type LogPoint = { date: string; success: number; failed: number; warning: number }
+type RangeKey = '7d' | '30d' | '90d'
 
-import { MailerJob, LogItem, UmamiInstance } from '@/types'
-import { computeNextExecution, formatNextExecution, formatNextExecutionLocalized } from '@/utils/scheduling';
-import { emitWarning } from "process";
+import { MailerJob, JobLog, UmamiInstance } from '@/types'
+import { computeNextExecution, formatNextExecutionLocalized } from '@/utils/scheduling';
 
 export default function DashboardPage() {
   const { locale } = useI18n()
@@ -45,56 +42,47 @@ export default function DashboardPage() {
   const [networkError, setHasNetworkError] = useState<string | null>(null)
   const [range, setRange] = useState<RangeKey>('30d')
 
-  // Neue Panels: vorerst Mockdaten → schnell ersetzbar
-  const [recentRuns, setRecentRuns] = useState<LogItem[]>([])
+  const [recentRuns, setRecentRuns] = useState<JobLog[]>([])
   const [jobs, setJobs] = useState<MailerJob[]>([])
   const [instances, setInstances] = useState<UmamiInstance[]>([])
 
   useEffect(() => {
     const ac = new AbortController()
-    ;(async () => {
-      try {
-        setLoading(true)
-        setHasNetworkError(null)
-        const [s, logs, jobs, recentRuns, instances] = await Promise.all([
-          fetchStats(),
-          fetchStatsLogs(),
-          fetchJobs(),
-          fetchLogs(),
-          fetchUmamis(),
-        ])
-        setStats(s)
-        setLogStats(Array.isArray(logs) ? logs : [])
-        setJobs(jobs)
-        setRecentRuns(recentRuns)
-        setInstances(instances)
-
-        // --- TODO: Diese fünf Fetches an deine echten Endpunkte hängen ---
-        // setRecentRuns(await fetchRecentRuns({limit:10, signal:ac.signal}))
-        // setJobs(await fetchJobs({signal:ac.signal}))
-        // setInstances(await fetchInstances({signal:ac.signal}))
-
-        // Temporäre Mockdaten (damit UI sofort sichtbar ist)
-      } catch (e: any) {
-        if (e?.name !== 'AbortError') setHasNetworkError(e?.message || 'Network error')
-      } finally {
-        setLoading(false)
-      }
-    })()
+      ; (async () => {
+        try {
+          setLoading(true)
+          setHasNetworkError(null)
+          const [s, logs, jobs, recentRuns, instances] = await Promise.all([
+            fetchStats(),
+            fetchStatsLogs(),
+            fetchJobs(),
+            fetchLogs(),
+            fetchUmamis(),
+          ])
+          setStats(s)
+          setLogStats(Array.isArray(logs) ? logs : [])
+          setJobs(jobs)
+          setRecentRuns(recentRuns)
+          setInstances(instances)
+        } catch (e: any) {
+          if (e?.name !== 'AbortError') setHasNetworkError(e?.message || 'Network error')
+        } finally {
+          setLoading(false)
+        }
+      })()
     return () => ac.abort()
   }, [])
 
   if (loading) return <LoadingSpinner title={locale.pages.dashboard} />
   if (networkError) return <NetworkError page={locale.pages.dashboard} message={networkError} />
 
-  // Health-Berechnung (7 Tage) – aus vorhandenen Logs
   const now = new Date()
-  const last7 = logStats.filter(p => new Date(p.date) >= new Date(now.getTime() - 7*24*3600e3))
-  const last7Failed = last7.reduce((s,p)=>s+(p.failed||0),0)
-  const last7Success = last7.reduce((s,p)=>s+(p.success||0),0)
-  const last7Skipped = last7.reduce((s,p)=>s+(p.skipped||0),0)
+  const last7 = logStats.filter(p => new Date(p.date) >= new Date(now.getTime() - 7 * 24 * 3600e3))
+  const last7Failed = last7.reduce((s, p) => s + (p.failed || 0), 0)
+  const last7Success = last7.reduce((s, p) => s + (p.success || 0), 0)
+  const last7Skipped = last7.reduce((s, p) => s + (p.warning || 0), 0)
   const last7Total = last7Failed + last7Success + last7Skipped
-  const successRate = last7Total ? Math.round((last7Success/last7Total)*100) : null
+  const successRate = last7Total ? Math.round((last7Success / last7Total) * 100) : null
 
   return (
     <Container>
@@ -125,28 +113,27 @@ export default function DashboardPage() {
         <KpiTile label={locale.pages.webhook} value={stats?.webhooks} icon={<PuzzlePieceIcon className="w-5 h-5" />} href="webhooks" />
       </div>
 
-      {/* Aktivität + Range */}
       <section className="mt-8 rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/70 dark:bg-gray-900/40 shadow-sm">
         <div className="flex items-center justify-between p-3 sm:p-4">
           <h2 className="text-sm font-semibold">{locale.dashboard.job_activity}</h2>
           <RangePicker value={range} onChange={setRange} />
         </div>
         <div className="rounded-b-2xl border-t border-gray-200/60 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/30 p-3 sm:p-4">
-         <JobChart jobData={logStats} />
+          <JobChart jobData={logStats} />
         </div>
       </section>
 
-      {/* Neue Sektionen */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* 1) Letzte Ausführungen */}
-        <Card title={locale.dashboard.last_runs} action={<Link href="/account/system/logs" className="text-xs underline">{'{Alle}'}</Link>}>
+        <Card title={locale.dashboard.last_runs} icon={<ArchiveBoxIcon className="w-4 h-4" />} action={<Link href="/account/system/logs" className="text-xs underline">{'{Alle}'}</Link>}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
             {recentRuns.slice(0, 3).map(r => (
-              <li key={r.id} className="py-3 flex items-center justify-between">
+              <li key={r.log_id} className="py-3 flex items-center justify-between">
                 <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">{r.name}</div>
-                  <div className="text-xs opacity-70">
-                    {new Date(r.details[0].timestamp).toLocaleString()}
+                  <div className="text-sm font-medium truncate">{r.job_name}</div>
+                  <div className="text-xs opacity-70 flex gap-2">
+                    <span>{new Date(r.started_at).toLocaleString()}</span>
+                    <span>•</span>
+                    <span>{r.duration_ms} ms</span>
                   </div>
                 </div>
                 <StatusPill status={r.status as 'success'} />
@@ -156,10 +143,9 @@ export default function DashboardPage() {
           </ul>
         </Card>
 
-        {/* 2) Nächste Ausführungen */}
         <Card title={locale.dashboard.next_runs} icon={<ClockIcon className="w-4 h-4" />}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
-            {jobs.filter(j=>j.is_active).slice(0, 3).map(j => {
+            {jobs.filter(j => j.is_active).slice(0, 3).map(j => {
               return (
                 <li key={j.id} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
@@ -177,17 +163,16 @@ export default function DashboardPage() {
                       })}
                     </div>
                   </div>
-                  <span className="text-[10px] px-2 py-1 rounded ring-1 ring-inset">
-                    {j.frequency.toUpperCase()}
+                  <span className="text-[10px] px-2 py-1 bg-gray-50 text-gray-700 ring-gray-200/70 dark:bg-gray-900/30 dark:text-gray-300 dark:ring-gray-800/50">
+                    {locale.enums.frequency[j.frequency]}
                   </span>
                 </li>
               )
             })}
-            {jobs.filter(j=>j.is_active).length === 0 && <EmptyState text={locale.dashboard.no_active_jobs} />}
+            {jobs.filter(j => j.is_active).length === 0 && <EmptyState text={locale.dashboard.no_active_jobs} />}
           </ul>
         </Card>
 
-        {/* 3) Problem-Jobs */}
         <Card title={locale.dashboard.problem_jobs} icon={<ArrowTrendingDownIcon className="w-4 h-4" />}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
             {/*
@@ -199,12 +184,11 @@ export default function DashboardPage() {
                 <Link href={`/jobs/${'p.id'}`} className="text-xs underline">Details</Link>
               </li>
             */}
-            
-          <EmptyState text={locale.dashboard.no_problem_jobs} />
+
+            <EmptyState text={locale.dashboard.no_problem_jobs} />
           </ul>
         </Card>
 
-        {/* 4) Instanzen-Status */}
         <Card title={locale.dashboard.instance_status} icon={<CpuChipIcon className="w-4 h-4" />}>
 
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
@@ -228,9 +212,7 @@ export default function DashboardPage() {
   )
 }
 
-/* ——— UI-Bausteine ——— */
-
-function KpiTile({ label, value, icon, href }:{label:string; value?:number|string; icon:React.ReactNode; href:string}) {
+function KpiTile({ label, value, icon, href }: { label: string; value?: number | string; icon: React.ReactNode; href: string }) {
   return (
     <Link href={href} className="group focus:outline-none">
       <div className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/70 dark:bg-gray-900/40
@@ -248,7 +230,7 @@ function KpiTile({ label, value, icon, href }:{label:string; value?:number|strin
   )
 }
 
-function Card({ title, children, icon, action }:{ title:string; children:React.ReactNode; icon?:React.ReactNode; action?:React.ReactNode }) {
+function Card({ title, children, icon, action }: { title: string; children: React.ReactNode; icon?: React.ReactNode; action?: React.ReactNode }) {
   return (
     <section className="rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/70 dark:bg-gray-900/40 shadow-sm">
       <div className="flex items-center justify-between p-3 sm:p-4">
@@ -265,7 +247,7 @@ function Card({ title, children, icon, action }:{ title:string; children:React.R
   )
 }
 
-function StatusPill({ status }:{ status:'success'|'failed'|'skipped'|'warning'|'healthy'|'unhealthy' }) {
+function StatusPill({ status }: { status: 'success' | 'failed' | 'skipped' | 'warning' | 'healthy' | 'unhealthy' }) {
   const map = {
     success: 'bg-green-50 text-green-700 ring-green-200/70 dark:bg-green-900/30 dark:text-green-300 dark:ring-green-800/50',
     failed: 'bg-red-50 text-red-700 ring-red-200/70 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800/50',
@@ -277,18 +259,18 @@ function StatusPill({ status }:{ status:'success'|'failed'|'skipped'|'warning'|'
   return <span className={`text-[10px] px-2 py-1 rounded ring-1 ring-inset ${map[status]}`}>{status}</span>
 }
 
-function EmptyState({ text }:{ text:string }) {
+function EmptyState({ text }: { text: string }) {
   return <div className="py-6 text-sm opacity-60">{text}</div>
 }
 
-function RangePicker({ value, onChange }:{ value:RangeKey; onChange:(v:RangeKey)=>void }) {
+function RangePicker({ value, onChange }: { value: RangeKey; onChange: (v: RangeKey) => void }) {
   return (
     <div className="inline-flex rounded-xl border border-gray-200/70 dark:border-gray-800/60 overflow-hidden" role="tablist" aria-label="Chart range">
-      {(['7d','30d','90d'] as RangeKey[]).map(k => (
-        <button key={k} role="tab" aria-selected={value===k} onClick={()=>onChange(k)}
+      {(['7d', '30d', '90d'] as RangeKey[]).map(k => (
+        <button key={k} role="tab" aria-selected={value === k} onClick={() => onChange(k)}
           className={[
             "px-3 py-1.5 text-xs font-medium transition",
-            value===k ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900" : "hover:bg-gray-100 dark:hover:bg-gray-800"
+            value === k ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900" : "hover:bg-gray-100 dark:hover:bg-gray-800"
           ].join(' ')}
         >
           {k.toUpperCase()}

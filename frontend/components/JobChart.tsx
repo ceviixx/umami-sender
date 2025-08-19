@@ -19,7 +19,7 @@ import { useI18n } from "@/locales/I18nContext";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-type JobEntry = { date: string; success: number; failed: number; skipped: number; };
+type JobEntry = { date: string; success: number; failed: number; warning: number; };
 type Props = { jobData: JobEntry[]; height?: number; className?: string };
 
 const last7 = () =>
@@ -28,7 +28,7 @@ const last7 = () =>
 const fillMissing = (data: JobEntry[]) => {
   const need = last7();
   const map = new Map(data.map(d => [d.date, d]));
-  return need.map(date => map.get(date) ?? { date, success: 0, failed: 0, skipped: 0 });
+  return need.map(date => map.get(date) ?? { date, success: 0, failed: 0, warning: 0 });
 };
 
 const rgba = (hex: string, a: number) => {
@@ -64,7 +64,7 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
   const labels = useMemo(() => filled.map(d => d.date), [filled]);
 
   const colSuccess = '#10b981'; 
-  const colSkipped = '#f59e0b'; 
+  const colWarning = '#f59e0b'; 
   const colFailed  = '#ef4444'; 
 
   const gradient =
@@ -97,11 +97,11 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
           fill: true,
         },
         {
-          label: locale.common.status.skipped,
-          data: filled.map(e => e.skipped),
-          borderColor: colSkipped,
-          backgroundColor: gradient(colSkipped),
-          pointBackgroundColor: colSkipped,
+          label: locale.common.status.warning,
+          data: filled.map(e => e.warning),
+          borderColor: colWarning,
+          backgroundColor: gradient(colWarning),
+          pointBackgroundColor: colWarning,
           pointBorderColor: '#ffffff',
           pointRadius: 3,
           pointHoverRadius: 5,
@@ -171,7 +171,7 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
       y: {
         beginAtZero: true,
         suggestedMax:
-          Math.max(...filled.map(d => Math.max(d.success, d.failed, d.skipped))) + 1,
+          Math.max(...filled.map(d => Math.max(d.success, d.failed, d.warning))) + 1,
         ticks: {
           color: 'rgba(107,114,128,0.7)',
           padding: 8,

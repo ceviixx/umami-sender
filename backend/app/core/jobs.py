@@ -5,11 +5,9 @@ from app.database import SessionLocal
 from app.models.jobs import Job
 from app.models.jobs_log import JobLog
 from app.models.webhooks import WebhookRecipient
-from app.core.logging import log_mailer_job
 from app.core.send_email_report import send_email_report
 from app.core.send_webhook_report import send_webhook_report
 from app.core.generate_report_summary import generate_report_summary
-import uuid
 
 def run_due_jobs():
     db: Session = SessionLocal()
@@ -64,9 +62,10 @@ def run_monthly_jobs(db: Session, now: datetime):
 
     process_jobs(db, jobs, now.date())
 
-
+"""
 def process_jobs(db: Session, jobs: list[Job], today: date):
     for job in jobs:
+        print(f"JOB:{job.name}")
         job_run_id = uuid.uuid4()
         
         mail_sent = db.query(JobLog).filter(
@@ -171,3 +170,125 @@ def process_jobs(db: Session, jobs: list[Job], today: date):
                         error=str(e), 
                         channel=webhook.type
                     )
+"""
+
+
+
+from datetime import datetime, date
+import uuid
+from sqlalchemy.orm import Session
+
+from app.utils.logging import job_log_context, add_log_detail
+
+def process_jobs(
+    db: Session,
+    jobs: list,
+    today: date,
+    *,
+    force_send: bool = False
+) -> None:
+    start_of_day = datetime(today.year, today.month, today.day)
+
+    for job in jobs:
+        # Ein Log-Eintrag pro Job
+        with job_log_context(db, job_id=job.id) as log:
+            # --- Zielkanäle des Jobs ermitteln ---
+            webhook_channels = []
+            if job.webhook_recipients:
+                webhook_objects = db.query(WebhookRecipient).filter(
+                    WebhookRecipient.id.in_(job.webhook_recipients)
+                ).all()
+                webhook_channels = [wh for wh in webhook_objects]
+
+            # --- Prüflogik (nur wenn NICHT forciert) ---
+            if not force_send:
+                # Schon gesendete E-Mail heute?
+                mail_sent = db.query(JobLog).filter(
+                    JobLog.job_id == job.id,
+                    JobLog.finished_at >= start_of_day,
+                    JobLog.status.in_(["success", "warning"]),  # ein erfolgreicher/teilw. erfolgreicher Run enthält ggf. E-Mail
+                ).first()
+
+                # Unsent Webhooks: Heuristik -> wenn es heute bereits einen success/warning Run gibt,
+                # prüfen wir, welche Kanäle darin vorkamen und ob ein success für diesen Kanal existiert.
+                # (Wenn du es exakter brauchst, kannst du die Details des heutigen Logs inspizieren.)
+                unsent_webhooks = []
+                if webhook_channels:
+                    # Grobe Heuristik: nur dann wieder senden, wenn heute noch gar nichts success für diesen Kanal war.
+                    # Dafür lesen wir alle heutigen Logs und checken Details pro Kanal.
+                    todays_logs = db.query(JobLog).filter(
+                        JobLog.job_id == job.id,
+                        JobLog.finished_at >= start_of_day
+                    ).all()
+                    def channel_had_success_today(ch: str, target_id: str) -> bool:
+                        for l in todays_logs:
+                            for d in (l.details or []):
+                                if d.get("channel") == ch and str(d.get("target_id")) == str(target_id) and d.get("status") == "success":
+                                    return True
+                        return False
+
+                    for wh in webhook_channels:
+                        if not channel_had_success_today(wh.type, wh.id):
+                            unsent_webhooks.append(wh)
+
+                # Wenn E-Mail schon raus und keine offenen Webhooks → nichts zu tun
+                if mail_sent and not unsent_webhooks:
+                    # Keine Aktion → wir hängen einen "skipped" Global-Hinweis an, damit im Log klar ist warum
+                    add_log_detail(log, channel="GLOBAL", target_id=None, status="skipped",
+                                   error="Nothing to send: already completed for today.")
+                    # Context setzt daraus später "skipped" oder "warning"
+                    continue
+            else:
+                unsent_webhooks = webhook_channels[:]  # Force: alle Webhooks senden, unabhängig vom Status
+
+            # --- Report erzeugen ---
+            try:
+                summary = generate_report_summary(db, job)  # <- deine bestehende Funktion
+            except Exception as e:
+                add_log_detail(log, channel="GLOBAL", target_id=None, status="failed", error=str(e))
+                # Context setzt den Gesamtstatus auf failed
+                continue
+
+            # --- E-Mail senden (bei Force immer, sonst nur wenn noch nicht gesendet) ---
+            send_email = False
+            if job.mailer_id:
+                if force_send:
+                    send_email = True
+                else:
+                    # Prüfen ob heute bereits E-Mail success in irgendeinem Log enthalten war
+                    todays_logs = db.query(JobLog).filter(
+                        JobLog.job_id == job.id,
+                        JobLog.finished_at >= start_of_day
+                    ).all()
+                    already_sent_email_today = any(
+                        any(d.get("channel") == "EMAIL" and d.get("status") == "success" for d in (l.details or []))
+                        for l in todays_logs
+                    )
+                    send_email = not already_sent_email_today
+
+            if send_email:
+                try:
+                    send_email_report(db, job, summary)
+                    add_log_detail(log, channel="EMAIL", target_id=job.mailer_id, status="success", error=None)
+                except Exception as e:
+                    msg = str(e)
+                    if "skipped|" in msg:
+                        add_log_detail(log, channel="EMAIL", target_id=job.mailer_id, status="skipped", error=msg.replace("skipped|", ""))
+                    else:
+                        add_log_detail(log, channel="EMAIL", target_id=job.mailer_id, status="failed", error=msg)
+            else:
+                add_log_detail(log, channel="EMAIL", target_id=job.mailer_id, status="skipped",
+                               error="Email already sent today." if not force_send else "Email sending disabled.")
+
+            # --- Webhooks senden (bei Force: alle, sonst nur die „unsent“) ---
+            targets = webhook_channels if force_send else unsent_webhooks
+            for webhook in targets:
+                try:
+                    send_webhook_report(db, job, summary, webhook)
+                    add_log_detail(log, channel=webhook.type, target_id=webhook.id, status="success", error=None)
+                except Exception as e:
+                    msg = str(e)
+                    if "skipped|" in msg:
+                        add_log_detail(log, channel=webhook.type, target_id=webhook.id, status="skipped", error=msg.replace("skipped|", ""))
+                    else:
+                        add_log_detail(log, channel=webhook.type, target_id=webhook.id, status="failed", error=msg)

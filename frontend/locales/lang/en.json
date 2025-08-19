@@ -7,8 +7,9 @@
     "mailer": "Mailer",
     "webhook": "Webhook",
     "templates": "Templates",
+    "template_update": "Update templates",
     "account": "Account",
-    "changepassword": "Change Password",
+    "changepassword": "Change password",
     "logs": "Logs",
     "adminSection": "Admin",
     "systemSection": "System",
@@ -20,6 +21,7 @@
     }
   },
   "buttons": {
+    "execute_now": "Execute job",
     "try_again": "Try again",
     "change_password": "Change password",
     "logs": "Logs",
@@ -211,7 +213,8 @@
     "saved": "Saved successfully",
     "updated": "Updated successfully",
     "test_success": "Test successful",
-    "stream_interrupted": ""
+    "stream_interrupted": "",
+    "job_started": "Job was triggered successfully."
   },
   "weekdays": {
     "monday": "Monday",
@@ -246,7 +249,7 @@
     "unhealthy": "Unhealthy",
     "status": {
       "success": "Success",
-      "skipped": "Skipped",
+      "warning": "Warning",
       "failed": "Failed"
     },
     "today": "Today",
@@ -313,12 +316,18 @@
     "templates_refresh_running": "Templates are being updated…",
     "templates_idle": "No execution started yet.",
     "templates_overwrite_warning": "During refresh, manually modified templates will be overwritten.",
-    "templates_refresh_hint": "Loads the fixed templates branch and imports new/modified templates.",
+    "templates_refresh_hint": "Fetches the templates branch and updates new or changed templates.",
     "status": {
       "start": "Start",
       "end": "End"
     },
     "templates_done": "Templates have been updated successfully.",
-    "templates_error": "An error occurred while updating templates."
+    "templates_error": "An error occurred while updating templates.",
+    "stat": {
+      "inserted": "Inserted",
+      "updated": "Updated",
+      "skipped": "Skipped",
+      "invalid": "Invalid"
+    }
   }
 }

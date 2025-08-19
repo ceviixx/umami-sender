@@ -50,9 +50,8 @@ export default function TemplatesRefreshPage() {
 
   return (
     <Container>
-      <PageHeader title={locale?.pages?.templates ?? "Templates"} />
+      <PageHeader title={locale.pages.template_update} />
 
-      {/* Callout + Action */}
       <div className="mt-2 flex items-start gap-3">
         <InfoCallout className="flex-1">
           <p>{locale.admin_templates.templates_refresh_hint}</p>
@@ -108,10 +107,10 @@ export default function TemplatesRefreshPage() {
         {stats && !loading && (
           <div className="p-5">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <StatTile label="Inserted" value={stats.inserted} />
-              <StatTile label="Updated" value={stats.updated} />
-              <StatTile label="Skipped" value={stats.skipped} />
-              <StatTile label="Invalid" value={stats.invalid} emphasizeNegative />
+              <StatTile label={locale.admin_templates.stat.inserted} value={stats.inserted} />
+              <StatTile label={locale.admin_templates.stat.updated} value={stats.updated} />
+              <StatTile label={locale.admin_templates.stat.skipped} value={stats.skipped} />
+              <StatTile label={locale.admin_templates.stat.invalid} value={stats.invalid} emphasizeNegative />
             </div>
 
             <div className="mt-5 rounded-xl border border-gray-200 dark:border-gray-800 p-4">

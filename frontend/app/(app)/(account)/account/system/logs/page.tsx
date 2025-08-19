@@ -3,7 +3,7 @@
 import { useI18n } from '@/locales/I18nContext'
 import PageHeader from '@/components/navigation/PageHeader'
 import { useEffect, useState } from 'react'
-import { LogItem } from '@/types'
+import { JobLog } from '@/types'
 import EmptyState from '@/components/EmptyState'
 import { fetchLogs } from '@/lib/api/logs'
 import CardList from '@/components/cardlist/CardList'
@@ -11,7 +11,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import Container from '@/components/layout/Container'
 
 export default function LogsPage() {
-  const [logs, setLogs] = useState<LogItem[]>([])
+  const [logs, setLogs] = useState<JobLog[]>([])
   const [loading, setLoading] = useState(true)
   const { locale } = useI18n()
 
@@ -33,21 +33,21 @@ export default function LogsPage() {
       ) : (
         <CardList
           items={logs}
-          keyField={(item) => item.id}
-          title={(item) => item.name}
+          keyField={(item) => item.log_id}
+          title={(item) => item.job_name}
           badge={(item) => item.status}
           badgeTone={(item) => item.status}
           rightSlot={(item) => (
             <>
               <span className="text-xs text-gray-400">
-                run:{item.run}
+                {item.duration_ms} ms
               </span>
             </>
           )}
           bottomSlot={(item) => 
             <CardList 
               items={item.details}
-              keyField={(item) => item.timestamp}
+              keyField={(item) => item.channel}
               title={(item) => item.channel}
               subtitle={(item) => (
                 <code className='text-xs'>{item.error}</code>
@@ -57,7 +57,7 @@ export default function LogsPage() {
               rightSlot={(item) => (
                 <>
                   <span className="text-xs text-gray-400">
-                    {new Date(item.timestamp).toLocaleString()}
+                    {item.target_id}
                   </span>
                 </>
               )}

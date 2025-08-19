@@ -2,7 +2,7 @@
 
 import { useI18n } from "@/locales/I18nContext";
 import { useEffect, useState } from 'react'
-import { fetchJobs, deleteJob, updateJobStatus } from '@/lib/api/jobs'
+import { fetchJobs, deleteJob, updateJobStatus, runJob } from '@/lib/api/jobs'
 import { MailerJob } from '@/types'
 import ConfirmDelete from '@/components/ConfirmDelete'
 import EmptyState from '@/components/EmptyState'
@@ -13,7 +13,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
 import { PaperAirplaneIcon, PuzzlePieceIcon } from '@heroicons/react/20/solid';
 import { useRouter } from 'next/navigation'
-import { showError } from "@/lib/toast";
+import { showError, showSuccess } from "@/lib/toast";
 import Container from "@/components/layout/Container";
 
 export default function JobsPage() {
@@ -83,6 +83,16 @@ export default function JobsPage() {
     }
   }
 
+  const handleRunJob = async (jobId: string) => {
+    try {
+      const res = await runJob(jobId)
+      showSuccess(locale.messages.job_started)
+    } catch (error: any) {
+      const message = error.message
+      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+    }
+  }
+
   if (loading) { return <LoadingSpinner title={locale.pages.jobs} /> }
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
@@ -119,6 +129,11 @@ export default function JobsPage() {
                   {
                     title: locale.buttons.logs,
                     action: () => router.push(`/jobs/${item.id}/logs`),
+                    tone: 'default',
+                  },
+                  {
+                    title: locale.buttons.execute_now,
+                    action: () => handleRunJob(item.id),
                     tone: 'default',
                   },
                   {

@@ -37,40 +37,40 @@ def get_dashboard_stats(request: Request, db: Session = Depends(get_db)):
             detail=str(e)
         )
 
+from datetime import datetime
+from fastapi import Depends, Request
+from sqlalchemy import func, case, cast
+from sqlalchemy.sql import select
+from sqlalchemy.types import Date
+from sqlalchemy.orm import Session
+from app.models.jobs_log import JobLog
+from app.utils.responses import send_status_response
+
+
 @router.get("/log")
 def get_job_log_chart(request: Request, db: Session = Depends(get_db)):
+    """
+    Chart-Daten pro Tag über alle Job-Runs des Users.
+    Nutzt den Root-Status des JobLog (kein Run-Grouping mehr).
+    """
     user = Security(request).get_user()
 
     try:
-        job_ids = select(Job.id).where(Job.user_id == user.id)
+        job_ids_subq = select(Job.id).where(Job.user_id == user.id)
 
-        run_summary_sq = (
-            db.query(
-                cast(func.min(JobLog.timestamp), Date).label("date"),
-                JobLog.run.label("run"),
-                func.max(
-                    case(
-                        (JobLog.status == "failed", 3),
-                        (JobLog.status == "success", 2),
-                        (JobLog.status == "skipped", 1),
-                        else_=0,
-                    )
-                ).label("priority"),
-            )
-            .filter(JobLog.job_id.in_(job_ids))
-            .group_by(JobLog.run)
-            .subquery()
-        )
+        day_expr = cast(func.coalesce(JobLog.finished_at, JobLog.started_at), Date)
 
         data = (
             db.query(
-                run_summary_sq.c.date.label("date"),
-                func.sum(case((run_summary_sq.c.priority == 2, 1), else_=0)).label("success"),
-                func.sum(case((run_summary_sq.c.priority == 3, 1), else_=0)).label("failed"),
-                func.sum(case((run_summary_sq.c.priority == 1, 1), else_=0)).label("skipped"),
+                day_expr.label("date"),
+                func.sum(case((JobLog.status == "success", 1), else_=0)).label("success"),
+                func.sum(case((JobLog.status == "failed", 1), else_=0)).label("failed"),
+                func.sum(case((JobLog.status == "warning", 1), else_=0)).label("skipped"),
             )
-            .group_by(run_summary_sq.c.date)
-            .order_by(run_summary_sq.c.date)
+            .filter(JobLog.job_id.in_(job_ids_subq))
+            .filter(JobLog.status != "running")  # laufende Runs i. d. R. nicht im Chart
+            .group_by(day_expr)
+            .order_by(day_expr.asc())
             .all()
         )
 
@@ -79,7 +79,7 @@ def get_job_log_chart(request: Request, db: Session = Depends(get_db)):
                 "date": row.date.isoformat(),
                 "success": int(row.success or 0),
                 "failed": int(row.failed or 0),
-                "skipped": int(row.skipped or 0),
+                "warning": int(row.skipped or 0),
             }
             for row in data
         ]

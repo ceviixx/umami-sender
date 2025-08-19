@@ -172,14 +172,14 @@ def import_templates_from_repo():
                     stats["inserted"] += 1
                 else:
                     if row.content_hash != content_hash:
-                        print(f"♻️  Update: {sender_type}")
+                        # print(f"♻️  Update: {sender_type}")
                         row.content = content
                         row.example_content = example_obj
                         row.source_commit = stats["commit"]
                         row.content_hash = content_hash
                         stats["updated"] += 1
                     else:
-                        print(f"✅ Skip: {sender_type} (no changes)")
+                        # print(f"✅ Skip: {sender_type} (no changes)")
                         stats["skipped"] += 1
 
             db.commit()

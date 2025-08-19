@@ -7,6 +7,7 @@
     "mailer": "Mailer",
     "webhook": "Webhook",
     "templates": "Vorlagen",
+    "template_update": "Vorlagen aktualisieren",
     "account": "Konto",
     "changepassword": "Passwort ändern",
     "logs": "Protokolle",
@@ -20,6 +21,7 @@
     }
   },
   "buttons": {
+    "execute_now": "Job ausführen",
     "try_again": "Erneut versuchen",
     "change_password": "Passwort ändern",
     "logs": "Protokolle",
@@ -211,7 +213,8 @@
     "saved": "Erfolgreich gespeichert",
     "updated": "Erfolgreich aktualisiert",
     "test_success": "Test erfolgreich",
-    "stream_interrupted": "Stream unterbrochen."
+    "stream_interrupted": "Stream unterbrochen.",
+    "job_started": "Job erfolgreich angestoßen"
   },
   "weekdays": {
     "monday": "Montag",
@@ -246,7 +249,7 @@
     "unhealthy": "Nicht erreichbar",
     "status": {
       "success": "Erfolgreich",
-      "skipped": "Übersprungen",
+      "warning": "Warnung",
       "failed": "Fehlgeschlagen"
     },
     "today": "Heute",
@@ -313,12 +316,18 @@
     "templates_refresh_running": "Templates werden aktualisiert…",
     "templates_idle": "Noch keine Ausführung gestartet.",
     "templates_overwrite_warning": "Manuell geänderte Templates werden beim Refresh überschrieben.",
-    "templates_refresh_hint": "Lädt den festgelegten Templates-Branch und importiert neue oder geänderte Templates.",
+    "templates_refresh_hint": "Lädt den Templates-Branch und aktualisiert neue oder geänderte Templates.",
     "status": {
       "start": "Start",
       "end": "Ende"
     },
     "templates_done": "Templates wurden erfolgreich aktualisiert.",
-    "templates_error": "Beim Aktualisieren der Templates ist ein Fehler aufgetreten."
+    "templates_error": "Beim Aktualisieren der Templates ist ein Fehler aufgetreten.",
+    "stat": {
+      "inserted": "Eingefügt",
+      "updated": "Aktualisiert",
+      "skipped": "Übersprungen",
+      "invalid": "Ungültig"
+    }
   }
 }

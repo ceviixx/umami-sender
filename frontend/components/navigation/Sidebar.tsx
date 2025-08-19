@@ -99,7 +99,7 @@ export default function Sidebar() {
       },
       {
         href: '/account/admin/templates',
-        label: locale.pages.templates,
+        label: locale.pages.template_update,
         icon: <DocumentIcon className="w-5 h-5" />,
         match: ['/account/admin/templates']
       },
