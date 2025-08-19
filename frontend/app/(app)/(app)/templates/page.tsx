@@ -12,6 +12,7 @@ import { showSuccess, showError } from "@/lib/toast";
 import { EyeIcon, XMarkIcon, ArrowPathIcon } from '@heroicons/react/20/solid'
 import CardList from "@/components/cardlist/CardList";
 import TemplatePreviewModal from '@/components/TemplatePreviewModal'
+import Container from "@/components/layout/Container";
 
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([])
@@ -54,7 +55,7 @@ export default function TemplatesPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.pages.templates} />
 
       {templates.length === 0 ? (
@@ -98,6 +99,6 @@ export default function TemplatesPage() {
         templateType={currentTemplateType ?? ''}
         onRefresh={handleRefresh}
       />
-    </div>
+    </Container>
   );
 }

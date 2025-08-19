@@ -11,27 +11,42 @@ import {
 type PageHeaderProps = {
   hasBack?: boolean
   title: string
+  subtitle?: string
   href?: string
 }
 
-export default function PageHeader({ hasBack = false, title, href }: PageHeaderProps) {
+export default function PageHeader({ hasBack = false, title, subtitle, href }: PageHeaderProps) {
   const router = useRouter()
   const { locale } = useI18n()
 
   return (
     <div className="flex justify-between items-center mb-6 h-8">
-      <h1 className="text-2xl font-bold flex items-center">
-        {hasBack && (<button
-          type="button"
-          onClick={() => router.back()}
-          aria-label={locale?.buttons.back || "Back"}
-          title={locale?.buttons.back || "Back"}
-          className="group inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition"
-        >
-          <ChevronLeftIcon className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
-        </button>)}
-        {title}
-      </h1>
+      <hgroup className="flex items-start gap-2">
+        {hasBack && (
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label={locale?.buttons.back || "Back"}
+            title={locale?.buttons.back || "Back"}
+            className="group inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 transition"
+          >
+            <ChevronLeftIcon className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
+          </button>
+        )}
+
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-bold leading-tight">
+            {title}
+          </h1>
+
+          {subtitle && (
+            <p className="mt-1 text-sm text-muted-foreground">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      </hgroup>
+
       {href && (
         <button
           type="button"

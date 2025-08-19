@@ -1,4 +1,5 @@
 {
+  "lang_code": "de-DE",
   "pages": {
     "dashboard": "Dashboard",
     "umami": "Umami",
@@ -209,7 +210,8 @@
     "no_webhooks": "Keine Webhooks konfiguriert",
     "saved": "Erfolgreich gespeichert",
     "updated": "Erfolgreich aktualisiert",
-    "test_success": "Test erfolgreich"
+    "test_success": "Test erfolgreich",
+    "stream_interrupted": "Stream unterbrochen."
   },
   "weekdays": {
     "monday": "Montag",
@@ -240,11 +242,18 @@
   "common": {
     "active": "Aktiv",
     "inactive": "Inaktiv",
+    "healthy": "Erreichbar",
+    "unhealthy": "Nicht erreichbar",
     "status": {
       "success": "Erfolgreich",
       "skipped": "Übersprungen",
       "failed": "Fehlgeschlagen"
-    }
+    },
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "nextMonthHint": "nächsten Monat",
+    "inMonth": "(%MONTH%)",
+    "warning": "Achtung"
   },
   "api_messages": {
     "API_KEY_REQUIRED": "API-Schlüssel erforderlich",
@@ -287,5 +296,29 @@
     "WEBHOOK_NOT_FOUND": "Webhook nicht gefunden",
     "WEBHOOK_TEST_FAILED": "Webhook-Test fehlgeschlagen",
     "WEAK_PASSWORD": "Passwort zu schwach"
+  },
+  "dashboard": {
+    "job_activity": "Job-Aktivität",
+    "last_runs": "Letzte Ausführungen",
+    "no_runs": "Keine Runs gefunden.",
+    "next_runs": "Nächste Ausführungen",
+    "no_active_jobs": "Keine aktiven Jobs",
+    "problem_jobs": "Problem-Jobs (7 Tage)",
+    "no_problem_jobs": "Keine auffälligen Jobs.",
+    "instance_status": "Instanzen-Status",
+    "no_instances": "Keine Instanzen."
+  },
+  "admin_templates": {
+    "already_running": "Ein Refresh läuft bereits.",
+    "templates_refresh_running": "Templates werden aktualisiert…",
+    "templates_idle": "Noch keine Ausführung gestartet.",
+    "templates_overwrite_warning": "Manuell geänderte Templates werden beim Refresh überschrieben.",
+    "templates_refresh_hint": "Lädt den festgelegten Templates-Branch und importiert neue oder geänderte Templates.",
+    "status": {
+      "start": "Start",
+      "end": "Ende"
+    },
+    "templates_done": "Templates wurden erfolgreich aktualisiert.",
+    "templates_error": "Beim Aktualisieren der Templates ist ein Fehler aufgetreten."
   }
 }

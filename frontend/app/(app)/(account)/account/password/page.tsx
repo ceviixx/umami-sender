@@ -7,6 +7,7 @@ import TextInput from '@/components/inputs/TextInput'
 import FormButtons from '@/components/FormButtons'
 import { updatePassword } from '@/lib/api/me'
 import { showError, showSuccess } from '@/lib/toast'
+import Container from '@/components/layout/Container'
 
 type FormData = {
   currentPassword: string
@@ -48,7 +49,7 @@ export default function ChangePasswordPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.pages.changepassword} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -109,6 +110,6 @@ export default function ChangePasswordPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

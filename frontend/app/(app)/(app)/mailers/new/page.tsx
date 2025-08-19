@@ -9,6 +9,7 @@ import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
+import Container from "@/components/layout/Container";
 
 export default function MailerNewPage() {
   const [sender, setSender] = useState<Sender | null>(null);
@@ -98,7 +99,7 @@ export default function MailerNewPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.ui.create} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -256,6 +257,6 @@ export default function MailerNewPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

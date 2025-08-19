@@ -10,6 +10,7 @@ import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
 import { showError, showSuccess } from '@/lib/toast'
 import { useWebhookType } from "@/lib/constants";
+import Container from "@/components/layout/Container";
 
 export default function WebhookNewPage() {
   const router = useRouter()
@@ -60,7 +61,7 @@ export default function WebhookNewPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.ui.create} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -145,6 +146,6 @@ export default function WebhookNewPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

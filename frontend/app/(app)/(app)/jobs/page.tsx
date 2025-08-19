@@ -14,6 +14,7 @@ import CardList from "@/components/cardlist/CardList";
 import { PaperAirplaneIcon, PuzzlePieceIcon } from '@heroicons/react/20/solid';
 import { useRouter } from 'next/navigation'
 import { showError } from "@/lib/toast";
+import Container from "@/components/layout/Container";
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<MailerJob[]>([])
@@ -86,7 +87,7 @@ export default function JobsPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader
         title={locale.pages.jobs}
         href='/jobs/new'
@@ -145,6 +146,6 @@ export default function JobsPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </Container>
   )
 }

@@ -8,6 +8,7 @@ import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
+import Container from "@/components/layout/Container";
 
 export default function HostNewPage() {
   const router = useRouter()
@@ -49,7 +50,7 @@ export default function HostNewPage() {
   const isSelfHosted = form.type === 'self_hosted'
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.ui.create} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -195,6 +196,6 @@ export default function HostNewPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

@@ -97,6 +97,12 @@ export default function Sidebar() {
         icon: <UsersIcon className="w-5 h-5" />,
         match: ['/account/admin/users', /^\/account\/admin\/users\//]
       },
+      {
+        href: '/account/admin/templates',
+        label: locale.pages.templates,
+        icon: <DocumentIcon className="w-5 h-5" />,
+        match: ['/account/admin/templates']
+      },
     ],
   }
 

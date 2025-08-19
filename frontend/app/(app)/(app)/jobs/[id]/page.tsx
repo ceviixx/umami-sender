@@ -21,6 +21,7 @@ import { useWeekdays, useOptions } from '@/lib/constants'
 import LoadingSpinner from "@/components/LoadingSpinner";
 import NetworkError from "@/components/NetworkError";
 import { showError, showSuccess } from "@/lib/toast";
+import Container from "@/components/layout/Container";
 
 function Section({
   title,
@@ -303,7 +304,7 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
   if (networkError) { return <NetworkError page={locale.ui.edit} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader hasBack={true} title={locale.ui.edit} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -490,6 +491,6 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   );
 }

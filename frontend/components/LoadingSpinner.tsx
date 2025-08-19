@@ -1,6 +1,7 @@
 'use client';
 
 import PageHeader from './navigation/PageHeader';
+import Container from './layout/Container';
 
 interface LoadingSpinnerProps {
   title: string;
@@ -9,7 +10,7 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({ title, message = '' }: LoadingSpinnerProps) {
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={title} />
 
       <div className="mt-6 rounded-2xl">
@@ -26,6 +27,6 @@ export default function LoadingSpinner({ title, message = '' }: LoadingSpinnerPr
           <span className="sr-only">{message}</span>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

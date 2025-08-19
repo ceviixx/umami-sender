@@ -5,3 +5,4 @@ export const fetchTemplate = (type: string) => apiFetch(`/templates/${type}`);
 export const fetchTemplatePreview = (type: string) => apiFetch(`/templates/${type}/preview`);
 export const updateTemplate = (type: string, data: any) => apiFetch(`/templates/${type}`, { method: 'PUT', body: data });
 export const deleteTemplate = (type: string) => apiFetch(`/templates/${type}`, { method: 'DELETE' });
+export const updateTemplates = () => apiFetch('/templates/refresh', { method: 'PATCH' })

@@ -1,41 +1,111 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# 🔐 Check for SECRET_KEY
-if [ -z "$SECRET_KEY" ]; then
-  echo "❌ SECRET_KEY is not set. Please define it as an environment variable (e.g. in docker-compose.yml or .env file)."
+# ---- Config ----
+: "${DB_HOST:=db}"
+: "${DB_PORT:=5432}"
+: "${DB_USER:=user}"
+: "${DB_PASS:=pass}"
+: "${DB_NAME:=umamisender}"
+
+export PGPASSWORD="$DB_PASS"
+
+# 🔐 Required
+if [ -z "${SECRET_KEY:-}" ]; then
+  echo "❌ SECRET_KEY is not set."
   exit 1
 fi
 
-echo "⏳ Waiting for database..."
-until pg_isready -h db -p 5432 -U "user" > /dev/null 2>&1; do
+echo "⏳ Waiting for database ${DB_HOST}:${DB_PORT}..."
+until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" >/dev/null 2>&1; do
   sleep 1
 done
 
 echo "📁 Ensuring Alembic versions folder exists..."
 mkdir -p alembic/versions/
 
-echo "🔎 Checking for invalid alembic revision..."
-if ! alembic current 2>&1 | grep -q "Current revision"; then
-  echo "⚠️ Ungültige Revision oder keine Revision in DB gefunden – Setze zurück."
-  export PGPASSWORD="pass"
-  psql -h db -U "user" -d "umamisender" -c "DROP TABLE IF EXISTS alembic_version;"
-fi
+# ---- Helpers ----
+db_has_known_tables() {
+  psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -tAc "
+    SELECT COUNT(*) FROM information_schema.tables
+    WHERE table_schema='public'
+      AND table_name IN ('users','senders','jobs','job_logs','webhooks','mailer_jobs','templates')
+  " | awk '{print int($1)}'
+}
 
-if [ -z "$(ls -A alembic/versions/)" ]; then
-  echo "🛠️ Generating fresh migration from existing DB state..."
-  alembic revision --autogenerate -m "initial from existing DB"
+alembic_version_table_exists() {
+  psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -tAc "
+    SELECT to_regclass('public.alembic_version') IS NOT NULL
+  " | grep -q t
+}
+
+get_db_revision() {
+  psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT version_num FROM alembic_version LIMIT 1" 2>/dev/null | tr -d '[:space:]'
+}
+
+revision_file_exists() {
+  local rev="$1"
+  ls -1 alembic/versions/${rev}_*.py >/dev/null 2>&1
+}
+
+# ---- Advisory lock (prevents race conditions with multiple instances) ----
+echo "🔒 Acquiring migration lock…"
+psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c "SELECT pg_advisory_lock(424242);" >/dev/null
+
+cleanup_lock() {
+  psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c "SELECT pg_advisory_unlock(424242);" >/dev/null || true
+}
+trap cleanup_lock EXIT
+
+# ---- Check DB / Alembic state ----
+echo "🔎 Checking Alembic / DB state…"
+
+# 1) If DB alembic_version points to an unknown revision → clear it
+if alembic_version_table_exists; then
+  db_rev="$(get_db_revision || true)"
+  if [ -n "${db_rev:-}" ]; then
+    if ! revision_file_exists "$db_rev"; then
+      echo "⚠️  DB points to unknown revision (${db_rev}) → deleting entry from alembic_version."
+      psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c "DELETE FROM alembic_version;" >/dev/null || true
+    else
+      echo "ℹ️  DB revision (${db_rev}) exists in container."
+    fi
+  else
+    echo "ℹ️  alembic_version table exists but is empty."
+  fi
 else
-  echo "✅ Alembic versions already exist, skipping revision generation."
+  echo "ℹ️  No alembic_version table found in DB (will be created on demand)."
 fi
 
-echo "🚀 Applying migrations..."
+# 2) Autogenerate a new migration against current DB state
+echo "🛠️  Autogenerating migration (if needed)…"
+before_latest="$(ls -1t alembic/versions/*.py 2>/dev/null | head -n1 || true)"
+alembic revision --autogenerate -m "autogen $(date -u +%Y-%m-%dT%H:%M:%SZ)" || true
+after_latest="$(ls -1t alembic/versions/*.py 2>/dev/null | head -n1 || true)"
+
+# 3) Clean up empty revisions
+if [ -n "$after_latest" ] && [ "$after_latest" != "$before_latest" ]; then
+  if grep -qE "def upgrade\(\):\s+pass" "$after_latest" && grep -qE "def downgrade\(\):\s+pass" "$after_latest"; then
+    echo "ℹ️  No schema changes detected → removing empty revision $(basename "$after_latest")"
+    rm -f "$after_latest"
+    after_latest="$before_latest"
+  else
+    echo "✅ New migration generated: $(basename "$after_latest")"
+  fi
+else
+  echo "ℹ️  No new migration generated."
+fi
+
+# 4) Apply migrations
+echo "🚀 Applying migrations…"
 alembic upgrade head
 
-python3 -m app.seeds.initial_user
+# ---- Seeds (optional) ----
+echo "🌱 Seeding default data…"
+python3 -m app.seeds.initial_user || true
+#python3 -m app.seeds.__templates__ || true
+python -m app.services.import_templates || echo "⚠️ Template import failed (non-blocking)"
 
-echo "🌱 Seeding default template (if not exists)..."
-python3 -m app.seeds.__templates__
 
-echo "✅ Starting backend..."
+echo "✅ Starting backend…"
 exec uvicorn app.main:app --host 0.0.0.0 --port 8000

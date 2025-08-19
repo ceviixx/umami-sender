@@ -8,6 +8,7 @@ import EmptyState from '@/components/EmptyState'
 import { fetchLogs } from '@/lib/api/logs'
 import CardList from '@/components/cardlist/CardList'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import Container from '@/components/layout/Container'
 
 export default function LogsPage() {
   const [logs, setLogs] = useState<LogItem[]>([])
@@ -24,7 +25,7 @@ export default function LogsPage() {
   if (loading) { return <LoadingSpinner title={locale.pages.logs} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.pages.logs} />
 
       {logs.length === 0 ? (
@@ -64,6 +65,6 @@ export default function LogsPage() {
           }
         />
       )}
-    </div>
+    </Container>
   )
 }

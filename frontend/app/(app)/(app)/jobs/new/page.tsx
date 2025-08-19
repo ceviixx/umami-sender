@@ -18,7 +18,7 @@ import { fetchMailers } from '@/lib/api/mailers'
 import { fetchWebhooks } from '@/lib/api/webhook'
 import { fetchTemplates } from '@/lib/api/templates'
 import { useWeekdays, useOptions } from '@/lib/constants'
-import { hostname } from "os";
+import Container from "@/components/layout/Container";
 
 function Section({
   title,
@@ -267,7 +267,7 @@ export default function JobNewPage() {
   const isValidOverview = isValidRecipients && validateForm(3);
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.ui.create} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -454,6 +454,6 @@ export default function JobNewPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   );
 }

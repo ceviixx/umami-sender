@@ -10,6 +10,7 @@ import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
 import { showSuccess, showError } from '@/lib/toast'
+import Container from "@/components/layout/Container";
 
 export default function WebhookEditPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true)
@@ -68,7 +69,7 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader hasBack title={locale.ui.edit} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -136,6 +137,6 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

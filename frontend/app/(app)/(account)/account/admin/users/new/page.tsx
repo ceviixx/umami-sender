@@ -9,6 +9,7 @@ import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
 import { showError, showSuccess } from '@/lib/toast'
+import Container from '@/components/layout/Container'
 
 export default function UserNewPage() {
   const router = useRouter()
@@ -41,7 +42,7 @@ export default function UserNewPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.ui.create} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -102,6 +103,6 @@ export default function UserNewPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

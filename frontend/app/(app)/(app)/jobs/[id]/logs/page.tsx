@@ -8,6 +8,7 @@ import EmptyState from '@/components/EmptyState'
 import { fetchJobLogs } from '@/lib/api/logs'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from '@/components/cardlist/CardList'
+import Container from "@/components/layout/Container";
 
 export default function JobLogsPage({ params }: { params: { id: string } }) {
   const [logs, setLogs] = useState<LogItem[]>([])
@@ -24,7 +25,7 @@ export default function JobLogsPage({ params }: { params: { id: string } }) {
   if (loading) { <LoadingSpinner title={locale.pages.logs} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader
         hasBack={true}
         title={locale.pages.logs}
@@ -67,6 +68,6 @@ export default function JobLogsPage({ params }: { params: { id: string } }) {
           }
         />
       )}
-    </div>
+    </Container>
   )
 }

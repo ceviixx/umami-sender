@@ -4,6 +4,7 @@ export interface UmamiInstance {
   id: string
   name: string
   type: UmamiType
+  is_healthy: boolean
 }
 
 export interface Template {

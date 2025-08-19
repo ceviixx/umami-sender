@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String, Enum as SqlEnum
+from sqlalchemy import Column, Boolean, TIMESTAMP, String, Enum as SqlEnum
 from sqlalchemy.orm import relationship
 from app.database import Base
 import enum
@@ -24,6 +24,10 @@ class Umami(Base, TimestampMixin):
     username = Column(String, nullable=True)
     password_hash = Column(String, nullable=True)
     bearer_token = Column(String, nullable=True)
+    
+    is_healthy = Column(Boolean, nullable=False, server_default='true')
+    last_healthy_check_at = Column(TIMESTAMP, nullable=False, server_default='now()')
+    health_response = Column(String, nullable=True)
     
     mailer_jobs = relationship("Job", back_populates="host", cascade="all, delete-orphan")
 

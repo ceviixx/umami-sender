@@ -14,6 +14,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
 import { showError } from "@/lib/toast";
 import { useWebhookType } from "@/lib/constants";
+import Container from "@/components/layout/Container";
 
 export default function WebhooksPage() {
   const router = useRouter()
@@ -52,7 +53,7 @@ export default function WebhooksPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader
         title={locale.pages.webhook}
         href='/webhooks/new'
@@ -89,6 +90,6 @@ export default function WebhooksPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </Container>
   )
 }

@@ -13,6 +13,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
 import { showError } from "@/lib/toast";
 import { useRouter } from 'next/navigation'
+import Container from "@/components/layout/Container";
 
 export default function MailersPage() {
   const [senders, setSenders] = useState<Sender[]>([])
@@ -50,7 +51,7 @@ export default function MailersPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader
         title={locale.pages.mailer}
         href='/mailers/new'
@@ -87,6 +88,6 @@ export default function MailersPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </Container>
   )
 }

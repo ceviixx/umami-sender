@@ -1,4 +1,5 @@
 {
+  "lang_code": "en-EN",
   "pages": {
     "dashboard": "Dashboard",
     "umami": "Umami",
@@ -209,7 +210,8 @@
     "no_webhooks": "No webhooks configured",
     "saved": "Saved successfully",
     "updated": "Updated successfully",
-    "test_success": "Test successful"
+    "test_success": "Test successful",
+    "stream_interrupted": ""
   },
   "weekdays": {
     "monday": "Monday",
@@ -240,11 +242,18 @@
   "common": {
     "active": "Active",
     "inactive": "Inactive",
+    "healthy": "Healthy",
+    "unhealthy": "Unhealthy",
     "status": {
       "success": "Success",
       "skipped": "Skipped",
       "failed": "Failed"
-    }
+    },
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "nextMonthHint": "next month",
+    "inMonth": "(%MONTH%)",
+    "warning": "Warning"
   },
   "api_messages": {
     "API_KEY_REQUIRED": "API key required",
@@ -287,5 +296,29 @@
     "WEBHOOK_NOT_FOUND": "Webhook not found",
     "WEBHOOK_TEST_FAILED": "Webhook test failed",
     "WEAK_PASSWORD": "Password too weak"
+  },
+  "dashboard": {
+    "job_activity": "Job activity",
+    "last_runs": "Last runs",
+    "no_runs": "No runs found.",
+    "next_runs": "Next runs",
+    "no_active_jobs": "No active jobs",
+    "problem_jobs": "Problem jobs (7d)",
+    "no_problem_jobs": "No problematic jobs.",
+    "instance_status": "Instance status",
+    "no_instances": "No instances."
+  },
+  "admin_templates": {
+    "already_running": "A refresh is already in progress.",
+    "templates_refresh_running": "Templates are being updated…",
+    "templates_idle": "No execution started yet.",
+    "templates_overwrite_warning": "During refresh, manually modified templates will be overwritten.",
+    "templates_refresh_hint": "Loads the fixed templates branch and imports new/modified templates.",
+    "status": {
+      "start": "Start",
+      "end": "End"
+    },
+    "templates_done": "Templates have been updated successfully.",
+    "templates_error": "An error occurred while updating templates."
   }
 }

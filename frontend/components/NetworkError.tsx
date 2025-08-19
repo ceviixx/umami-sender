@@ -5,6 +5,7 @@ import PageHeader from '@/components/navigation/PageHeader';
 import { useRouter } from 'next/navigation';
 import { ArrowPathIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 import { useI18n } from "@/locales/I18nContext";
+import Container from './layout/Container';
 
 type NetworkErrorProps = {
   page: string;
@@ -36,7 +37,7 @@ export default function NetworkError({
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={page} />
 
       <div
@@ -82,6 +83,6 @@ export default function NetworkError({
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

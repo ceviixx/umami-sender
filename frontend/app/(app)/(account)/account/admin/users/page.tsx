@@ -12,6 +12,7 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
+import Container from '@/components/layout/Container'
 
 export default function UsersPage() {
   const router = useRouter()
@@ -42,7 +43,7 @@ export default function UsersPage() {
   if (networkError) { return <NetworkError page={locale.pages.admin.users} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader
         title={locale.pages.admin.users}
         href='/account/admin/users/new'
@@ -79,6 +80,6 @@ export default function UsersPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </Container>
   )
 }
