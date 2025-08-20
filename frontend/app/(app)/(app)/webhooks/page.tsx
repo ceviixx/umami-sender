@@ -60,7 +60,11 @@ export default function WebhooksPage() {
       />
 
       {webhooks.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="Create your first webhook recipient with the + in the top right." 
+          rows={4}
+        />
       ) : (
         <CardList
           items={webhooks}

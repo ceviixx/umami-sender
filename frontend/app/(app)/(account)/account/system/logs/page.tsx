@@ -29,7 +29,11 @@ export default function LogsPage() {
       <PageHeader title={locale.pages.logs} />
 
       {logs.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="There currently no logs to display" 
+          rows={4}
+        />
       ) : (
         <CardList
           items={logs}

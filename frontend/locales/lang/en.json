@@ -7,6 +7,7 @@
     "mailer": "Mailer",
     "webhook": "Webhook",
     "templates": "Templates",
+    "template_preview":"Template preview",
     "template_update": "Update templates",
     "account": "Account",
     "changepassword": "Change password",

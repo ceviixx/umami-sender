@@ -50,7 +50,11 @@ export default function UsersPage() {
       />
 
       {users.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="No other users, you can create an new with the + in the top right." 
+          rows={4}
+        />
       ) : (
         <CardList
           items={users}

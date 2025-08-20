@@ -58,7 +58,11 @@ export default function HostsPage() {
       />
 
       {instances.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="Connect your first umami with the + in the top right." 
+          rows={4}
+        />
       ) : (
         <CardList
           items={instances}

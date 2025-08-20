@@ -133,10 +133,11 @@ def add_instance(request: Request, data: UmamiInstanceCreate, db: Session = Depe
             detail="The provided instance type is not recognized or supported."
         )
 
-
+    instance.is_healthy = True
     db.add(instance)
     db.commit()
     db.refresh(instance)
+
     return instance
 
 @router.get("", response_model=list[UmamiInstanceOut])
@@ -190,7 +191,6 @@ def update_instance(request: Request, instance_id: str, data: UmamiInstanceUpdat
 
     update_data = data.dict(exclude_unset=True)
 
-    # 🔍 Wenn Typ mitgeschickt wird, validieren
     instance_type = update_data.get("type", instance.type)
 
     if instance_type == "cloud":
@@ -299,6 +299,8 @@ def update_instance(request: Request, instance_id: str, data: UmamiInstanceUpdat
 
     for field, value in update_data.items():
         setattr(instance, field, value)
+
+    instance.is_healthy = True
 
     db.commit()
     db.refresh(instance)

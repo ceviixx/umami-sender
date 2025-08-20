@@ -104,7 +104,11 @@ export default function JobsPage() {
       />
 
       {jobs.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="Setup your first job with the + in the top right." 
+          rows={4}
+        />
       ) : (
         <CardList
           items={jobs}

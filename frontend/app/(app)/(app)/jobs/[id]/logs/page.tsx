@@ -32,7 +32,11 @@ export default function JobLogsPage({ params }: { params: { id: string } }) {
       />
 
       {logs.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="There currently no logs to display" 
+          rows={4}
+        />
       ) : (
         <CardList
           items={logs}

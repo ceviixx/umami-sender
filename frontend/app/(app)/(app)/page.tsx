@@ -40,11 +40,48 @@ export default function DashboardPage() {
   const [logStats, setLogStats] = useState<LogPoint[]>([])
   const [loading, setLoading] = useState(true)
   const [networkError, setHasNetworkError] = useState<string | null>(null)
-  const [range, setRange] = useState<RangeKey>('30d')
+  const [range, setRange] = useState<RangeKey>('7d')
 
   const [recentRuns, setRecentRuns] = useState<JobLog[]>([])
   const [jobs, setJobs] = useState<MailerJob[]>([])
   const [instances, setInstances] = useState<UmamiInstance[]>([])
+  const [problemJobs, setProblemJobs] = useState<JobLog[]>([])
+
+
+
+
+
+
+
+
+function daysFromRange(range: RangeKey) {
+  switch (range) {
+    case '7d': return 7
+    case '30d': return 30
+    case '90d': return 90
+  }
+}
+
+function sortByDateAsc<T extends { date: string }>(arr: T[]): T[] {
+  return [...arr].sort((a, b) => +new Date(a.date) - +new Date(b.date))
+}
+
+const filteredChartData = useMemo(() => {
+  const days = daysFromRange(range)
+  const cutoff = new Date()
+  cutoff.setHours(0, 0, 0, 0)
+  cutoff.setDate(cutoff.getDate() - days + 1)
+
+  const filtered = logStats.filter(p => new Date(p.date) >= cutoff)
+  return sortByDateAsc(filtered)
+}, [logStats, range])
+
+
+
+
+
+
+
 
   useEffect(() => {
     const ac = new AbortController()
@@ -64,6 +101,8 @@ export default function DashboardPage() {
           setJobs(jobs)
           setRecentRuns(recentRuns)
           setInstances(instances)
+
+          setProblemJobs(recentRuns)
         } catch (e: any) {
           if (e?.name !== 'AbortError') setHasNetworkError(e?.message || 'Network error')
         } finally {
@@ -84,10 +123,15 @@ export default function DashboardPage() {
   const last7Total = last7Failed + last7Success + last7Skipped
   const successRate = last7Total ? Math.round((last7Success / last7Total) * 100) : null
 
+
+  const recentProblems = problemJobs.filter(
+    j => j.status !== 'success' && Date.parse(j.started_at) >= Date.now() - 7*24*60*60*1000
+  );
+
   return (
     <Container>
       <PageHeader title={locale.pages.dashboard} />
-      {/*
+      
       {last7Failed > 0 && (
         <div role="alert" className="mb-6 rounded-2xl border border-amber-200/70 dark:border-amber-900/40 bg-amber-50/70 dark:bg-amber-900/20 p-4 flex items-start gap-3">
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl ring-1 ring-inset ring-amber-200/60 dark:ring-amber-900/50">
@@ -104,7 +148,6 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-      */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <KpiTile label={locale.pages.umami} value={stats?.umami} icon={<ChartBarIcon className="w-5 h-5" />} href="umami" />
@@ -119,7 +162,11 @@ export default function DashboardPage() {
           <RangePicker value={range} onChange={setRange} />
         </div>
         <div className="rounded-b-2xl border-t border-gray-200/60 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/30 p-3 sm:p-4">
-          <JobChart jobData={logStats} />
+          <JobChart
+            key={`${range}-${filteredChartData.length}-${filteredChartData[0]?.date}-${filteredChartData.at(-1)?.date}`}
+            jobData={filteredChartData}
+            range={range}
+          />
         </div>
       </section>
 
@@ -143,9 +190,6 @@ export default function DashboardPage() {
                 <SkeletonListRow key={`skeleton-${idx}`} />
               )
             )}
-            {
-              // recentRuns.length === 0 && <EmptyState text={locale.dashboard.no_runs} />
-            }
           </ul>
         </Card>
 
@@ -177,26 +221,25 @@ export default function DashboardPage() {
                 <SkeletonListRow key={`skeleton-${idx}`} />
               )
             )}
-            {
-              // jobs.filter(j => j.is_active).length === 0 && <EmptyState text={locale.dashboard.no_active_jobs} />
-            }
           </ul>
         </Card>
 
         <Card title={locale.dashboard.problem_jobs} icon={<ArrowTrendingDownIcon className="w-4 h-4" />}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
-            
-            {/*
-              <li key={'p.id'} className="py-3 flex items-center justify-between">
-                <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">{'p.name'}</div>
-                  <div className="text-xs opacity-70">Fehler: {'p.failed'}</div>
-                </div>
-                <Link href={`/jobs/${'p.id'}`} className="text-xs underline">Details</Link>
-              </li>
-            */}
-
-            <EmptyState text={locale.dashboard.no_problem_jobs} />
+          
+            {padTo(recentProblems.filter(j => j.status != 'success').filter(j => j.started_at ), 3).map((p, idx) =>
+              p ? (
+                <li key={p.log_id} className="py-3 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{p.job_name}</div>
+                    <div className="text-xs opacity-70">Fehler: {p.details.toString()}</div>
+                  </div>
+                  <Link href={`/jobs/${p.job_id}/logs`} className="text-xs underline">Details</Link>
+                </li>
+              ) : (
+                <SkeletonListRow key={`skeleton-${idx}`} />
+              )
+            )}
           </ul>
         </Card>
 
@@ -218,9 +261,6 @@ export default function DashboardPage() {
                 <SkeletonListRow key={`skeleton-${idx}`} />
               )
             )}
-            {
-             // recentRuns.length === 0 && <EmptyState text={locale.dashboard.no_runs} />
-            }
           </ul>
         </Card>
 
@@ -282,10 +322,6 @@ function StatusPill({ status }: { status: 'success' | 'failed' | 'skipped' | 'wa
   return <span className={`text-[10px] px-2 py-1 rounded ring-1 ring-inset ${map[status]}`}>{status}</span>
 }
 
-function EmptyState({ text }: { text: string }) {
-  return <div className="py-6 text-sm opacity-60">{text}</div>
-}
-
 function RangePicker({ value, onChange }: { value: RangeKey; onChange: (v: RangeKey) => void }) {
   return (
     <div className="inline-flex rounded-xl border border-gray-200/70 dark:border-gray-800/60 overflow-hidden" role="tablist" aria-label="Chart range">
@@ -308,10 +344,10 @@ function SkeletonListRow() {
   return (
     <li className="py-3 flex items-center justify-between">
       <div className="min-w-0 w-full">
-        <div className="h-4 w-40 rounded animate-pulse bg-gray-200/70 dark:bg-gray-800/60" />
-        <div className="mt-1 h-3 w-24 rounded animate-pulse bg-gray-200/60 dark:bg-gray-800/50" />
+        <div className="h-4 w-40 rounded bg-gray-200/20 dark:bg-gray-800/10" />
+        <div className="mt-1 h-3 w-24 rounded bg-gray-200/20 dark:bg-gray-800/10" />
       </div>
-      <div className="ml-4 h-5 w-16 rounded-full animate-pulse bg-gray-200/70 dark:bg-gray-800/60" />
+      <div className="ml-4 h-5 w-16 rounded bg-gray-200/20 dark:bg-gray-800/10" />
     </li>
   );
 }
