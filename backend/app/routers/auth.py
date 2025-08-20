@@ -85,3 +85,18 @@ def refresh_token(request: Request):
 
 # for user register has password using
 # hashed_password = pwd_context.hash(plain_password)
+
+from app.utils.security import Security
+@router.get("/verify")
+def login(request: Request, db: Session = Depends(get_db)):
+    user = Security(request).get_user()
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "role": user.role,
+        "language": user.language,
+        "createdAt": user.created_at.isoformat() if user.created_at else None
+    }

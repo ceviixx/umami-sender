@@ -126,27 +126,33 @@ export default function DashboardPage() {
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card title={locale.dashboard.last_runs} icon={<ArchiveBoxIcon className="w-4 h-4" />} action={<Link href="/account/system/logs" className="text-xs underline">{'{Alle}'}</Link>}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
-            {recentRuns.slice(0, 3).map(r => (
-              <li key={r.log_id} className="py-3 flex items-center justify-between">
-                <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">{r.job_name}</div>
-                  <div className="text-xs opacity-70 flex gap-2">
-                    <span>{new Date(r.started_at).toLocaleString()}</span>
-                    <span>•</span>
-                    <span>{r.duration_ms} ms</span>
+            {padTo(recentRuns, 3).map((r, idx) =>
+              r ? (
+                <li key={r.log_id} className="py-3 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{r.job_name}</div>
+                    <div className="text-xs opacity-70 flex gap-2">
+                      <span>{new Date(r.started_at).toLocaleString()}</span>
+                      <span>•</span>
+                      <span>{r.duration_ms} ms</span>
+                    </div>
                   </div>
-                </div>
-                <StatusPill status={r.status as 'success'} />
-              </li>
-            ))}
-            {recentRuns.length === 0 && <EmptyState text={locale.dashboard.no_runs} />}
+                  <StatusPill status={r.status as 'success'} />
+                </li>
+              ) : (
+                <SkeletonListRow key={`skeleton-${idx}`} />
+              )
+            )}
+            {
+              // recentRuns.length === 0 && <EmptyState text={locale.dashboard.no_runs} />
+            }
           </ul>
         </Card>
 
         <Card title={locale.dashboard.next_runs} icon={<ClockIcon className="w-4 h-4" />}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
-            {jobs.filter(j => j.is_active).slice(0, 3).map(j => {
-              return (
+            {padTo(jobs.filter(j => j.is_active), 3).map((j, idx) =>
+              j ? (
                 <li key={j.id} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{j.name}</div>
@@ -167,14 +173,19 @@ export default function DashboardPage() {
                     {locale.enums.frequency[j.frequency]}
                   </span>
                 </li>
+              ) : (
+                <SkeletonListRow key={`skeleton-${idx}`} />
               )
-            })}
-            {jobs.filter(j => j.is_active).length === 0 && <EmptyState text={locale.dashboard.no_active_jobs} />}
+            )}
+            {
+              // jobs.filter(j => j.is_active).length === 0 && <EmptyState text={locale.dashboard.no_active_jobs} />
+            }
           </ul>
         </Card>
 
         <Card title={locale.dashboard.problem_jobs} icon={<ArrowTrendingDownIcon className="w-4 h-4" />}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
+            
             {/*
               <li key={'p.id'} className="py-3 flex items-center justify-between">
                 <div className="min-w-0">
@@ -192,24 +203,36 @@ export default function DashboardPage() {
         <Card title={locale.dashboard.instance_status} icon={<CpuChipIcon className="w-4 h-4" />}>
 
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
-            {instances.slice(0, 4).map(i => (
-              <li key={i.id} className="py-3 flex items-center justify-between">
-                <div className="min-w-0">
-                  <div className="text-sm font-medium truncate">{i.name}</div>
-                  <div className="text-xs opacity-70">
-                    {i.type === 'cloud' ? 'Cloud' : 'Self-hosted'}
+            {padTo(instances, 3).map((i, idx) =>
+              i ? (
+                <li key={i.id ?? idx} className="py-3 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{i.name}</div>
+                    <div className="text-xs opacity-70">
+                      {i.type === 'cloud' ? 'Cloud' : 'Self-hosted'}
+                    </div>
                   </div>
-                </div>
-                <StatusPill status={i.is_healthy ? 'healthy' : 'unhealthy' as 'success'} />
-              </li>
-            ))}
-            {recentRuns.length === 0 && <EmptyState text={locale.dashboard.no_runs} />}
+                  <StatusPill status={(i.is_healthy ? 'healthy' : 'unhealthy') as 'success'} />
+                </li>
+              ) : (
+                <SkeletonListRow key={`skeleton-${idx}`} />
+              )
+            )}
+            {
+             // recentRuns.length === 0 && <EmptyState text={locale.dashboard.no_runs} />
+            }
           </ul>
         </Card>
 
       </div>
     </Container>
   )
+}
+
+function padTo<T>(items: T[], count: number) {
+  const limited = items.slice(0, count);
+  const skeletonsNeeded = Math.max(0, count - limited.length);
+  return [...limited, ...Array(skeletonsNeeded).fill(null)] as (T | null)[];
 }
 
 function KpiTile({ label, value, icon, href }: { label: string; value?: number | string; icon: React.ReactNode; href: string }) {
@@ -278,4 +301,17 @@ function RangePicker({ value, onChange }: { value: RangeKey; onChange: (v: Range
       ))}
     </div>
   )
+}
+
+
+function SkeletonListRow() {
+  return (
+    <li className="py-3 flex items-center justify-between">
+      <div className="min-w-0 w-full">
+        <div className="h-4 w-40 rounded animate-pulse bg-gray-200/70 dark:bg-gray-800/60" />
+        <div className="mt-1 h-3 w-24 rounded animate-pulse bg-gray-200/60 dark:bg-gray-800/50" />
+      </div>
+      <div className="ml-4 h-5 w-16 rounded-full animate-pulse bg-gray-200/70 dark:bg-gray-800/60" />
+    </li>
+  );
 }
