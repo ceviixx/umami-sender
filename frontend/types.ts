@@ -36,8 +36,8 @@ export interface Website {
 
 
 export type LogDetail = {
-  channel: string;              // "EMAIL" | "DISCORD" | "WEBHOOK" | "GLOBAL" | …
-  target_id?: string | null;    // mailer_id / webhook_id / null
+  channel: string;
+  target_id?: string | null;
   status: "success" | "skipped" | "failed";
   error?: string | null;
 };
@@ -45,14 +45,14 @@ export type JobLog = {
   log_id: string;
   job_id: string;
   job_name: string;
-  started_at: string;           // ISO
-  finished_at?: string | null;  // ISO | null
+  started_at: string; 
+  finished_at?: string | null; 
   status: "success" | "warning" | "failed" | "running" | "skipped";
   details: LogDetail[];
   count_success?: number;
   count_failed?: number;
   count_skipped?: number;
-  duration_ms?: number;         // vom Backend berechnet
+  duration_ms?: number;
 };
 
 

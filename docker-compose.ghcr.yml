@@ -25,6 +25,8 @@ services:
       - DATABASE_URL=postgresql://user:pass@db/umamisender
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=supersecret
+    volumes:
+      - uploads:/var/app/uploads/branding
 
   worker:
     container_name: worker
@@ -66,3 +68,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:

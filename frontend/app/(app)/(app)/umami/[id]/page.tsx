@@ -9,7 +9,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
-import { showSuccess, showError } from '@/lib/toast'
+import { showSuccess, showError, notification_ids } from '@/lib/toast'
 import Container from "@/components/layout/Container";
 
 export default function HostEditPage({ params }: { params: { id: string } }) {
@@ -41,7 +41,10 @@ export default function HostEditPage({ params }: { params: { id: string } }) {
     fetchUmami(params.id)
       .then(setForm)
       .finally(() => setLoading(false))
-      .catch((error) => showError(locale.api_messages[error as 'DATA_ERROR'] || error))
+      .catch((error: any) => {
+        const code = error.message as 'DATA_ERROR'
+        showError({id: notification_ids.umami, title: locale.messages.title.error, description: locale.api_messages[code]})
+      })
   }, [params.id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -55,10 +58,10 @@ export default function HostEditPage({ params }: { params: { id: string } }) {
 
     try {
       await updateUmami(params.id, form)
-      showSuccess(locale.messages.updated)
+      showSuccess({id: notification_ids.umami, title: locale.messages.title.success, description: locale.messages.updated})
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.umami, title: locale.messages.title.error, description: locale.api_messages[code]})
     } finally {
       setLoading(false)
     }

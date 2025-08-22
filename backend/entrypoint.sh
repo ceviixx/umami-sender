@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# ---- Config ----
 : "${DB_HOST:=db}"
 : "${DB_PORT:=5432}"
 : "${DB_USER:=user}"
@@ -10,7 +9,6 @@ set -euo pipefail
 
 export PGPASSWORD="$DB_PASS"
 
-# 🔐 Required
 if [ -z "${SECRET_KEY:-}" ]; then
   echo "❌ SECRET_KEY is not set."
   exit 1
@@ -24,7 +22,6 @@ done
 echo "📁 Ensuring Alembic versions folder exists..."
 mkdir -p alembic/versions/
 
-# ---- Helpers ----
 db_has_known_tables() {
   psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -tAc "
     SELECT COUNT(*) FROM information_schema.tables
@@ -48,7 +45,6 @@ revision_file_exists() {
   ls -1 alembic/versions/${rev}_*.py >/dev/null 2>&1
 }
 
-# ---- Advisory lock (prevents race conditions with multiple instances) ----
 echo "🔒 Acquiring migration lock…"
 psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -c "SELECT pg_advisory_lock(424242);" >/dev/null
 
@@ -57,10 +53,8 @@ cleanup_lock() {
 }
 trap cleanup_lock EXIT
 
-# ---- Check DB / Alembic state ----
 echo "🔎 Checking Alembic / DB state…"
 
-# 1) If DB alembic_version points to an unknown revision → clear it
 if alembic_version_table_exists; then
   db_rev="$(get_db_revision || true)"
   if [ -n "${db_rev:-}" ]; then
@@ -77,13 +71,11 @@ else
   echo "ℹ️  No alembic_version table found in DB (will be created on demand)."
 fi
 
-# 2) Autogenerate a new migration against current DB state
 echo "🛠️  Autogenerating migration (if needed)…"
 before_latest="$(ls -1t alembic/versions/*.py 2>/dev/null | head -n1 || true)"
 alembic revision --autogenerate -m "autogen $(date -u +%Y-%m-%dT%H:%M:%SZ)" || true
 after_latest="$(ls -1t alembic/versions/*.py 2>/dev/null | head -n1 || true)"
 
-# 3) Clean up empty revisions
 if [ -n "$after_latest" ] && [ "$after_latest" != "$before_latest" ]; then
   if grep -qE "def upgrade\(\):\s+pass" "$after_latest" && grep -qE "def downgrade\(\):\s+pass" "$after_latest"; then
     echo "ℹ️  No schema changes detected → removing empty revision $(basename "$after_latest")"
@@ -96,15 +88,12 @@ else
   echo "ℹ️  No new migration generated."
 fi
 
-# 4) Apply migrations
 echo "🚀 Applying migrations…"
 alembic upgrade head
 
-# ---- Seeds (optional) ----
 echo "🌱 Seeding default data…"
 python3 -m app.seeds.initial_user || true
-#python3 -m app.seeds.__templates__ || true
-python -m app.services.import_templates || echo "⚠️ Template import failed (non-blocking)"
+python3 -m app.services.import_templates || echo "⚠️ Template import failed (non-blocking)"
 
 
 echo "✅ Starting backend…"

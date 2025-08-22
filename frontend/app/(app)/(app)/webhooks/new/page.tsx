@@ -8,7 +8,7 @@ import SelectBox from '@/components/inputs/SelectBox'
 import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
-import { showError, showSuccess } from '@/lib/toast'
+import { showError, showSuccess, notification_ids } from '@/lib/toast'
 import { useWebhookType } from "@/lib/constants";
 import Container from "@/components/layout/Container";
 
@@ -38,11 +38,11 @@ export default function WebhookNewPage() {
 
     try {
       await createWebhook(form)
-      showSuccess('Success')
+      showSuccess({id: notification_ids.webhook, title: locale.messages.title.success, description: 'Success'})
       router.push('/webhooks')
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.webhook, title: locale.messages.title.error, description: locale.api_messages[code]})
     }
   }
 
@@ -51,10 +51,10 @@ export default function WebhookNewPage() {
     setTesting(true)
     try {
       await testWebhook({ ...form })
-      showSuccess(locale.messages.saved)
+      showSuccess({id: notification_ids.webhook_test, title: locale.messages.title.success, description: locale.messages.saved})
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.webhook_test, title: locale.messages.title.error, description: locale.api_messages[code]})
     } finally {
       setTesting(false)
     }

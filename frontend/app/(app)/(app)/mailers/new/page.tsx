@@ -8,7 +8,7 @@ import { createMailer, testConnection } from '@/lib/api/mailers'
 import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
-import { showSuccess, showError } from '@/lib/toast'
+import { showSuccess, showError, notification_ids } from '@/lib/toast'
 import Container from "@/components/layout/Container";
 
 export default function MailerNewPage() {
@@ -68,11 +68,11 @@ export default function MailerNewPage() {
 
     try {
       await createMailer(payload)
-      showSuccess('Created')
+      showSuccess({id: notification_ids.mailer, title: locale.messages.title.success, description: 'Created'})
       router.push('/mailers')
     } catch (err: any) {
-      const message = err?.response?.data?.detail || err?.message || 'Fehler beim Speichern'
-      showError(message)
+      const code = err.message as 'DATA_ERROR'
+      showError({id: notification_ids.mailer, title: locale.messages.title.error, description: locale.api_messages[code]})
     } finally {
       setIsSaving(false)
     }
@@ -89,10 +89,10 @@ export default function MailerNewPage() {
         smtp_password: form.use_auth ? form.smtp_password : '',
       }
       await testConnection(payload)
-      showSuccess(locale.messages.saved)
+      showSuccess({id: notification_ids.mailer_test, title: locale.messages.title.success, description: locale.messages.saved})
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.mailer_test, title: locale.messages.title.error, description: locale.api_messages[code]})
     } finally {
       setTesting(false)
     }

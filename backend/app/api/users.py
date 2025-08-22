@@ -1,28 +1,23 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
 from app.schemas.user import UserOut, UserUpdate, UserCreate
 from app.utils.responses import send_status_response
-
-from app.utils.security import Security
 from app.utils.crypto import hash_password
 import re
+
+from app.utils.security import authenticated_admin, not_found_response
+from app.models.user import User
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 @router.post("", response_model=UserOut)
-def create_user(request: Request, data: UserCreate, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-
-    if user.role != "admin":
-        return send_status_response(
-            code="FORBIDDEN",
-            message="You do not have permission to create users.",
-            status=403,
-            detail="Only admin users can create new users."
-        )
-    
+def create_user(
+    data: UserCreate, 
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_admin)
+):
     if db.query(User).filter(User.username == data.username).first():
         return send_status_response(
             code="USERNAME_EXISTS",
@@ -50,90 +45,51 @@ def create_user(request: Request, data: UserCreate, db: Session = Depends(get_db
     return user
     
 @router.get("", response_model=list[UserOut])
-def list_users(request: Request, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    
-    if user.role != "admin":
-        return send_status_response(
-            code="FORBIDDEN",
-            message="You do not have permission to view users.",
-            status=403,
-            detail="Only admin users can view the list of users."
-        )
-    
+def list_users(
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_admin)
+):
     return (db.query(User)
-            .filter(User.id != user.id)
+            .filter(User.id != _user.id)
             .order_by(User.created_at.desc())
             .all())
 
-@router.delete("/{user_id}")
-def delete_user(request: Request, user_id: str, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    
-    if user.role != "admin":
-        return send_status_response(
-            code="FORBIDDEN",
-            message="You do not have permission to delete users.",
-            status=403,
-            detail="Only admin users can delete other users."
-        )
-    
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        return send_status_response(
-            code="DELETE_FAILED",
-            message="Cannot delete: user not found",
-            status=404,
-            detail=f"User with id {user_id} does not exist."
-        )
+@router.delete("/{id}")
+def delete_user(
+    id: str, 
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_admin)
+):
+    user = db.query(User).filter(User.id == id).first()
+
+    if not user: return not_found_response(User, id)
     
     db.delete(user)
     db.commit()
     return {"success": True}
 
-@router.get("/{user_id}", response_model=UserOut)
-def get_user(request: Request, user_id: str, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    
-    if user.role != "admin":
-        return send_status_response(
-            code="FORBIDDEN",
-            message="You do not have permission to view this user.",
-            status=403,
-            detail="Only admin users can view other users' details."
-        )
-    
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        return send_status_response(
-            code="NOT_FOUND",
-            message="User not found",
-            status=404,
-            detail=f"No user with id {user_id} exists."
-        )
+@router.get("/{id}", response_model=UserOut)
+def get_user(
+    id: str, 
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_admin)
+):
+    user = db.query(User).filter(User.id == id).first()
+
+    if not user: return not_found_response(User, id)
     
     return user
 
-@router.put("/{user_id}", response_model=UserOut)
-def update_user(request: Request, user_id: str, data: UserUpdate, db: Session = Depends(get_db)):
-    me = Security(request).get_user()
+@router.put("/{id}", response_model=UserOut)
+def update_user(
+    id: str, 
+    data: UserUpdate, 
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_admin)
+):
+    user = db.query(User).filter(User.id == id).first()
 
-    if me.role != "admin":
-        return send_status_response(
-            code="FORBIDDEN",
-            message="You do not have permission to update users.",
-            status=403,
-            detail="Only admin users can update other users."
-        )
-
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        return send_status_response(
-            code="UPDATE_FAILED",
-            message="Cannot update: user not found",
-            status=404,
-            detail=f"User with id {user_id} does not exist."
-        )
+    if not user: return not_found_response(User, id)
 
     data_dict = data.dict(exclude_unset=True)
 

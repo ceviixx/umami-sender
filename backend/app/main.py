@@ -7,8 +7,11 @@ from app.api import template
 from app.api import me
 from app.api import users
 from app.api import logs
+from app.api import settings_logo
+from app.api import settings_template_source
 from app.routers import umami
 from app.routers import auth
+
 
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.responses import send_status_response
@@ -34,14 +37,17 @@ app.include_router(webhooks.router)
 app.include_router(template.router)
 app.include_router(logs.router)
 
+app.include_router(settings_logo.router)
+app.include_router(settings_template_source.router)
+
 @app.get("/")
 def root():
-    return send_status_response(
-        code="OK",
-        message="API is healthy and running.",
-        status=200,
-        detail="The UmamiSender API root endpoint responded successfully."
-    )
+    return {
+        "code": "OK",
+        "message": "API is healthy and running.",
+        "status": 200,
+        "detail": "The UmamiSender API root endpoint responded successfully."
+    }
 
 
 

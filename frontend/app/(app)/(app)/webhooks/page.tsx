@@ -12,7 +12,7 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
-import { showError } from "@/lib/toast";
+import { showError, notification_ids } from "@/lib/toast";
 import { useWebhookType } from "@/lib/constants";
 import Container from "@/components/layout/Container";
 
@@ -40,8 +40,9 @@ export default function WebhooksPage() {
         .then(() => {
           setWebhooks(prev => prev.filter(w => w.id !== deleteId))
         })
-        .catch((error) => {
-          showError(error.message)
+        .catch((error: any) => {
+          const code = error.message as 'DATA_ERROR'
+          showError({id: notification_ids.webhook, title: locale.messages.title.error, description: locale.api_messages[code]})
         })
         .finally(() => {
           setDeleteId(null)

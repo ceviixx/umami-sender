@@ -13,8 +13,9 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
 import { PaperAirplaneIcon, PuzzlePieceIcon } from '@heroicons/react/20/solid';
 import { useRouter } from 'next/navigation'
-import { showError, showSuccess } from "@/lib/toast";
+import { showError, showSuccess, notification_ids } from "@/lib/toast";
 import Container from "@/components/layout/Container";
+
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<MailerJob[]>([])
@@ -40,7 +41,7 @@ export default function JobsPage() {
         setJobs(prev => prev.filter(w => w.id !== deleteId))
       })
       .catch((error) => {
-        showError(error.message)
+        showError({id: notification_ids.job, title: locale.messages.title.error, description: error.message})
       })
       .finally(() => {
         setDeleteId(null)
@@ -86,10 +87,10 @@ export default function JobsPage() {
   const handleRunJob = async (jobId: string) => {
     try {
       const res = await runJob(jobId)
-      showSuccess(locale.messages.job_started)
+      showSuccess({id: notification_ids.job, title: locale.messages.title.success, description: locale.messages.job_started})
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.job, title: locale.messages.title.error, description: locale.api_messages[code]})
     }
   }
 

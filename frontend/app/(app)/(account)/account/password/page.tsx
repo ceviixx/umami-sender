@@ -6,7 +6,7 @@ import PageHeader from '@/components/navigation/PageHeader'
 import TextInput from '@/components/inputs/TextInput'
 import FormButtons from '@/components/FormButtons'
 import { updatePassword } from '@/lib/api/me'
-import { showError, showSuccess } from '@/lib/toast'
+import { showError, showSuccess, notification_ids } from '@/lib/toast'
 import Container from '@/components/layout/Container'
 
 type FormData = {
@@ -39,10 +39,10 @@ export default function ChangePasswordPage() {
         newPassword: form.newPassword,
         confirmPassword: form.confirmPassword,
       })
-      showSuccess('Password updated successfully')
+      showSuccess({id: notification_ids.update_password, title: locale.messages.title.success, description: 'Password updated successfully'})
       setForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (error: any) {
-      showError(error.message || 'Failed to update password')
+      showError({id: notification_ids.update_password, title: locale.messages.title.error, description: error.message})
     } finally {
       setSubmitting(false)
     }

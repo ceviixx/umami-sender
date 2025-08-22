@@ -232,7 +232,7 @@ const filteredChartData = useMemo(() => {
                 <li key={p.log_id} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{p.job_name}</div>
-                    <div className="text-xs opacity-70">Fehler: {p.details.toString()}</div>
+                    <JobLogErrorInline log={p} />
                   </div>
                   <Link href={`/jobs/${p.job_id}/logs`} className="text-xs underline">Details</Link>
                 </li>
@@ -267,6 +267,24 @@ const filteredChartData = useMemo(() => {
       </div>
     </Container>
   )
+}
+
+type Props = { log: JobLog };
+function JobLogErrorInline({ log }: Props) {
+  const errors = Array.from(
+    new Set( // Duplikate vermeiden
+      (log.details || [])
+        .map(d => d.error?.trim())
+        .filter((e): e is string => !!e)
+        .map(e => e.replace(/\s+/g, " ")) // Normalisieren
+    )
+  ).join(", ");
+
+  return (
+    <div className="text-xs opacity-70">
+      {errors}
+    </div>
+  );
 }
 
 function padTo<T>(items: T[], count: number) {

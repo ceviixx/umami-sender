@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.template import MailTemplate
@@ -7,51 +7,42 @@ from app.models.template_styles import MailTemplateStyle
 from sqlalchemy import and_
 from app.utils.responses import send_status_response
 from app.core.render_template import render_template
-from app.core.generate_report_summary import embedded_logo
+from app.core.generate_report_summary import resolve_logo_data_url
 from app.utils.response_clean import process_api_response
+from app.services.import_templates import import_templates_from_repo
 from fastapi.responses import HTMLResponse
 from jinja2 import UndefinedError
 from pydantic import BaseModel
 from typing import List, Optional, Any
 
-from app.utils.security import Security
-from app.services.import_templates import import_templates_from_repo
+from app.utils.security import authenticated_admin, authenticated_user, not_found_response
+from app.models.user import User
+
+
 
 router = APIRouter(prefix="/templates", tags=["templates"])
 
-"""
-@router.get("", response_model=list[MailTemplateList])
-def list_templates(request: Request, db: Session = Depends(get_db)):
-    _ = Security(request).get_user()
-    return (db.query(MailTemplate)
-            .filter(MailTemplate.sender_type.contains('EMAIL'))
-            .order_by(MailTemplate.sender_type.asc())
-            .all())
-"""
 @router.get("/{id}", response_model=MailTemplateOut)
-def get_template(request: Request, id: str, db: Session = Depends(get_db)):
-    _ = Security(request).get_user()
+def get_template(
+    id: str, 
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_user)
+):
     template = db.query(MailTemplate).filter(MailTemplate.id == id).first()
-    if not template:
-        return send_status_response(
-            code="TEMPLATE_NOT_FOUND",
-            message="Template not found",
-            status=404,
-            detail=f"No template found for id '{id}'"
-        )
+
+    if not template: return not_found_response(MailTemplate, id)
+
     return template
 
 @router.get("/{id}/preview", response_class=HTMLResponse)
-def get_preview(request: Request, id: str, db: Session = Depends(get_db)):
-    _ = Security(request).get_user()
+def get_preview(
+    id: str, 
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_user)
+):
     template = db.query(MailTemplate).filter(MailTemplate.id == id).first()
-    if not template:
-        return send_status_response(
-            code="TEMPLATE_NOT_FOUND",
-            message="Template not found",
-            status=404,
-            detail=f"No template found for id '{id}'"
-        )
+
+    if not template: return not_found_response(MailTemplate, id)
     
     if template.style_id:
         style = db.query(MailTemplateStyle).filter_by(id=template.style_id).first()
@@ -63,7 +54,7 @@ def get_preview(request: Request, id: str, db: Session = Depends(get_db)):
         example_content = template.example_content
         if "summary" not in example_content or not isinstance(example_content["summary"], dict):
             example_content["summary"] = {}
-        example_content["summary"]["embedded_logo"] = embedded_logo()
+        example_content["summary"]["embedded_logo"] = resolve_logo_data_url(db)
         example_content["inline_css"] = css
 
         example_content = process_api_response(response=example_content, db=db)
@@ -85,22 +76,20 @@ def get_preview(request: Request, id: str, db: Session = Depends(get_db)):
             detail=str(e)
         )
 
-@router.put("/{template_type}", response_model=MailTemplateOut)
-def update_template(request: Request, template_type: str, data: MailTemplateUpdate, db: Session = Depends(get_db)):
-    _ = Security(request).get_user()
+@router.put("/{id}", response_model=MailTemplateOut)
+def update_template(
+    id: str, 
+    data: MailTemplateUpdate, 
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_admin)
+):
     template = db.query(MailTemplate).filter(
         and_(
             MailTemplate.type == 'custom',
-            MailTemplate.sender_type == template_type
+            MailTemplate.sender_type == id
         )
     ).first()
-    if not template:
-        return send_status_response(
-            code="TEMPLATE_NOT_FOUND",
-            message="Template not found",
-            status=404,
-            detail=f"No template found for type '{template_type}'"
-        )
+    if not template: return not_found_response(MailTemplate, id)
 
     for key, value in data.dict(exclude_unset=True).items():
         setattr(template, key, value)
@@ -109,22 +98,19 @@ def update_template(request: Request, template_type: str, data: MailTemplateUpda
     db.refresh(template)
     return template
 
-@router.delete("/{template_type}")
-def delete_template(request: Request, template_type: str, db: Session = Depends(get_db)):
-    _ = Security(request).get_user()
+@router.delete("/{id}")
+def delete_template(
+    id: str, 
+    db: Session = Depends(get_db),
+    _user: User = Depends(authenticated_admin)
+):
     template = db.query(MailTemplate).filter(
         and_(
             MailTemplate.type == 'custom',
-            MailTemplate.sender_type == template_type
+            MailTemplate.sender_type == id
         )
     ).first()
-    if not template:
-        return send_status_response(
-            code="TEMPLATE_NOT_FOUND",
-            message="Template not found",
-            status=404,
-            detail=f"No template found for type '{template_type}'"
-        )
+    if not template: return not_found_response(MailTemplate, id)
     template.content = None
 
     db.commit()
@@ -143,18 +129,10 @@ class RefreshStats(BaseModel):
     errors: List[str]
 
 @router.patch("/refresh", response_model=RefreshStats)
-def refresh_templates(request: Request, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    
-    if user.role != "admin":
-        return send_status_response(
-            code="FORBIDDEN",
-            message="You do not have permission to view users.",
-            status=403,
-            detail="Only admin users can view the list of users."
-        )
-    
-
+def refresh_templates(
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_admin)
+):
     stats = import_templates_from_repo()
     if stats.get("errors") and "already running" in " ".join(stats["errors"]).lower():
         return send_status_response(
@@ -176,13 +154,11 @@ def refresh_templates(request: Request, db: Session = Depends(get_db)):
 
 
 
-
-# app/api/routes/templates.py
 from typing import List, Optional
 from datetime import datetime
 import re
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field, ConfigDict
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
@@ -233,20 +209,16 @@ class TemplateOut(BaseModel):
 
 @router.get("", response_model=List[TemplateOut])
 def list_templates(
-    request: Request,
     db: Session = Depends(get_db),
     type: Optional[List[str]] = Query(default=None, description="Filter: ?type=EMAIL&type=WEBHOOK_DISCORD"),
+    _user: User = Depends(authenticated_user)
 ):
-    _ = Security(request).get_user()
-
     stmt = select(MailTemplate)
     if type:
         stmt = stmt.where(MailTemplate.sender_type.in_(type))
 
-    # (Kein updated_at in Model: wir lassen FE sortieren; falls du später Spalte hinzufügst, einfach hier .order_by(...) ergänzen)
     rows: List[MailTemplate] = db.execute(stmt).scalars().all()
 
-    # synthetische Felder einbauen
     out: List[TemplateOut] = []
     for r in rows:
         out.append(TemplateOut.model_validate({

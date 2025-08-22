@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func, cast, Date, select, case
 from app.database import get_db
@@ -9,14 +9,16 @@ from app.models.webhooks import WebhookRecipient
 from app.models.jobs_log import JobLog
 from app.utils.responses import send_status_response
 
-from app.utils.security import Security
+from app.utils.security import authenticated_user
+from app.models.user import User
 
 router = APIRouter(prefix="/stats", tags=["stats"])
 
 @router.get("")
-def get_dashboard_stats(request: Request, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-
+def get_dashboard_stats(
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
     try:
         senders_count = db.query(Sender).filter(Sender.user_id == user.id).count()
         umami_count = db.query(Umami).filter(Umami.user_id == user.id).count()
@@ -48,13 +50,10 @@ from app.utils.responses import send_status_response
 
 
 @router.get("/log")
-def get_job_log_chart(request: Request, db: Session = Depends(get_db)):
-    """
-    Chart-Daten pro Tag über alle Job-Runs des Users.
-    Nutzt den Root-Status des JobLog (kein Run-Grouping mehr).
-    """
-    user = Security(request).get_user()
-
+def get_job_log_chart(
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
     try:
         job_ids_subq = select(Job.id).where(Job.user_id == user.id)
 
@@ -68,7 +67,7 @@ def get_job_log_chart(request: Request, db: Session = Depends(get_db)):
                 func.sum(case((JobLog.status == "warning", 1), else_=0)).label("skipped"),
             )
             .filter(JobLog.job_id.in_(job_ids_subq))
-            .filter(JobLog.status != "running")  # laufende Runs i. d. R. nicht im Chart
+            .filter(JobLog.status != "running")
             .group_by(day_expr)
             .order_by(day_expr.asc())
             .all()

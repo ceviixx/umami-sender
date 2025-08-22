@@ -175,7 +175,6 @@ def process_jobs(db: Session, jobs: list[Job], today: date):
 
 
 from datetime import datetime, date
-import uuid
 from sqlalchemy.orm import Session
 
 from app.utils.logging import job_log_context, add_log_detail

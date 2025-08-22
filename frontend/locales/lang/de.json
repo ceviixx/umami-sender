@@ -18,10 +18,12 @@
       "users": "Benutzer",
       "logs": "Protokolle",
       "config": "Konfiguration",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "branding": "Logo"
     }
   },
   "buttons": {
+    "reset": "Zurücksetzen",
     "execute_now": "Job ausführen",
     "try_again": "Erneut versuchen",
     "change_password": "Passwort ändern",
@@ -38,6 +40,7 @@
     "update": "Aktualisieren",
     "edit": "Bearbeiten",
     "delete": "Löschen",
+    "replace": "Ersetzen",
     "cancel": "Abbrechen",
     "create": "Erstellen",
     "back": "Zurück",
@@ -108,7 +111,10 @@
       "day": "Tag",
       "webhook_recipients": "Webhook-Empfänger",
       "report": "Bericht",
-      "execution_time": "Ausführungszeit (UTC)"
+      "execution_time": "Ausführungszeit (UTC)",
+      "repository_url": "Repository-URL",
+      "branch": "Branch",
+      "subdirectory": "Unterverzeichnis (optional)"
     },
     "placeholders": {
       "choose_website": "– Website auswählen –",
@@ -123,10 +129,22 @@
       "choose_role": "- Rolle auswählen -",
       "loading": "– Laden... –",
       "no_senders_or_webhooks": "- Keine Daten -",
-      "choose_language": "- Sprache auswählen -"
+      "choose_language": "- Sprache auswählen -",
+      "repository_url": "z. B. https://github.com/user/templates.git",
+      "branch": "z. B. main oder templates",
+      "subdirectory": "Wird automatisch normalisiert (führender / wird entfernt)."
     },
     "errors": {
-      "max_items": "Maximal {max} Elemente erlaubt"
+      "max_items": "Maximal {max} Elemente erlaubt",
+      "repo": {
+        "required": "Repo-URL ist erforderlich",
+        "invalidProtocol": "Ungültige Repo-URL (erlaubt: https)",
+        "invalid": "Ungültige Repo-URL"
+      },
+      "branch": {
+        "required": "Branch ist erforderlich",
+        "noSpaces": "Branch darf keine Leerzeichen enthalten"
+      }
     },
     "help": {
       "userEditHint": "Lasse das Passwort leer, um es nicht zu ändern.",
@@ -209,13 +227,19 @@
     }
   },
   "messages": {
+    "title": {
+      "success": "Erfolgreich",
+      "error": "Fehlgeschlagen",
+      "info": "Info"
+    },
     "confirm_delete": "Löschen bestätigen",
     "no_webhooks": "Keine Webhooks konfiguriert",
     "saved": "Erfolgreich gespeichert",
     "updated": "Erfolgreich aktualisiert",
     "test_success": "Test erfolgreich",
     "stream_interrupted": "Stream unterbrochen.",
-    "job_started": "Job erfolgreich angestoßen"
+    "job_started": "Job erfolgreich angestoßen",
+    "reloaded": "Erfolgreich aktualisiert"
   },
   "weekdays": {
     "monday": "Montag",
@@ -313,6 +337,10 @@
     "no_instances": "Keine Instanzen."
   },
   "admin_templates": {
+    "sections": {
+      "update": "Vorlagen aktualisieren",
+      "source": "Vorlagenquelle"
+    },
     "already_running": "Ein Refresh läuft bereits.",
     "templates_refresh_running": "Templates werden aktualisiert…",
     "templates_idle": "Noch keine Ausführung gestartet.",
@@ -329,6 +357,43 @@
       "updated": "Aktualisiert",
       "skipped": "Übersprungen",
       "invalid": "Ungültig"
+    },
+    "offical_templates": "Offizielle Vorlagen"
+  },
+  "admin_branding": {
+    "sections": {
+      "brandLogo": "Brand-Logo"
+    },
+    "uploadHint": "PNG, JPEG, WEBP oder SVG – max. 1 MB. Drag & Drop wird unterstützt.",
+    "tips": {
+      "title": "Tipps",
+      "values": {
+        "recommendation": "Empfohlen: transparente PNG/SVG.",
+        "maxHeight": "Maximale Höhe 80–120px für klare Darstellung in der App.",
+        "exportInfo": "Bei Export/Emails wird automatisch die aktuelle Version genutzt."
+      }
+    },
+    "details": {
+      "title": "Details",
+      "values": {
+        "type": "Type",
+        "hash": "Hash",
+        "size": "Dateigröße",
+        "storage": "Speicher"
+      }
+    }
+  },
+  "templates": {
+    "preview": "Vorschau",
+    "all": "Alle",
+    "preview_options": {
+      "mobile": "Mobile",
+      "desktop": "Desktop",
+      "full": "Voll",
+      "mode": {
+        "dark": "Dunkel",
+        "light": "Hell"
+      }
     }
   }
 }

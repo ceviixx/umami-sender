@@ -7,7 +7,7 @@
     "mailer": "Mailer",
     "webhook": "Webhook",
     "templates": "Templates",
-    "template_preview":"Template preview",
+    "template_preview": "Template preview",
     "template_update": "Update templates",
     "account": "Account",
     "changepassword": "Change password",
@@ -18,10 +18,12 @@
       "users": "Users",
       "logs": "Logs",
       "config": "Config",
-      "settings": "Settings"
+      "settings": "Settings",
+      "branding": "Branding"
     }
   },
   "buttons": {
+    "reset": "Reset",
     "execute_now": "Execute job",
     "try_again": "Try again",
     "change_password": "Change password",
@@ -38,6 +40,7 @@
     "update": "Update",
     "edit": "Edit",
     "delete": "Delete",
+    "replace": "Replace",
     "cancel": "Cancel",
     "create": "Create",
     "back": "Back",
@@ -108,7 +111,10 @@
       "day": "Day",
       "webhook_recipients": "Webhook Recipients",
       "report": "Report",
-      "execution_time": "Execution time (UTC)"
+      "execution_time": "Execution time (UTC)",
+      "repository_url": "Repository URL",
+      "branch": "Branch",
+      "subdirectory": "Subdirectory (optional)"
     },
     "placeholders": {
       "choose_website": "– Choose website –",
@@ -123,10 +129,22 @@
       "choose_role": "- Choose role -",
       "loading": "– Loading... –",
       "no_senders_or_webhooks": "- No data -",
-      "choose_language": "- Choose language -"
+      "choose_language": "- Choose language -",
+      "repository_url": "e.g. https://github.com/user/templates.git",
+      "branch": "e.g. main or templates",
+      "subdirectory": "Automatically normalized (leading / will be removed)."
     },
     "errors": {
-      "max_items": "Maximum of {max} items allowed"
+      "max_items": "Maximum of {max} items allowed",
+      "repo": {
+        "required": "Repository URL is required",
+        "invalidProtocol": "Invalid repository URL (only https is allowed)",
+        "invalid": "Invalid repository URL"
+      },
+      "branch": {
+        "required": "Branch is required",
+        "noSpaces": "Branch must not contain spaces"
+      }
     },
     "help": {
       "userEditHint": "Leave the password empty to keep it unchanged.",
@@ -209,13 +227,19 @@
     }
   },
   "messages": {
+    "title": {
+      "success": "Success",
+      "error": "Error",
+      "info": "Info"
+    },
     "confirm_delete": "Confirm deletion",
     "no_webhooks": "No webhooks configured",
     "saved": "Saved successfully",
     "updated": "Updated successfully",
     "test_success": "Test successful",
     "stream_interrupted": "",
-    "job_started": "Job was triggered successfully."
+    "job_started": "Job was triggered successfully.",
+    "reloaded": "Successfully reloaded"
   },
   "weekdays": {
     "monday": "Monday",
@@ -313,6 +337,10 @@
     "no_instances": "No instances."
   },
   "admin_templates": {
+    "sections": {
+      "update": "Update templates",
+      "source": "Template source"
+    },
     "already_running": "A refresh is already in progress.",
     "templates_refresh_running": "Templates are being updated…",
     "templates_idle": "No execution started yet.",
@@ -329,6 +357,43 @@
       "updated": "Updated",
       "skipped": "Skipped",
       "invalid": "Invalid"
+    },
+    "offical_templates": "Official templates"
+  },
+  "admin_branding": {
+    "sections": {
+      "brandLogo": "Brand Logo"
+    },
+    "uploadHint": "PNG, JPEG, WEBP or SVG – max. 1 MB. Drag & Drop is supported.",
+    "tips": {
+      "title": "Tips",
+      "values": {
+        "recommendation": "Recommended: transparent PNG/SVG.",
+        "maxHeight": "Maximum height 80–120px for clear display in the app.",
+        "exportInfo": "For export/emails, the current version is used automatically."
+      }
+    },
+    "details": {
+      "title": "Details",
+      "values": {
+        "type": "Type",
+        "hash": "Hash",
+        "size": "Size",
+        "storage": "Storage"
+      }
+    }
+  },
+  "templates": {
+    "preview": "Preview",
+    "all": "All",
+    "preview_options": {
+      "mobile": "Mobile",
+      "desktop": "Desktop",
+      "full": "Full",
+      "mode": {
+        "dark": "Dark",
+        "light": "Light"
+      }
     }
   }
 }

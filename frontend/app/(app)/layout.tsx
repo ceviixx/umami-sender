@@ -2,7 +2,9 @@
 
 import '../globals.css'
 import Sidebar from '@/components/navigation/Sidebar'
-import { Toaster } from 'react-hot-toast'
+
+import { Toaster } from 'react-notification-kit';
+
 import { I18nProvider } from "@/locales/I18nContext"
 import UserMenu from '@/components/navigation/UserMenu'
 import ClientAuthGuard from '@/components/ClientAuthGuard'
@@ -122,26 +124,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <main id="main" className="flex-1 overflow-y-auto bg-white dark:bg-gray-900 px-4 sm:px-6 py-4 sm:py-6 md:ml-64" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
                     {children}
 
-                    <Toaster
-                      position="top-center"
-                      reverseOrder={false}
-                      gutter={8}
-                      toastOptions={{
-                        duration: 4000,
-                        style: {
-                          borderRadius: '12px',
-                          border: '1px solid rgba(229,231,235,.7)',
-                          background: 'rgba(255,255,255,.95)',
-                          color: '#111827',
-                          padding: '12px 16px',
-                          boxShadow:
-                            '0 10px 15px -3px rgba(0,0,0,.05), 0 4px 6px -2px rgba(0,0,0,.03)',
-                        },
-                        success: { iconTheme: { primary: '#10b981', secondary: '#ecfdf5' } },
-                        error: { iconTheme: { primary: '#ef4444', secondary: '#fee2e2' } },
-                      }}
-                      containerStyle={{ zIndex: 60, marginTop: '-6px' }}
-                    />
+                    <Toaster position="top-right" defaultDuration={2000} maxVisible={3} />
                   </main>
                 </div>
               </div>

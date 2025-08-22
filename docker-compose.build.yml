@@ -32,6 +32,8 @@ services:
     depends_on:
       - db
       - redis
+    volumes:
+      - uploads:/var/app/uploads/branding
 
   worker:
     container_name: worker
@@ -83,3 +85,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:

@@ -17,7 +17,8 @@ import {
   UserIcon,
   KeyIcon,
   UsersIcon,
-  ListBulletIcon
+  ListBulletIcon,
+  PaintBrushIcon,
 } from '@heroicons/react/20/solid'
 
 type SidebarLink = {
@@ -110,6 +111,12 @@ export default function Sidebar() {
               label: locale.pages.admin.users,
               icon: <UsersIcon className="w-5 h-5" />,
               match: ['/account/admin/users', /^\/account\/admin\/users\//]
+            },
+            {
+              href: '/account/admin/branding',
+              label: locale.pages.admin.branding,
+              icon: <PaintBrushIcon className="w-5 h-5" />,
+              match: ['/account/admin/branding']
             },
             {
               href: '/account/admin/templates',

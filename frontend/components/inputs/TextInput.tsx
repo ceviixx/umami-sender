@@ -9,7 +9,7 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   value: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   description?: string
-  error?: string
+  error?: string | null
   className?: string
 }
 

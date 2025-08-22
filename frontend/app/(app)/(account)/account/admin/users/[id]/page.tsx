@@ -8,8 +8,10 @@ import SelectBox from '@/components/inputs/SelectBox'
 import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
-import { showSuccess, showError } from '@/lib/toast'
+import { showSuccess, showError, notification_ids } from '@/lib/toast'
 import Container from '@/components/layout/Container'
+
+const NOTIFICATION_ID = 'update-user'
 
 export default function UserEditPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true)
@@ -50,10 +52,9 @@ export default function UserEditPage({ params }: { params: { id: string } }) {
 
     try {
       await updateUser(params.id, form)
-      showSuccess('Updated')
+      showSuccess({id: notification_ids.user, title: locale.messages.title.success, description: 'Updated'})
     } catch (error: any) {
-      const message = error?.response?.data?.detail || error?.message || 'Failed to update webhook'
-      showError(message)
+      showError({id: notification_ids.user, title: locale.messages.title.error, description: error.message})
     }
   }
 

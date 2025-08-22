@@ -20,7 +20,7 @@ import { fetchTemplates } from '@/lib/api/templates'
 import { useWeekdays, useOptions } from '@/lib/constants'
 import LoadingSpinner from "@/components/LoadingSpinner";
 import NetworkError from "@/components/NetworkError";
-import { showError, showSuccess } from "@/lib/toast";
+import { showError, showSuccess, notification_ids } from "@/lib/toast";
 import Container from "@/components/layout/Container";
 
 function Section({
@@ -216,8 +216,8 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
         const websites = await fetchWebsitesByUmami(form.umami_id ?? '')
         setWebsites(websites)
       } catch (error: any) {
-        const message = error.message
-        showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+        const code = error.message as 'DATA_ERROR'
+        showError({id: notification_ids.websites, title: locale.messages.title.error, description: locale.api_messages[code]})
         setWebsites([])
       }
     }
@@ -249,15 +249,15 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
     
     try {
       await updateJob(params.id, form)
-      showSuccess(locale.messages.updated)
+      showSuccess({id: notification_ids.job, title: locale.messages.title.success, description: locale.messages.updated})
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.job, title: locale.messages.title.error, description: locale.api_messages[code]})
     }
   }
 
-  const [isStepValid, setIsStepValidState] = useState(false); // (nur um Imports/Logik nicht zu verändern)
-  const [active, setActiveState] = useState(0);               // (dito)
+  const [isStepValid, setIsStepValidState] = useState(false);
+  const [active, setActiveState] = useState(0);
 
   const validateForm = (step: number = active): boolean => {
     if (step === 0) {

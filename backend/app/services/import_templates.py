@@ -6,18 +6,22 @@ import hashlib
 from pathlib import Path
 from datetime import datetime, timezone
 import threading
+from typing import Dict, Tuple, Optional
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from app.database import SessionLocal
 from app.models.template import MailTemplate
+from app.models.system_settings import SystemSettings
 
-REPO_URL = "https://github.com/ceviixx/umami-sender.git"
-BRANCH = "templates"
-SUBDIR = "." 
+# ======= Defaults (Fallback) =======
+DEFAULT_TEMPLATE_SOURCE = {
+    "repo":   "https://github.com/ceviixx/umami-sender.git",
+    "branch": "templates",
+    "subdir": ".",
+}
 
 _refresh_lock = threading.Lock()
-
 
 # ----------------- Utilities -----------------
 def run(cmd, cwd=None):
@@ -29,10 +33,8 @@ def run(cmd, cwd=None):
         stderr=subprocess.STDOUT,
     )
 
-
 def sha256_str(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
-
 
 def detect_content_type(file: Path) -> str:
     suf = file.suffix.lower()
@@ -42,21 +44,56 @@ def detect_content_type(file: Path) -> str:
         return "application/json"
     return "text/plain"
 
-
 def read_text(file: Path) -> str:
     return file.read_text(encoding="utf-8")
-
 
 def canonical_json(obj) -> str:
     """Stabile, kompakte JSON-Serialisierung für Hashing/Vergleich."""
     return json.dumps(obj, sort_keys=True, separators=(",", ":"))
 
+def _empty_or_missing(v: Optional[str]) -> bool:
+    return v is None or (isinstance(v, str) and v.strip() == "")
+
+def _merge_with_defaults(cfg: Optional[dict]) -> Tuple[Dict[str, str], str]:
+    """
+    Merged DB-Config mit Defaults. Leer/fehlerhaft -> Defaults.
+    Gibt (config, source_tag) zurück, z. B. ("db" | "default").
+    """
+    # Fallback, wenn cfg None oder kein dict
+    if not isinstance(cfg, dict):
+        return DEFAULT_TEMPLATE_SOURCE.copy(), "default"
+
+    repo   = cfg.get("repo")
+    branch = cfg.get("branch")
+    subdir = cfg.get("subdir")
+
+    # Wenn alle drei fehlen/leer sind, gelten Defaults
+    if all(_empty_or_missing(x) for x in (repo, branch, subdir)):
+        return DEFAULT_TEMPLATE_SOURCE.copy(), "default"
+
+    merged = {
+        "repo":   repo   if not _empty_or_missing(repo)   else DEFAULT_TEMPLATE_SOURCE["repo"],
+        "branch": branch if not _empty_or_missing(branch) else DEFAULT_TEMPLATE_SOURCE["branch"],
+        "subdir": subdir if not _empty_or_missing(subdir) else DEFAULT_TEMPLATE_SOURCE["subdir"],
+    }
+    return merged, "db"
+
+def _load_template_source_config(db: Session) -> Tuple[Dict[str, str], str]:
+    """
+    Lädt TEMPLATE_SOURCE aus SystemSettings (JSONB: {repo, branch, subdir}).
+    Fällt auf DEFAULT_TEMPLATE_SOURCE zurück, wenn nicht vorhanden/leer/ungültig.
+    """
+    stmt = select(SystemSettings).where(SystemSettings.type == "TEMPLATE_SOURCE")
+    row = db.execute(stmt).scalar_one_or_none()
+    cfg = getattr(row, "config", None)
+    return _merge_with_defaults(cfg)
 
 # ----------------- Importer -----------------
 def import_templates_from_repo():
     """
-    Klont die Templates-Branch, importiert/aktualisiert Templates in der DB
-    und gibt Stats zurück. Verhindert parallele Läufe via Lock.
+    Klont die Templates-Branch mit Quelle aus DB-Config (oder Defaults),
+    importiert/aktualisiert Templates in der DB und gibt Stats zurück.
+    Verhindert parallele Läufe via Lock.
     """
     started_at = datetime.now(timezone.utc).isoformat()
     stats = {
@@ -68,6 +105,8 @@ def import_templates_from_repo():
         "started_at": started_at,
         "finished_at": None,
         "errors": [],
+        "source": None,   # "db" oder "default"
+        "source_config": None,  # tatsächlich verwendete Config
     }
 
     if not _refresh_lock.acquire(blocking=False):
@@ -76,7 +115,29 @@ def import_templates_from_repo():
         return stats
 
     tmpdir = tempfile.mkdtemp(prefix="templates_")
+    db: Session = SessionLocal()
     try:
+        # --- Quelle laden (DB oder Fallback) ---
+        try:
+            cfg, source_tag = _load_template_source_config(db)
+            stats["source"] = source_tag
+            stats["source_config"] = cfg
+            REPO_URL = cfg["repo"]
+            BRANCH = cfg["branch"]
+            SUBDIR = cfg["subdir"]
+            print(f"🔧 Using template source ({source_tag}): repo={REPO_URL}, branch={BRANCH}, subdir={SUBDIR}")
+        except Exception as e:
+            # Defensive: wenn das Laden fehlschlägt, nutze Defaults
+            msg = f"config error, falling back to defaults: {e}"
+            print(f"⚠️  {msg}")
+            stats["errors"].append(msg)
+            cfg = DEFAULT_TEMPLATE_SOURCE.copy()
+            stats["source"] = "default"
+            stats["source_config"] = cfg
+            REPO_URL = cfg["repo"]
+            BRANCH = cfg["branch"]
+            SUBDIR = cfg["subdir"]
+
         # --- Clone branch shallow ---
         try:
             print(f"⬇️  Cloning {REPO_URL} (branch: {BRANCH}) ...")
@@ -95,6 +156,7 @@ def import_templates_from_repo():
             stats["finished_at"] = datetime.now(timezone.utc).isoformat()
             return stats
 
+        # --- Subdir prüfen ---
         base = Path(tmpdir) / SUBDIR
         if not base.exists():
             msg = f"Subdir '{SUBDIR}' not found in branch '{BRANCH}'."
@@ -103,6 +165,7 @@ def import_templates_from_repo():
             stats["finished_at"] = datetime.now(timezone.utc).isoformat()
             return stats
 
+        # --- Kandidaten finden ---
         candidates = []
         for p in base.iterdir():
             if not p.is_dir() or p.name.startswith("."):
@@ -112,7 +175,6 @@ def import_templates_from_repo():
 
         print(f"🔎 Found {len(candidates)} candidate template folders.")
 
-        db: Session = SessionLocal()
         try:
             for folder in sorted(candidates):
                 sender_type = folder.name
@@ -195,10 +257,8 @@ def import_templates_from_repo():
             stats["finished_at"] = datetime.now(timezone.utc).isoformat()
             return stats
 
-        finally:
-            db.close()
-
     finally:
+        db.close()
         shutil.rmtree(tmpdir, ignore_errors=True)
         _refresh_lock.release()
 

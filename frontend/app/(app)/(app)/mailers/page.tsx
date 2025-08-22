@@ -11,7 +11,7 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
-import { showError } from "@/lib/toast";
+import { showError, notification_ids } from "@/lib/toast";
 import { useRouter } from 'next/navigation'
 import Container from "@/components/layout/Container";
 
@@ -39,7 +39,7 @@ export default function MailersPage() {
           setSenders(prev => prev.filter(w => w.id !== deleteId))
         })
         .catch((error) => {
-          showError(error.message)
+          showError({id: notification_ids.mailer, title: locale.messages.title.error, description: error.message})
         })
         .finally(() => {
           setDeleteId(null)
