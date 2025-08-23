@@ -97,4 +97,5 @@ python3 -m app.services.import_templates || echo "⚠️ Template import failed 
 
 
 echo "✅ Starting backend…"
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8000 \
+  --proxy-headers --forwarded-allow-ips="*"

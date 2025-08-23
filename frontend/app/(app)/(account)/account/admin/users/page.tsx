@@ -13,6 +13,7 @@ import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
 import Container from '@/components/layout/Container'
+import { showError, notification_ids } from "@/lib/toast";
 
 export default function UsersPage() {
   const router = useRouter()
@@ -34,8 +35,15 @@ export default function UsersPage() {
   const handleDelete = async () => {
     if (deleteId !== null) {
       await deleteUser(deleteId)
-      setDeleteId(null)
-      setUsers(prev => prev.filter(w => w.id !== deleteId))
+      .then(() => {
+        setUsers(prev => prev.filter(w => w.id !== deleteId))
+      })
+      .catch((error) => {
+        showError({id: notification_ids.user, title: locale.messages.title.error, description: error.message})
+      })
+      .finally(() => {
+        setDeleteId(null)
+      })
     }
   }
 

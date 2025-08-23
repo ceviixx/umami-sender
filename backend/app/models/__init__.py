@@ -1,5 +1,3 @@
-# app/models/__init__.py
-
 from .template import MailTemplate
 from .sender import Sender
 from .umami import Umami, UmamiType
@@ -10,3 +8,4 @@ from .template_styles import MailTemplateStyle
 from .value_mappings import ValueMappings
 from .user import User
 from .system_settings import SystemSettings
+from .audit import AuditLog

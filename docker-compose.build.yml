@@ -15,16 +15,10 @@ services:
   frontend:
     container_name: frontend
     build: ./frontend
-    expose:
-      - "3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=/api
 
   backend:
     container_name: backend
     build: ./backend
-    expose:
-      - "8000"
     environment:
       - DATABASE_URL=postgresql://user:pass@db/umamisender
       - REDIS_URL=redis://redis:6379/0
@@ -47,13 +41,12 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:pass@db/umamisender
       - REDIS_URL=redis://redis:6379/0
-      - PYTHONPATH=/worker
 
   beat:
     container_name: beat
     build:
       context: .
-      dockerfile: worker/Dockerfile
+      dockerfile: worker/beat.Dockerfile
     depends_on:
       - backend
       - redis
@@ -61,9 +54,6 @@ services:
     environment:
       - DATABASE_URL=postgresql://user:pass@db/umamisender
       - REDIS_URL=redis://redis:6379/0
-      - PYTHONPATH=/worker/app
-    command: >
-      celery -A tasks.worker beat --loglevel=info
 
   redis:
     container_name: redis
@@ -80,8 +70,6 @@ services:
       POSTGRES_PASSWORD: pass
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "54321:5432"
 
 volumes:
   pgdata:

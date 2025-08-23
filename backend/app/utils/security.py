@@ -88,3 +88,14 @@ def not_found_response(model, object_id: str | int, *, action: str | None = None
         status=404,
         detail=f"{model_name} with id {object_id} does not exist.",
     )
+
+def load_user_from_token(token: str, db: Session) -> User:
+    payload = _decode(token)
+    user_id = payload.get("sub") or payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Token missing subject")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
