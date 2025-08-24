@@ -230,7 +230,8 @@
     "title": {
       "success": "",
       "error": "",
-      "info": ""
+      "info": "",
+      "loading": ""
     },
     "confirm_delete": "",
     "no_webhooks": "",
@@ -239,7 +240,10 @@
     "test_success": "",
     "stream_interrupted": "",
     "job_started": "",
-    "reloaded": ""
+    "reloaded": "",
+    "job_running": "",
+    "job_failed": "",
+    "job_success": ""
   },
   "weekdays": {
     "monday": "",
@@ -334,7 +338,13 @@
     "problem_jobs": "",
     "no_problem_jobs": "",
     "instance_status": "",
-    "no_instances": ""
+    "no_instances": "",
+    "issues": {
+      "title": "",
+      "subtitle": "",
+      "subtitleNoRate": "",
+      "viewLogs": ""
+    }
   },
   "admin_templates": {
     "sections": {

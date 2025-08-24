@@ -230,7 +230,8 @@
     "title": {
       "success": "Success",
       "error": "Error",
-      "info": "Info"
+      "info": "Info",
+      "loading": "Loading"
     },
     "confirm_delete": "Confirm deletion",
     "no_webhooks": "No webhooks configured",
@@ -239,7 +240,10 @@
     "test_success": "Test successful",
     "stream_interrupted": "",
     "job_started": "Job was triggered successfully.",
-    "reloaded": "Successfully reloaded"
+    "reloaded": "Successfully reloaded",
+    "job_running": "Job is being executed…",
+    "job_failed": "Job failed",
+    "job_success": "Job successful"
   },
   "weekdays": {
     "monday": "Monday",
@@ -334,7 +338,13 @@
     "problem_jobs": "Problem jobs (7d)",
     "no_problem_jobs": "No problematic jobs.",
     "instance_status": "Instance status",
-    "no_instances": "No instances."
+    "no_instances": "No instances.",
+    "issues": {
+      "title": "Issues in the last 7 days",
+      "subtitle": "{last7Failed} failed runs · {successRate}% success rate",
+      "subtitleNoRate": "{last7Failed} failed runs · success rate unavailable",
+      "viewLogs": "View logs"
+    }
   },
   "admin_templates": {
     "sections": {

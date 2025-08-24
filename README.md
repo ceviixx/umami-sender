@@ -126,12 +126,14 @@ nginx/     # Reverse proxy for unified access
 UmamiSender supports optional audit logs (because I love logs) for API requests, workers, and the beat scheduler.  
 
 | Variable               | Applies to      | Default | Description                                                                 |
-| ---------------------- | --------------- | ------- | --------------------------------------------------------------------------- |
+| :--------------------- | :-------------- | :------ | :-------------------------------------------------------------------------- |
 | `AUDIT_API_ENABLED`    | backend         | `true`  | Enables API request logging. For the REST API this is **enabled by default**. |
 | `AUDIT_WORKER_ENABLED` | worker, beat    | `false` | Enables worker/beat audit logging. Every run will be logged, which can quickly produce a large amount of data. Disabled by default – activate via Compose if needed. |
 
-> 🗄️ **Retention:** All audit logs are automatically deleted after **90 days**.  
-> A daily cleanup job removes entries older than this retention period.
+> 🗄️ **Retention Policy:**  
+> • **System logs** are automatically deleted after **30 days**.  
+> • **User audit logs** are automatically deleted after **90 days**.  
+> A daily cleanup job removes entries older than the respective retention period.
 
 ---
 

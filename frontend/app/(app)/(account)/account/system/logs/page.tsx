@@ -21,7 +21,7 @@ export default function LogsPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  
+
   if (loading) { return <LoadingSpinner title={locale.pages.logs} /> }
 
   return (
@@ -29,9 +29,9 @@ export default function LogsPage() {
       <PageHeader title={locale.pages.logs} />
 
       {logs.length === 0 ? (
-        <EmptyState 
-          variant='chip' 
-          hint="There currently no logs to display" 
+        <EmptyState
+          variant='chip'
+          hint="There currently no logs to display"
           rows={4}
         />
       ) : (
@@ -42,14 +42,16 @@ export default function LogsPage() {
           badge={(item) => item.status}
           badgeTone={(item) => item.status}
           rightSlot={(item) => (
-            <>
-              <span className="text-xs text-gray-400">
-                {item.duration_ms} ms
-              </span>
-            </>
+            <span className="text-xs text-gray-400">
+              {new Date(String(item.started_at).replace(/(\.\d{3})\d+$/, "$1")).toLocaleString(locale.lang_code, {
+                dateStyle: "medium",
+                timeStyle: "short",
+                hour12: false,
+              })} - {item.duration_ms}ms
+            </span>
           )}
-          bottomSlot={(item) => 
-            <CardList 
+          bottomSlot={(item) =>
+            <CardList
               items={item.details}
               keyField={(item) => item.channel}
               title={(item) => item.channel}
@@ -58,13 +60,6 @@ export default function LogsPage() {
               )}
               badge={(item) => item.status}
               badgeTone={(item) => item.status}
-              rightSlot={(item) => (
-                <>
-                  <span className="text-xs text-gray-400">
-                    {item.target_id}
-                  </span>
-                </>
-              )}
             />
           }
         />

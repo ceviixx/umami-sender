@@ -20,15 +20,6 @@ type ToastOptions = {
   description: string;
 };
 
-type PromiseToastOptions = {
-  id?: notification_ids;
-  loading?: { title?: string; description: string };
-  success?: { title?: string; description: string };
-  error?: { title?: string; description: string };
-};
-
-
-
 export const showSuccess = ({ id, title, description }: ToastOptions) => {
   toast.show({
     id,
@@ -74,22 +65,33 @@ export const showDefault = ({ id, title, description }: ToastOptions) => {
   });
 };
 
-export function showPromise<T>(promise: Promise<T>, { id, loading, success, error }: PromiseToastOptions): Promise<T> {
+
+
+
+
+type ToastPayload = { title: string; description?: string };
+type ToastContent<T = any> = ToastPayload | ((payload: T) => ToastPayload);
+
+export type PromiseToastOptions<T = any> = {
+  id: string;
+  loading?: Partial<ToastPayload>;
+  success?: ToastContent<T>;
+  error?: ToastContent<any>;
+};
+
+export function showPromise<T>(
+  promise: Promise<T>,
+  { id, loading, success, error }: PromiseToastOptions<T>
+): Promise<T> {
+  const norm = <P,>(c: ToastContent<P> | undefined, p: P, fallback: ToastPayload): ToastPayload & { id: string } => {
+    if (!c) return { id, ...fallback };
+    const res = typeof c === "function" ? c(p) : c;
+    return { id, title: res.title, description: res.description };
+  };
+
   return toast.promise(promise, {
-    loading: {
-      id,
-      title: loading?.title ?? "Loading",
-      description: loading?.description ?? "Please wait...",
-    },
-    success: {
-      id,
-      title: success?.title ?? "Success",
-      description: success?.description ?? "Operation completed successfully",
-    },
-    error: {
-      id,
-      title: error?.title ?? "Error",
-      description: error?.description ?? "Something went wrong",
-    },
+    loading: { id, title: loading?.title ?? "Loading", description: loading?.description ?? "Please wait..." },
+    success: (res: T) => norm(success, res, { title: "Success", description: "Operation completed successfully" }),
+    error: (err: any) => norm(error, err, { title: "Error", description: "Something went wrong" }),
   });
 }

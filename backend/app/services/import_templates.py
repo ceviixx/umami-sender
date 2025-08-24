@@ -48,18 +48,12 @@ def read_text(file: Path) -> str:
     return file.read_text(encoding="utf-8")
 
 def canonical_json(obj) -> str:
-    """Stabile, kompakte JSON-Serialisierung für Hashing/Vergleich."""
     return json.dumps(obj, sort_keys=True, separators=(",", ":"))
 
 def _empty_or_missing(v: Optional[str]) -> bool:
     return v is None or (isinstance(v, str) and v.strip() == "")
 
 def _merge_with_defaults(cfg: Optional[dict]) -> Tuple[Dict[str, str], str]:
-    """
-    Merged DB-Config mit Defaults. Leer/fehlerhaft -> Defaults.
-    Gibt (config, source_tag) zurück, z. B. ("db" | "default").
-    """
-    # Fallback, wenn cfg None oder kein dict
     if not isinstance(cfg, dict):
         return DEFAULT_TEMPLATE_SOURCE.copy(), "default"
 
@@ -67,7 +61,6 @@ def _merge_with_defaults(cfg: Optional[dict]) -> Tuple[Dict[str, str], str]:
     branch = cfg.get("branch")
     subdir = cfg.get("subdir")
 
-    # Wenn alle drei fehlen/leer sind, gelten Defaults
     if all(_empty_or_missing(x) for x in (repo, branch, subdir)):
         return DEFAULT_TEMPLATE_SOURCE.copy(), "default"
 
@@ -79,10 +72,6 @@ def _merge_with_defaults(cfg: Optional[dict]) -> Tuple[Dict[str, str], str]:
     return merged, "db"
 
 def _load_template_source_config(db: Session) -> Tuple[Dict[str, str], str]:
-    """
-    Lädt TEMPLATE_SOURCE aus SystemSettings (JSONB: {repo, branch, subdir}).
-    Fällt auf DEFAULT_TEMPLATE_SOURCE zurück, wenn nicht vorhanden/leer/ungültig.
-    """
     stmt = select(SystemSettings).where(SystemSettings.type == "TEMPLATE_SOURCE")
     row = db.execute(stmt).scalar_one_or_none()
     cfg = getattr(row, "config", None)
@@ -90,11 +79,6 @@ def _load_template_source_config(db: Session) -> Tuple[Dict[str, str], str]:
 
 # ----------------- Importer -----------------
 def import_templates_from_repo():
-    """
-    Klont die Templates-Branch mit Quelle aus DB-Config (oder Defaults),
-    importiert/aktualisiert Templates in der DB und gibt Stats zurück.
-    Verhindert parallele Läufe via Lock.
-    """
     started_at = datetime.now(timezone.utc).isoformat()
     stats = {
         "inserted": 0,
@@ -105,8 +89,8 @@ def import_templates_from_repo():
         "started_at": started_at,
         "finished_at": None,
         "errors": [],
-        "source": None,   # "db" oder "default"
-        "source_config": None,  # tatsächlich verwendete Config
+        "source": None,
+        "source_config": None,
     }
 
     if not _refresh_lock.acquire(blocking=False):
@@ -117,7 +101,6 @@ def import_templates_from_repo():
     tmpdir = tempfile.mkdtemp(prefix="templates_")
     db: Session = SessionLocal()
     try:
-        # --- Quelle laden (DB oder Fallback) ---
         try:
             cfg, source_tag = _load_template_source_config(db)
             stats["source"] = source_tag
@@ -127,7 +110,6 @@ def import_templates_from_repo():
             SUBDIR = cfg["subdir"]
             print(f"🔧 Using template source ({source_tag}): repo={REPO_URL}, branch={BRANCH}, subdir={SUBDIR}")
         except Exception as e:
-            # Defensive: wenn das Laden fehlschlägt, nutze Defaults
             msg = f"config error, falling back to defaults: {e}"
             print(f"⚠️  {msg}")
             stats["errors"].append(msg)
@@ -138,7 +120,7 @@ def import_templates_from_repo():
             BRANCH = cfg["branch"]
             SUBDIR = cfg["subdir"]
 
-        # --- Clone branch shallow ---
+
         try:
             print(f"⬇️  Cloning {REPO_URL} (branch: {BRANCH}) ...")
             run(["git", "init"], cwd=tmpdir)
@@ -156,7 +138,7 @@ def import_templates_from_repo():
             stats["finished_at"] = datetime.now(timezone.utc).isoformat()
             return stats
 
-        # --- Subdir prüfen ---
+
         base = Path(tmpdir) / SUBDIR
         if not base.exists():
             msg = f"Subdir '{SUBDIR}' not found in branch '{BRANCH}'."
@@ -165,7 +147,7 @@ def import_templates_from_repo():
             stats["finished_at"] = datetime.now(timezone.utc).isoformat()
             return stats
 
-        # --- Kandidaten finden ---
+
         candidates = []
         for p in base.iterdir():
             if not p.is_dir() or p.name.startswith("."):
@@ -234,14 +216,12 @@ def import_templates_from_repo():
                     stats["inserted"] += 1
                 else:
                     if row.content_hash != content_hash:
-                        # print(f"♻️  Update: {sender_type}")
                         row.content = content
                         row.example_content = example_obj
                         row.source_commit = stats["commit"]
                         row.content_hash = content_hash
                         stats["updated"] += 1
                     else:
-                        # print(f"✅ Skip: {sender_type} (no changes)")
                         stats["skipped"] += 1
 
             db.commit()

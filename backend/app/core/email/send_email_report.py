@@ -2,9 +2,8 @@ from sqlalchemy.orm import Session
 from app.models.jobs import Job
 from app.models.sender import Sender
 from app.models.template import MailTemplate
-from app.core.send_email import send_email
+from app.core.email.send_email import send_email
 from app.core.render_template import render_template
-from app.models.template_styles import MailTemplateStyle
 from app.utils.response_clean import process_api_response
 
 def send_email_report(db: Session, job: Job, summary: dict):
@@ -24,19 +23,12 @@ def send_email_report(db: Session, job: Job, summary: dict):
     if not template:
         raise Exception(f"Mail template not found. {sender_type}")
 
-    if template.style_id:
-        style = db.query(MailTemplateStyle).filter_by(id=template.style_id).first()
-    else:
-        style = db.query(MailTemplateStyle).filter_by(is_default=True).first()
-    css = style.css if style else ""
-
     if not job.email_recipients:
         raise Exception("skipped|No email recipients specified for the job.")
 
     html_body = render_template(template.content, {
         "summary": summary,
-        "job": job,
-        "inline_css": css,
+        "job": job
     })
     html_body = process_api_response(response=html_body, db=db)
 

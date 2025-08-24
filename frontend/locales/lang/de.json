@@ -230,7 +230,8 @@
     "title": {
       "success": "Erfolgreich",
       "error": "Fehlgeschlagen",
-      "info": "Info"
+      "info": "Info",
+      "loading": "Laden"
     },
     "confirm_delete": "Löschen bestätigen",
     "no_webhooks": "Keine Webhooks konfiguriert",
@@ -239,7 +240,10 @@
     "test_success": "Test erfolgreich",
     "stream_interrupted": "Stream unterbrochen.",
     "job_started": "Job erfolgreich angestoßen",
-    "reloaded": "Erfolgreich aktualisiert"
+    "reloaded": "Erfolgreich aktualisiert",
+    "job_running": "Job wird ausgeführt…",
+    "job_failed": "Job fehlgeschlagen",
+    "job_success": "Job erfolgreich"
   },
   "weekdays": {
     "monday": "Montag",
@@ -334,7 +338,13 @@
     "problem_jobs": "Problem-Jobs (7 Tage)",
     "no_problem_jobs": "Keine auffälligen Jobs.",
     "instance_status": "Instanzen-Status",
-    "no_instances": "Keine Instanzen."
+    "no_instances": "Keine Instanzen.",
+    "issues": {
+      "title": "Issues in den letzten 7 Tagen",
+      "subtitle": "{last7Failed} fehlgeschlagene Runs · {successRate}% Erfolgsrate",
+      "subtitleNoRate": "{last7Failed} fehlgeschlagene Runs · Erfolgsrate nicht verfügbar",
+      "viewLogs": "Logs ansehen"
+    }
   },
   "admin_templates": {
     "sections": {

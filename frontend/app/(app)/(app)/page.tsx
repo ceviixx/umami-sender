@@ -76,13 +76,6 @@ const filteredChartData = useMemo(() => {
   return sortByDateAsc(filtered)
 }, [logStats, range])
 
-
-
-
-
-
-
-
   useEffect(() => {
     const ac = new AbortController()
       ; (async () => {
@@ -138,11 +131,11 @@ const filteredChartData = useMemo(() => {
             <ExclamationTriangleIcon className="h-5 w-5 text-amber-600 dark:text-amber-300" />
           </span>
           <div className="text-sm text-amber-900 dark:text-amber-100">
-            <div className="font-semibold">Issues in den letzten 7 Tagen</div>
-            <div className="opacity-90">{last7Failed} fehlgeschlagene Runs · {successRate ?? '–'}% Success-Rate</div>
+            <div className="font-semibold">{locale.dashboard.issues.title}</div>
+            <div className="opacity-90">{locale.dashboard.issues.subtitle.replace('{successRate}', `${successRate}`).replace('{last7Failed}', `${last7Failed}`)}</div>
             <div className="mt-2">
-              <Link href="/logs" className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium ring-1 ring-inset ring-amber-300/70 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition">
-                Logs ansehen
+              <Link href="/account/system/logs" className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium ring-1 ring-inset ring-amber-300/70 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition">
+                {locale.dashboard.issues.viewLogs}
               </Link>
             </div>
           </div>
@@ -281,9 +274,7 @@ function JobLogErrorInline({ log }: Props) {
   ).join(", ");
 
   return (
-    <div className="text-xs opacity-70">
-      {errors}
-    </div>
+    <div className="text-xs opacity-70 truncate">{errors}</div>
   );
 }
 

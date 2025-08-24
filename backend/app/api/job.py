@@ -112,7 +112,7 @@ def run_job(
 
     if not job: return not_found_response(Job, id)
     
-    ensure_is_owner(job.id, user)
+    ensure_is_owner(job.user_id, user)
     
     now = datetime.utcnow()
     process_jobs(db=db, jobs=[job], today=now, force_send=True)
@@ -123,7 +123,3 @@ def run_job(
         status=202,
         detail=f"Job with id {id} has been enqueued and will run shortly."
     )
-
-    
-
-    

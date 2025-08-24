@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.template import MailTemplate
 from app.schemas.template import MailTemplateCreate, MailTemplateOut, MailTemplateUpdate, MailTemplateList
-from app.models.template_styles import MailTemplateStyle
 from sqlalchemy import and_
 from app.utils.responses import send_status_response
 from app.core.render_template import render_template
@@ -44,18 +43,11 @@ def get_preview(
 
     if not template: return not_found_response(MailTemplate, id)
     
-    if template.style_id:
-        style = db.query(MailTemplateStyle).filter_by(id=template.style_id).first()
-    else:
-        style = db.query(MailTemplateStyle).filter_by(is_default=True).first()
-    css = style.css if style else ""
-
     try:
         example_content = template.example_content
         if "summary" not in example_content or not isinstance(example_content["summary"], dict):
             example_content["summary"] = {}
         example_content["summary"]["embedded_logo"] = resolve_logo_data_url(db)
-        example_content["inline_css"] = css
 
         example_content = process_api_response(response=example_content, db=db)
 
@@ -163,46 +155,16 @@ from pydantic import BaseModel, Field, ConfigDict
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
-def humanize_sender_type(s: str) -> str:
-    """
-    Beispiele:
-      EMAIL                    -> Email
-      WEBHOOK_DISCORD          -> Discord
-      WEBHOOK_SLACK            -> Slack
-      WEBHOOK_GENERIC          -> Webhook (Generic)
-      WEBHOOK_TEAMS_DEPLOY     -> Teams Deploy
-      whatever_custom          -> Whatever Custom
-    """
-    if not s:
-        return "Template"
-    # Prefixe "WEBHOOK_", "EMAIL_" entfernen
-    s = re.sub(r'^(WEBHOOK|EMAIL)[\W_]+', '', s, flags=re.IGNORECASE)
-    # underscores/Non-Word -> Space
-    s = re.sub(r'[\W_]+', ' ', s)
-    # einige bekannte Mappings
-    known = {
-        "DISCORD": "Discord",
-        "SLACK": "Slack",
-        "GENERIC": "Webhook (Generic)",
-        "EMAIL": "Email"
-    }
-    parts = s.strip().split()
-    parts = [known.get(p.upper(), p.capitalize()) for p in parts]
-    return " ".join(parts) if parts else "Template"
-
 class TemplateOut(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
-    id: str  # UUID
-    # Frontend-Keys:
+    id: str 
     name: str
     type: str = Field(validation_alias="sender_type")
     description: Optional[str] = None
     updatedAt: Optional[datetime] = None
 
-    # Rohfelder (optional nützlich fürs FE/Preview)
     sender_type: str
-    style_id: Optional[str] = None
     example_content: Optional[dict] = None
     source_commit: Optional[str] = None
     content_hash: Optional[str] = None
@@ -223,12 +185,11 @@ def list_templates(
     for r in rows:
         out.append(TemplateOut.model_validate({
             "id": str(r.id),
-            "name": humanize_sender_type(r.sender_type) or r.sender_type,
+            "name": r.sender_type,
             "type": r.sender_type,
             "description": None,
             "updatedAt": r.updated_at,
             "sender_type": r.sender_type,
-            "style_id": str(r.style_id) if r.style_id else None,
             "source_commit": r.source_commit,
             "content_hash": r.content_hash,
         }))

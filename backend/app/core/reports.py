@@ -3,8 +3,8 @@ from app.models.umami import Umami
 from app.models.sender import Sender
 from app.models.template import MailTemplate
 from app.models.webhooks import WebhookRecipient
-from app.core.send_email import send_email
-from app.core.send_webhook import send_webhook
+from app.core.email.send_email import send_email
+from app.core.webhook.send_webhook import send_webhook
 from app.core.umami import fetch_website_summary
 from app.core.render_template import render_template
 from sqlalchemy.orm import Session

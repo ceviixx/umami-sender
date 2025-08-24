@@ -45,11 +45,13 @@ export default function JobLogsPage({ params }: { params: { id: string } }) {
           badge={(item) => item.status}
           badgeTone={(item) => item.status}
           rightSlot={(item) => (
-            <>
-              <span className="text-xs text-gray-400">
-                run:{item.job_name}
-              </span>
-            </>
+            <span className="text-xs text-gray-400">
+              {new Date(String(item.started_at).replace(/(\.\d{3})\d+$/, "$1")).toLocaleString(locale.lang_code, {
+                dateStyle: "medium",
+                timeStyle: "short",
+                hour12: false,
+              })} - {item.duration_ms}ms
+            </span>
           )}
           bottomSlot={(item) => 
             <CardList 
@@ -61,13 +63,6 @@ export default function JobLogsPage({ params }: { params: { id: string } }) {
               )}
               badge={(item) => item.status}
               badgeTone={(item) => item.status}
-              rightSlot={(item) => (
-                <>
-                  <span className="text-xs text-gray-400">
-                    
-                  </span>
-                </>
-              )}
             />
           }
         />

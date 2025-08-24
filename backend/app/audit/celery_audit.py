@@ -111,7 +111,8 @@ else:
         ))
 
     @signals.beat_init.connect
-    def _beat_init(service, **_):
+    def _beat_init(sender=None, **kwargs):
+        service = sender or kwargs.get("service")
         _safe_write_audit(payload=dict(
             actor_kind=ActorKind.system,
             user_id=None,
@@ -123,7 +124,7 @@ else:
             message=None,
             request_id=None,
             correlation_id=None,
-            context=_ctx(pid=os.getpid(), hostname=HOST),
+            context=_ctx(pid=os.getpid(), hostname=HOST, beat_cls=(type(service).__name__ if service else None)),
         ))
 
     if ROLE == "beat" or " beat" in " ".join(sys.argv):

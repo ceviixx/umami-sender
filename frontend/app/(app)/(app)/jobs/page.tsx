@@ -13,7 +13,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
 import { PaperAirplaneIcon, PuzzlePieceIcon } from '@heroicons/react/20/solid';
 import { useRouter } from 'next/navigation'
-import { showError, showSuccess, notification_ids } from "@/lib/toast";
+import { showError, showSuccess, showPromise, notification_ids } from "@/lib/toast";
 import Container from "@/components/layout/Container";
 
 
@@ -37,15 +37,15 @@ export default function JobsPage() {
   const handleDelete = async () => {
     if (deleteId !== null) {
       await deleteJob(deleteId)
-      .then(() => {
-        setJobs(prev => prev.filter(w => w.id !== deleteId))
-      })
-      .catch((error) => {
-        showError({id: notification_ids.job, title: locale.messages.title.error, description: error.message})
-      })
-      .finally(() => {
-        setDeleteId(null)
-      })
+        .then(() => {
+          setJobs(prev => prev.filter(w => w.id !== deleteId))
+        })
+        .catch((error) => {
+          showError({ id: notification_ids.job, title: locale.messages.title.error, description: error.message })
+        })
+        .finally(() => {
+          setDeleteId(null)
+        })
     }
   }
 
@@ -85,12 +85,32 @@ export default function JobsPage() {
   }
 
   const handleRunJob = async (jobId: string) => {
+    return showPromise(runJob(jobId), {
+      id: notification_ids.job,
+      loading: {
+        title: locale.messages.title.loading, 
+        description: locale.messages.job_running
+      },
+      success: () => ({ 
+        title: locale.messages.title.success, 
+        description: locale.messages.job_success
+      }),
+      error: (err: any) => {
+        const code = (err?.message as keyof typeof locale.api_messages) ?? "GENERIC_ERROR";
+        return {
+          title: locale.messages.title.error, 
+          description: locale.api_messages[code]
+        };
+      },
+    });
+
+
     try {
       const res = await runJob(jobId)
-      showSuccess({id: notification_ids.job, title: locale.messages.title.success, description: locale.messages.job_started})
+      showSuccess({ id: notification_ids.job, title: locale.messages.title.success, description: locale.messages.job_started })
     } catch (error: any) {
       const code = error.message as 'DATA_ERROR'
-      showError({id: notification_ids.job, title: locale.messages.title.error, description: locale.api_messages[code]})
+      showError({ id: notification_ids.job, title: locale.messages.title.error, description: locale.api_messages[code] })
     }
   }
 
@@ -105,9 +125,9 @@ export default function JobsPage() {
       />
 
       {jobs.length === 0 ? (
-        <EmptyState 
-          variant='chip' 
-          hint="Setup your first job with the + in the top right." 
+        <EmptyState
+          variant='chip'
+          hint="Setup your first job with the + in the top right."
           rows={4}
         />
       ) : (
@@ -115,7 +135,7 @@ export default function JobsPage() {
           items={jobs}
           keyField={(item) => item.id}
           title={(item) => item.name}
-          subtitle={(item) => `${locale.forms.labels.frequency}: ${frequencyMap[item.frequency] ?? 'Unknown'} | ${locale.forms.labels.type}: ${locale.enums.job_content_type[item.report_type as 'summary' | 'report'] ?? item.report_type}` }
+          subtitle={(item) => `${locale.forms.labels.frequency}: ${frequencyMap[item.frequency] ?? 'Unknown'} | ${locale.forms.labels.type}: ${locale.enums.job_content_type[item.report_type as 'summary' | 'report'] ?? item.report_type}`}
           badge={(item) => item.is_active ? locale.common.active : locale.common.inactive}
           badgeTone={(item) => item.is_active ? "success" : "warning"}
           rightSlot={(item) => (
