@@ -10,7 +10,8 @@ import PageHeader from '@/components/navigation/PageHeader'
 import TextInput from '@/components/inputs/TextInput'
 import SelectBox from '@/components/inputs/SelectBox'
 import FormButtons from '@/components/FormButtons'
-import { showError, showSuccess } from '@/lib/toast'
+import { showError, showSuccess, notification_ids } from '@/lib/toast'
+import Container from '@/components/layout/Container'
 
 type Account = {
   username: string
@@ -34,8 +35,8 @@ export default function AccountPage() {
           language: data.language,
         })
         setLang(data.language)
-      } catch (error) {
-        showError('Failed to load account')
+      } catch (error: any) {
+        showError({id: notification_ids.account, title: locale.messages.title.error, description: error.message})
       }
     }
     loadAccount()
@@ -57,9 +58,9 @@ export default function AccountPage() {
         language: form.language,
       })
       setLang(form.language)
-      showSuccess('Account updated successfully')
+      showSuccess({id: notification_ids.account, title: locale.messages.title.success, description: 'Account updated successfully'})
     } catch (error: any) {
-      showError(error.message || 'Failed to update account')
+      showError({id: notification_ids.account, title: locale.messages.title.error, description: error.message})
     } finally {
       setSubmitting(false)
     }
@@ -68,7 +69,7 @@ export default function AccountPage() {
   if (!form) return null
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title="Account" />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -119,6 +120,6 @@ export default function AccountPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

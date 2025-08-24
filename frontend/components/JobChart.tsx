@@ -9,6 +9,7 @@ import {
   LineElement,
   Tooltip,
   Legend,
+  Filler,
   type ChartOptions,
   type Plugin,
   type ScriptableContext,
@@ -17,55 +18,54 @@ import { Line } from 'react-chartjs-2';
 import { format, subDays, parseISO } from 'date-fns';
 import { useI18n } from "@/locales/I18nContext";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
 
-type JobEntry = { date: string; success: number; failed: number; skipped: number; };
-type Props = { jobData: JobEntry[]; height?: number; className?: string };
+// ✨ Neu: RangeKey importieren oder hier definieren
+type RangeKey = '7d' | '30d' | '90d'
 
-const last7 = () =>
-  Array.from({ length: 7 }, (_, i) => format(subDays(new Date(), 6 - i), 'yyyy-MM-dd'));
+type JobEntry = { date: string; success: number; failed: number; warning: number; };
+// ✨ Neu: range-Prop hinzufügen
+type Props = { jobData: JobEntry[]; range: RangeKey; height?: number; className?: string };
 
-const fillMissing = (data: JobEntry[]) => {
-  const need = last7();
+// ✨ Helper: N letzte Tage als Labels (YYYY-MM-DD)
+const lastNDays = (days: number) =>
+  Array.from({ length: days }, (_, i) => {
+    // inkl. heute → vom ältesten zum neuesten
+    const d = subDays(new Date(), days - 1 - i);
+    return format(d, 'yyyy-MM-dd');
+  });
+
+// ✨ date → UTC-robust parsen (falls nur "YYYY-MM-DD" kommt)
+const parseDateSafe = (raw: string) => {
+  return raw.length === 10 ? new Date(raw + 'T00:00:00Z') : new Date(raw);
+};
+
+// ✨ fillMissing nach Range
+const fillMissingByRange = (data: JobEntry[], range: RangeKey) => {
+  const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+  const need = lastNDays(days);
   const map = new Map(data.map(d => [d.date, d]));
-  return need.map(date => map.get(date) ?? { date, success: 0, failed: 0, skipped: 0 });
+  return need.map(date => map.get(date) ?? { date, success: 0, failed: 0, warning: 0 });
 };
 
-const rgba = (hex: string, a: number) => {
-  const h = hex.replace('#', '');
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r},${g},${b},${a})`;
-};
+export default function JobLineChart({ jobData, range, height = 300, className = '' }: Props) {
+  const { locale } = useI18n();
 
-const hoverLine: Plugin<'line'> = {
-  id: 'hoverLine',
-  afterDatasetsDraw(chart) {
-    const { ctx, tooltip, chartArea } = chart;
-    const active = tooltip?.getActiveElements?.() ?? [];
-    if (!active.length) return;
-    const x = active[0].element.x;
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(x, chartArea.top);
-    ctx.lineTo(x, chartArea.bottom);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(107,114,128,0.35)';
-    ctx.stroke();
-    ctx.restore();
-  },
-};
-
-export default function JobLineChart({ jobData, height = 300, className = '' }: Props) {
-  const { locale } = useI18n()
-
-  const filled = useMemo(() => fillMissing(jobData), [jobData]);
+  // ✨ statt last7 → lastNDays abhängig von range
+  const filled = useMemo(() => fillMissingByRange(jobData, range), [jobData, range]);
   const labels = useMemo(() => filled.map(d => d.date), [filled]);
 
-  const colSuccess = '#10b981'; 
-  const colSkipped = '#f59e0b'; 
-  const colFailed  = '#ef4444'; 
+  const colSuccess = '#10b981';
+  const colWarning = '#f59e0b';
+  const colFailed  = '#ef4444';
+
+  const rgba = (hex: string, a: number) => {
+    const h = hex.replace('#', '');
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},${a})`;
+  };
 
   const gradient =
     (hex: string, top = 0.18, bottom = 0.02) =>
@@ -97,11 +97,11 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
           fill: true,
         },
         {
-          label: locale.common.status.skipped,
-          data: filled.map(e => e.skipped),
-          borderColor: colSkipped,
-          backgroundColor: gradient(colSkipped),
-          pointBackgroundColor: colSkipped,
+          label: locale.common.status.warning,
+          data: filled.map(e => e.warning),
+          borderColor: colWarning,
+          backgroundColor: gradient(colWarning),
+          pointBackgroundColor: colWarning,
           pointBorderColor: '#ffffff',
           pointRadius: 3,
           pointHoverRadius: 5,
@@ -125,8 +125,11 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
         },
       ],
     }),
-    [labels, filled]
+    [labels, filled, locale.common.status] // locale-abhängig, falls Sprache wechselt
   );
+
+  const suggestedMax =
+    Math.max(0, ...filled.map(d => Math.max(d.success, d.failed, d.warning))) + 1;
 
   const options: ChartOptions<'line'> = {
     responsive: true,
@@ -146,7 +149,7 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
         callbacks: {
           title(items) {
             const raw = items[0]?.label || '';
-            return format(parseISO(raw), 'MMM dd');
+            return format(parseDateSafe(raw), 'MMM dd');
           },
         },
       },
@@ -160,7 +163,7 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
           autoSkip: true,
           callback(value) {
             const raw = labels[Number(value)] as string;
-            return format(parseISO(raw), 'MMM dd');
+            return format(parseDateSafe(raw), 'MMM dd');
           },
         },
         grid: {
@@ -170,8 +173,7 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
       },
       y: {
         beginAtZero: true,
-        suggestedMax:
-          Math.max(...filled.map(d => Math.max(d.success, d.failed, d.skipped))) + 1,
+        suggestedMax,
         ticks: {
           color: 'rgba(107,114,128,0.7)',
           padding: 8,
@@ -186,11 +188,27 @@ export default function JobLineChart({ jobData, height = 300, className = '' }: 
     },
   };
 
+  // Hover-Line Plugin unverändert
+  const hoverLine: Plugin<'line'> = {
+    id: 'hoverLine',
+    afterDatasetsDraw(chart) {
+      const { ctx, tooltip, chartArea } = chart;
+      const active = tooltip?.getActiveElements?.() ?? [];
+      if (!active.length) return;
+      const x = active[0].element.x;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x, chartArea.top);
+      ctx.lineTo(x, chartArea.bottom);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(107,114,128,0.35)';
+      ctx.stroke();
+      ctx.restore();
+    },
+  };
+
   return (
-    <div
-      className={`relative w-full ${className}`}
-      style={{ height }}
-    >
+    <div className={`relative w-full ${className}`} style={{ height }}>
       <Line data={data} options={options} plugins={[hoverLine]} />
     </div>
   );

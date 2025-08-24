@@ -12,6 +12,8 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
+import Container from '@/components/layout/Container'
+import { showError, notification_ids } from "@/lib/toast";
 
 export default function UsersPage() {
   const router = useRouter()
@@ -33,8 +35,15 @@ export default function UsersPage() {
   const handleDelete = async () => {
     if (deleteId !== null) {
       await deleteUser(deleteId)
-      setDeleteId(null)
-      setUsers(prev => prev.filter(w => w.id !== deleteId))
+      .then(() => {
+        setUsers(prev => prev.filter(w => w.id !== deleteId))
+      })
+      .catch((error) => {
+        showError({id: notification_ids.user, title: locale.messages.title.error, description: error.message})
+      })
+      .finally(() => {
+        setDeleteId(null)
+      })
     }
   }
 
@@ -42,14 +51,18 @@ export default function UsersPage() {
   if (networkError) { return <NetworkError page={locale.pages.admin.users} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader
         title={locale.pages.admin.users}
         href='/account/admin/users/new'
       />
 
       {users.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="No other users, you can create an new with the + in the top right." 
+          rows={4}
+        />
       ) : (
         <CardList
           items={users}
@@ -79,6 +92,6 @@ export default function UsersPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </Container>
   )
 }

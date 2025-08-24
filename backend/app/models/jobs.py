@@ -1,9 +1,8 @@
-import uuid
+import uuid, enum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, ARRAY, Boolean, Time, text
 from sqlalchemy.orm import relationship
 from app.database import Base
-import enum
 from .base import TimestampMixin
 
 class Frequency(str, enum.Enum):
@@ -16,9 +15,11 @@ class Job(Base, TimestampMixin):
     __tablename__ = "jobs"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    user_id = Column(UUID(as_uuid=True), nullable=False, comment="user.id")
-    name = Column(String, nullable=False, default= "")
-    template_type = Column(String, nullable=False, default='default')
+
+    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id", ondelete="SET NULL"), nullable=True, index=True, comment="user.id")
+    
+    name = Column(String, nullable=False, default="")
+    template_type = Column(String, nullable=False, default="default")
     umami_id = Column(UUID(as_uuid=True), ForeignKey("umami.id"))
     website_id = Column(String, nullable=False)
     report_type = Column(String, default="summary", comment="Could be summary or report")
@@ -30,9 +31,10 @@ class Job(Base, TimestampMixin):
     mailer_id = Column(UUID(as_uuid=True), ForeignKey("senders.id"), nullable=True)
     email_recipients = Column(ARRAY(String), default=[])
     webhook_recipients = Column(ARRAY(UUID(as_uuid=True)), default=[])
-    timezone = Column(String, default='Europe/Berlin', comment="Timezone for all reque")
+    timezone = Column(String, default="Europe/Berlin", comment="Timezone for all reque")
     is_active = Column(Boolean, default=True)
 
+    user = relationship("User", back_populates="jobs")
     host = relationship("Umami", back_populates="mailer_jobs")
     logs = relationship("JobLog", back_populates="job", cascade="all, delete-orphan")
     sender = relationship("Sender")

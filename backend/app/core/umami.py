@@ -2,7 +2,7 @@ import requests
 from datetime import datetime, timedelta
 from app.models.umami import UmamiType, Umami
 from app.models.jobs import Job, Frequency
-from app.core.helper import convertUTM
+from app.utils.helper import convertUTM
 
 def fetch_website_summary(instance: Umami, job: Job):
     end = datetime.utcnow()

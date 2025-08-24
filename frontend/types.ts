@@ -4,6 +4,7 @@ export interface UmamiInstance {
   id: string
   name: string
   type: UmamiType
+  is_healthy: boolean
 }
 
 export interface Template {
@@ -32,19 +33,28 @@ export interface Website {
   domain: string
 }
 
-export type LogItemDetail = {
-  timestamp: string
-  status: string
-  error?: string | null
-  channel: string
-}
-export type LogItem = {
-  id: string
-  run: string
-  name: string
-  details: LogItemDetail[]
-  status: string
-}
+
+
+export type LogDetail = {
+  channel: string;
+  target_id?: string | null;
+  status: "success" | "skipped" | "failed";
+  error?: string | null;
+};
+export type JobLog = {
+  log_id: string;
+  job_id: string;
+  job_name: string;
+  started_at: string; 
+  finished_at?: string | null; 
+  status: "success" | "warning" | "failed" | "running" | "skipped";
+  details: LogDetail[];
+  count_success?: number;
+  count_failed?: number;
+  count_skipped?: number;
+  duration_ms?: number;
+};
+
 
 export type MailerJob = {
   id: string

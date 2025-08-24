@@ -1,4 +1,5 @@
 {
+  "lang_code": "fr-FR",
   "pages": {
     "dashboard": "",
     "umami": "",
@@ -6,6 +7,8 @@
     "mailer": "",
     "webhook": "",
     "templates": "",
+    "template_preview": "",
+    "template_update": "",
     "account": "",
     "changepassword": "",
     "logs": "",
@@ -15,10 +18,13 @@
       "users": "",
       "logs": "",
       "config": "",
-      "settings": ""
+      "settings": "",
+      "branding": ""
     }
   },
   "buttons": {
+    "reset": "",
+    "execute_now": "",
     "try_again": "",
     "change_password": "",
     "logs": "",
@@ -34,6 +40,7 @@
     "update": "",
     "edit": "",
     "delete": "",
+    "replace": "",
     "cancel": "",
     "create": "",
     "back": "",
@@ -104,7 +111,10 @@
       "day": "",
       "webhook_recipients": "",
       "report": "",
-      "execution_time": ""
+      "execution_time": "",
+      "repository_url": "",
+      "branch": "",
+      "subdirectory": ""
     },
     "placeholders": {
       "choose_website": "",
@@ -119,10 +129,22 @@
       "choose_role": "",
       "loading": "",
       "no_senders_or_webhooks": "",
-      "choose_language": ""
+      "choose_language": "",
+      "repository_url": "",
+      "branch": "",
+      "subdirectory": ""
     },
     "errors": {
-      "max_items": ""
+      "max_items": "",
+      "repo": {
+        "required": "",
+        "invalidProtocol": "",
+        "invalid": ""
+      },
+      "branch": {
+        "required": "",
+        "noSpaces": ""
+      }
     },
     "help": {
       "userEditHint": "",
@@ -205,11 +227,23 @@
     }
   },
   "messages": {
+    "title": {
+      "success": "",
+      "error": "",
+      "info": "",
+      "loading": ""
+    },
     "confirm_delete": "",
     "no_webhooks": "",
     "saved": "",
     "updated": "",
-    "test_success": ""
+    "test_success": "",
+    "stream_interrupted": "",
+    "job_started": "",
+    "reloaded": "",
+    "job_running": "",
+    "job_failed": "",
+    "job_success": ""
   },
   "weekdays": {
     "monday": "",
@@ -240,11 +274,18 @@
   "common": {
     "active": "",
     "inactive": "",
+    "healthy": "",
+    "unhealthy": "",
     "status": {
       "success": "",
-      "skipped": "",
+      "warning": "",
       "failed": ""
-    }
+    },
+    "today": "",
+    "tomorrow": "",
+    "nextMonthHint": "",
+    "inMonth": "",
+    "warning": ""
   },
   "api_messages": {
     "API_KEY_REQUIRED": "",
@@ -287,5 +328,82 @@
     "WEBHOOK_NOT_FOUND": "",
     "WEBHOOK_TEST_FAILED": "",
     "WEAK_PASSWORD": ""
+  },
+  "dashboard": {
+    "job_activity": "",
+    "last_runs": "",
+    "no_runs": ".",
+    "next_runs": "",
+    "no_active_jobs": "",
+    "problem_jobs": "",
+    "no_problem_jobs": "",
+    "instance_status": "",
+    "no_instances": "",
+    "issues": {
+      "title": "",
+      "subtitle": "",
+      "subtitleNoRate": "",
+      "viewLogs": ""
+    }
+  },
+  "admin_templates": {
+    "sections": {
+      "update": "",
+      "source": ""
+    },
+    "already_running": "",
+    "templates_refresh_running": "",
+    "templates_idle": "",
+    "templates_overwrite_warning": "",
+    "templates_refresh_hint": "",
+    "status": {
+      "start": "",
+      "end": ""
+    },
+    "templates_done": "",
+    "templates_error": "",
+    "stat": {
+      "inserted": "",
+      "updated": "",
+      "skipped": "",
+      "invalid": ""
+    },
+    "offical_templates": ""
+  },
+  "admin_branding": {
+    "sections": {
+      "brandLogo": ""
+    },
+    "uploadHint": "",
+    "tips": {
+      "title": "",
+      "values": {
+        "recommendation": "",
+        "maxHeight": "",
+        "exportInfo": ""
+      }
+    },
+    "details": {
+      "title": "",
+      "values": {
+        "type": "",
+        "hash": "",
+        "size": "",
+        "storage": ""
+      }
+    }
+  },
+  "templates": {
+    "preview": "",
+    "all": "",
+    "preview_options": {
+      "mobile": "",
+      "desktop": "",
+      "full": "",
+      "mode": {
+        "dark": "",
+        "light": ""
+      }
+    }
   }
 }

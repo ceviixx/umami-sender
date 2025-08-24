@@ -6,7 +6,8 @@ import PageHeader from '@/components/navigation/PageHeader'
 import TextInput from '@/components/inputs/TextInput'
 import FormButtons from '@/components/FormButtons'
 import { updatePassword } from '@/lib/api/me'
-import { showError, showSuccess } from '@/lib/toast'
+import { showError, showSuccess, notification_ids } from '@/lib/toast'
+import Container from '@/components/layout/Container'
 
 type FormData = {
   currentPassword: string
@@ -38,17 +39,17 @@ export default function ChangePasswordPage() {
         newPassword: form.newPassword,
         confirmPassword: form.confirmPassword,
       })
-      showSuccess('Password updated successfully')
+      showSuccess({id: notification_ids.update_password, title: locale.messages.title.success, description: 'Password updated successfully'})
       setForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (error: any) {
-      showError(error.message || 'Failed to update password')
+      showError({id: notification_ids.update_password, title: locale.messages.title.error, description: error.message})
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.pages.changepassword} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -109,6 +110,6 @@ export default function ChangePasswordPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

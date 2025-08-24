@@ -9,7 +9,8 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
-import { showSuccess, showError } from '@/lib/toast'
+import { showSuccess, showError, notification_ids } from '@/lib/toast'
+import Container from "@/components/layout/Container";
 
 export default function WebhookEditPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true)
@@ -24,7 +25,10 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
     fetchWebhook(params.id)
       .then(setForm)
       .finally(() => setLoading(false))
-      .catch((error) => showError(locale.api_messages[error as 'DATA_ERROR'] || error))
+      .catch((error: any) => {
+        const code = error.message as 'DATA_ERROR'
+        showError({id: notification_ids.webhook, title: locale.messages.title.error, description: locale.api_messages[code]})
+      })
   }, [params.id])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,11 +45,11 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
         name: form.name,
         url: form.url,
       })
-      showSuccess(locale.messages.updated)
+      showSuccess({id: notification_ids.webhook, title: locale.messages.title.success, description: locale.messages.updated})
       // router.back()
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.webhook, title: locale.messages.title.error, description: locale.api_messages[code]})
     }
   }
 
@@ -54,10 +58,10 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
     setTesting(true)
     try {
       await testWebhook({ ...form })
-      showSuccess(locale.messages.test_success)
+      showSuccess({id: notification_ids.webhook_test, title: locale.messages.title.success, description: locale.messages.test_success})
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.webhook_test, title: locale.messages.title.error, description: locale.api_messages[code]})
     } finally {
       setTesting(false)
     }
@@ -68,7 +72,7 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader hasBack title={locale.ui.edit} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -136,6 +140,6 @@ export default function WebhookEditPage({ params }: { params: { id: string } }) 
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

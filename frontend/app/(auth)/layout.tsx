@@ -9,7 +9,7 @@ export const metadata = {
     template: '%s | UmamiSender',
   },
   icons: {
-    icon: '/favicon-32x32.png',
+    icon: '/favicon.ico',
     shortcut: '/umamisender.png',
     apple: '/umamisender.png',
   },

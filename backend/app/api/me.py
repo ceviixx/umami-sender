@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.user import UserOut, UserUpdate, UserPasswordUpdate
@@ -6,28 +6,30 @@ from app.models.user import User
 from app.utils.responses import send_status_response
 from app.utils.crypto import verify_password, hash_password
 import re
-from app.utils.security import Security
+
+from app.utils.security import authenticated_user, ensure_is_owner, not_found_response
+from app.models.user import User
 
 router = APIRouter(prefix="/me", tags=["me"])
 
 @router.get("", response_model=UserOut)
-def get_me(request: Request, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
+def get_me(
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
     return db.query(User).filter(User.id == user.id).first()
 
 @router.put("", response_model=UserOut)
-def update_me(request: Request, data: UserUpdate, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-
+def update_me(
+    data: UserUpdate, 
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
     me = db.query(User).filter(User.id == user.id).first()
 
-    if not me:
-        return send_status_response(
-            code="UPDATE_FAILED",
-            message="Cannot update: User not found",
-            status=404,
-            detail=f"User with id {user.id} does not exist."
-        )
+    if not me: return not_found_response(User, id)
+    
+    ensure_is_owner(user.id, me)
     
     for key, value in data.dict(exclude_unset=True).items():
         setattr(me, key, value)
@@ -36,17 +38,11 @@ def update_me(request: Request, data: UserUpdate, db: Session = Depends(get_db))
     return me
 
 @router.put("/password")
-def update_password(request: Request, data: UserPasswordUpdate, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-
-    if user is None:
-        return send_status_response(
-            code="NOT_AUTHENTICATED",
-            message="Authentication required",
-            status=401,
-            detail="No valid user session found."
-        )
-
+def update_password(
+    data: UserPasswordUpdate, 
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
     if data.newPassword != data.confirmPassword:
         return send_status_response(
             code="PASSWORD_MISMATCH",

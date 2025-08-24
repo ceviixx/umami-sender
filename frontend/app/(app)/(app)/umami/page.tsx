@@ -12,7 +12,8 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
-import { showError } from "@/lib/toast";
+import { showError, notification_ids } from "@/lib/toast";
+import Container from "@/components/layout/Container";
 
 export default function HostsPage() {
   const [instances, setInstances] = useState<UmamiInstance[]>([])
@@ -37,8 +38,9 @@ export default function HostsPage() {
         .then(() => {
           setInstances(prev => prev.filter(w => w.id !== deleteId))
         })
-        .catch((error) => {
-          showError(error.message)
+        .catch((error: any) => {
+          const code = error.message as 'DATA_ERROR'
+          showError({id: notification_ids.umami, title: locale.messages.title.error, description: locale.api_messages[code]})
         })
         .finally(() => {
           setDeleteId(null)
@@ -50,20 +52,26 @@ export default function HostsPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader
         title={locale.pages.umami}
         href='/umami/new'
       />
 
       {instances.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="Connect your first umami with the + in the top right." 
+          rows={4}
+        />
       ) : (
         <CardList
           items={instances}
           keyField={(item) => item.id}
           title={(item) => item.name}
           subtitle={(item) => locale.enums.service_type[item.type]}
+          badge={(item) => item.is_healthy ? locale.common.healthy : locale.common.unhealthy}
+          badgeTone={(item) => item.is_healthy ? 'success' : 'warning'}
           rightSlot={(item) => (
             <ContextMenu
               items={[
@@ -87,6 +95,6 @@ export default function HostsPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </Container>
   )
 }

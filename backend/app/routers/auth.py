@@ -83,5 +83,21 @@ def refresh_token(request: Request):
         raise HTTPException(status_code=401, detail=f"Refresh failed: {str(e)}")
 
 
-# for user register has password using
-# hashed_password = pwd_context.hash(plain_password)
+from app.utils.security import authenticated_user
+from app.models.user import User
+
+@router.get("/verify")
+def login(
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "role": user.role,
+        "language": user.language,
+        "createdAt": user.created_at.isoformat() if user.created_at else None
+    }

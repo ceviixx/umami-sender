@@ -8,7 +8,7 @@ import TextInput from '@/components/inputs/TextInput'
 import SelectBox from '@/components/inputs/SelectBox'
 import MultiSelectListbox from "@/components/inputs/MultiSelectListbox";
 import ListInput from "@/components/inputs/ListInput";
-import TimePicker from "@/components/TimePicker";
+import TimePicker from "@/components/inputs/TimePicker";
 import FormButtons from "@/components/FormButtons";
 import { UmamiInstance, Website, Sender, WebhookRecipient, Template } from '@/types'
 import CheckboxPicker from "@/components/inputs/CheckboxPicker";
@@ -20,7 +20,8 @@ import { fetchTemplates } from '@/lib/api/templates'
 import { useWeekdays, useOptions } from '@/lib/constants'
 import LoadingSpinner from "@/components/LoadingSpinner";
 import NetworkError from "@/components/NetworkError";
-import { showError, showSuccess } from "@/lib/toast";
+import { showError, showSuccess, notification_ids } from "@/lib/toast";
+import Container from "@/components/layout/Container";
 
 function Section({
   title,
@@ -215,8 +216,8 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
         const websites = await fetchWebsitesByUmami(form.umami_id ?? '')
         setWebsites(websites)
       } catch (error: any) {
-        const message = error.message
-        showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+        const code = error.message as 'DATA_ERROR'
+        showError({id: notification_ids.websites, title: locale.messages.title.error, description: locale.api_messages[code]})
         setWebsites([])
       }
     }
@@ -248,15 +249,15 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
     
     try {
       await updateJob(params.id, form)
-      showSuccess(locale.messages.updated)
+      showSuccess({id: notification_ids.job, title: locale.messages.title.success, description: locale.messages.updated})
     } catch (error: any) {
-      const message = error.message
-      showError(locale.api_messages[message as 'DATA_ERROR'] || message)
+      const code = error.message as 'DATA_ERROR'
+      showError({id: notification_ids.job, title: locale.messages.title.error, description: locale.api_messages[code]})
     }
   }
 
-  const [isStepValid, setIsStepValidState] = useState(false); // (nur um Imports/Logik nicht zu verändern)
-  const [active, setActiveState] = useState(0);               // (dito)
+  const [isStepValid, setIsStepValidState] = useState(false);
+  const [active, setActiveState] = useState(0);
 
   const validateForm = (step: number = active): boolean => {
     if (step === 0) {
@@ -303,7 +304,7 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
   if (networkError) { return <NetworkError page={locale.ui.edit} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader hasBack={true} title={locale.ui.edit} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -490,6 +491,6 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   );
 }

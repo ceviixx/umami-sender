@@ -8,7 +8,9 @@ import SelectBox from '@/components/inputs/SelectBox'
 import PageHeader from '@/components/navigation/PageHeader'
 import FormButtons from '@/components/FormButtons'
 import TextInput from '@/components/inputs/TextInput'
-import { showError, showSuccess } from '@/lib/toast'
+import { showError, showSuccess, notification_ids } from '@/lib/toast'
+import Container from '@/components/layout/Container'
+
 
 export default function UserNewPage() {
   const router = useRouter()
@@ -32,16 +34,15 @@ export default function UserNewPage() {
 
     try {
       await createUser(form)
-      showSuccess('User created successfully!')
+      showSuccess({id: notification_ids.user, title: locale.messages.title.success, description: 'User created successfully!'})
       router.push('/account/admin/users')
     } catch (error: any) {
-      const message = error?.response?.detail || error?.message || 'An unexpected error occurred'
-      showError(message)
+      showError({id: notification_ids.user, title: locale.messages.title.error, description: error.message})
     }
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader title={locale.ui.create} />
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -102,6 +103,6 @@ export default function UserNewPage() {
           </div>
         </section>
       </form>
-    </div>
+    </Container>
   )
 }

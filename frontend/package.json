@@ -1,7 +1,7 @@
 {
   "name": "umamisender-frontend",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -17,7 +17,7 @@
     "react": "^18.2.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^18.2.0",
-    "react-hot-toast": "^2.5.2"
+    "react-notification-kit": "github:ceviixx/react-notification-kit"
   },
   "devDependencies": {
     "@types/node": "^20.6.0",

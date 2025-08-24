@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.umami import Umami, UmamiType
@@ -8,15 +8,18 @@ import requests
 import os
 from app.utils.responses import send_status_response
 
-from app.utils.security import Security
+from app.utils.security import authenticated_user, ensure_is_owner, not_found_response
+from app.models.user import User
 
 CLOUD_HOSTNAME = os.getenv("CLOUD_HOSTNAME", "https://api.umami.is/v1")
 router = APIRouter(prefix="/umami", tags=["umami"])
 
 @router.post("", response_model=UmamiInstanceOut)
-def add_instance(request: Request, data: UmamiInstanceCreate, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-
+def add_instance(
+    data: UmamiInstanceCreate,
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
     if data.type == "cloud":
         if not data.api_key:
             return send_status_response(
@@ -133,64 +136,49 @@ def add_instance(request: Request, data: UmamiInstanceCreate, db: Session = Depe
             detail="The provided instance type is not recognized or supported."
         )
 
-
+    instance.is_healthy = True
     db.add(instance)
     db.commit()
     db.refresh(instance)
+
     return instance
 
 @router.get("", response_model=list[UmamiInstanceOut])
-def list_instances(request: Request, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
+def list_instances(
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
     return db.query(Umami).filter(Umami.user_id == user.id).all()
 
-@router.get("/{instance_id}", response_model=UmamiInstanceOut)
-def get_instance(request: Request, instance_id: str, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    instance = db.query(Umami).filter(Umami.id == instance_id).first()
+@router.get("/{id}", response_model=UmamiInstanceOut)
+def get_instance(
+    id: str, 
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
+    instance = db.query(Umami).filter(Umami.id == id).first()
     
-    if instance.user_id != user.id:
-        return send_status_response(
-            code="UNAUTHORIZED",
-            message="Unauthorized access to instance",
-            status=403,
-            detail=f"User {user.id} is not allowed to access instance {instance_id}."
-        )
+    if not instance: return not_found_response(Umami, id)
+    
+    ensure_is_owner(instance.user_id, user)
 
-    if not instance:
-        return send_status_response(
-            code="INSTANCE_NOT_FOUND",
-            message="Instance not found",
-            status=404,
-            detail=f"No instance with id {instance_id} exists."
-        )
-    
     return instance
 
-@router.put("/{instance_id}", response_model=UmamiInstanceOut)
-def update_instance(request: Request, instance_id: str, data: UmamiInstanceUpdate, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    instance = db.query(Umami).filter(Umami.id == instance_id).first()
+@router.put("/{id}", response_model=UmamiInstanceOut)
+def update_instance(
+    id: str, 
+    data: UmamiInstanceUpdate, 
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
+    instance = db.query(Umami).filter(Umami.id == id).first()
 
-    if instance.user_id != user.id:
-        return send_status_response(
-            code="UNAUTHORIZED",
-            message="Unauthorized access to instance",
-            status=403,
-            detail=f"User {user.id} is not allowed to update instance {instance_id}."
-        )
-    
-    if not instance:
-        return send_status_response(
-            code="UPDATE_FAILED",
-            message="Cannot update: instance not found",
-            status=404,
-            detail=f"Instance with id {instance_id} does not exist."
-        )
+    if not instance: return not_found_response(Umami, id)
+
+    ensure_is_owner(instance.user_id, user)
 
     update_data = data.dict(exclude_unset=True)
 
-    # 🔍 Wenn Typ mitgeschickt wird, validieren
     instance_type = update_data.get("type", instance.type)
 
     if instance_type == "cloud":
@@ -300,56 +288,40 @@ def update_instance(request: Request, instance_id: str, data: UmamiInstanceUpdat
     for field, value in update_data.items():
         setattr(instance, field, value)
 
+    instance.is_healthy = True
+
     db.commit()
     db.refresh(instance)
     return instance
 
-@router.delete("/{instance_id}")
-def delete_instance(request: Request, instance_id: str, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    instance = db.query(Umami).filter(Umami.id == instance_id).first()
+@router.delete("/{id}")
+def delete_instance(
+    id: str, 
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
+    instance = db.query(Umami).filter(Umami.id == id).first()
 
-    if instance.user_id != user.id:
-        return send_status_response(
-            code="UNAUTHORIZED",
-            message="Cannot delete: unauthorized",
-            status=403,
-            detail=f"User {user.id} is not the owner of instance {instance_id}."
-        )
-    
-    if not instance:
-        return send_status_response(
-            code="INSTANCE_NOT_FOUND",
-            message="Instance not found",
-            status=404,
-            detail=f"No instance with id {instance_id} exists."
-        )
+    if not instance: return not_found_response(Umami, id)
+
+    ensure_is_owner(instance.id, user)
 
     db.delete(instance)
     db.commit()
     return {"detail": "Deleted"}
 
-@router.get("/{instance_id}/websites")
-def get_websites_for_instance(request: Request, instance_id: str, db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    instance = db.query(Umami).filter(Umami.id == instance_id).first()
+@router.get("/{id}/websites")
+def get_websites_for_instance(
+    id: str, 
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
+    instance = db.query(Umami).filter(Umami.id == id).first()
 
-    if instance.user_id != user.id:
-        return send_status_response(
-            code="UNAUTHORIZED_ACCESS",
-            message="Unauthorized access.",
-            status=403,
-            detail="You are not allowed to access this instance."
-        )
-
-    if not instance:
-        return send_status_response(
-            code="INSTANCE_NOT_FOUND",
-            message="Instance not found",
-            status=404,
-            detail=f"No instance with id {instance_id} exists."
-        )
+    if not instance: return not_found_response(Umami, id)
     
+    ensure_is_owner(instance.user_id, user)
+
     if instance.type == UmamiType.cloud:
         base_url = os.getenv("CLOUD_HOSTNAME", "https://api.umami.is/v1")
         headers = {"x-umami-api-key": instance.api_key}
@@ -369,26 +341,18 @@ def get_websites_for_instance(request: Request, instance_id: str, db: Session = 
             detail=f"An error occurred while retrieving websites: {str(e)}"
         )
 
-@router.get("/{instance_id}/reports")
-def get_reports_for_website_id(request: Request, instance_id: str,website_id: str = Query(..., description="The ID of the desired website"), db: Session = Depends(get_db)):
-    user = Security(request).get_user()
-    instance = db.query(Umami).filter(Umami.id == instance_id).first()
+@router.get("/{id}/reports")
+def get_reports_for_website_id(
+    id: str,
+    website_id: str = Query(..., description="The ID of the desired website"), 
+    db: Session = Depends(get_db),
+    user: User = Depends(authenticated_user)
+):
+    instance = db.query(Umami).filter(Umami.id == id).first()
 
-    if instance.user_id != user.id:
-        return send_status_response(
-            code="UNAUTHORIZED_ACCESS",
-            message="You are not authorized to access this instance.",
-            status=403,
-            detail=f"User {user.id} does not own instance {instance.id}."
-        )
-
-    if not instance:
-        return send_status_response(
-            code="INSTANCE_NOT_FOUND",
-            message="Instance not found.",
-            status=404,
-            detail=f"No instance with ID {instance_id} exists."
-        )
+    if not instance: return not_found_response(Umami, id)
+    
+    ensure_is_owner(instance.id, user)
 
     if instance.type == UmamiType.cloud:
         base_url = os.getenv("CLOUD_HOSTNAME", "https://api.umami.is/v1")

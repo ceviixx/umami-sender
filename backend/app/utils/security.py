@@ -1,55 +1,101 @@
-from fastapi import Request, HTTPException
 from jose import jwt, JWTError
 from app.database import SessionLocal
 from app.models.user import User
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.utils.responses import send_status_response
 import os
 
 SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret")
 ALGORITHM = "HS256"
 
 
-class Security:
-    def __init__(self, request: Request):
-        self.request = request
-        self._user = None
+_bearer = HTTPBearer(auto_error=True)
 
-    def _get_token(self) -> str:
-        """Extracts the Bearer token from the Authorization header."""
-        auth_header = self.request.headers.get("Authorization")
-        if not auth_header or not auth_header.startswith("Bearer "):
-            raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+def _decode(token: str) -> dict:
+    try:
+        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
+        )
 
-        return auth_header.split(" ")[1]
+# --- Basis-Dependencies ------------------------------------------------------
 
-    def _decode_token(self) -> dict:
-        """Decodes the JWT and validates it."""
-        token = self._get_token()
-        try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            return payload
-        except JWTError:
-            raise HTTPException(status_code=401, detail="Invalid or expired token")
+def authenticated_user(
+    creds: HTTPAuthorizationCredentials = Depends(_bearer),
+    db: Session = Depends(get_db),
+) -> User:
+    payload = _decode(creds.credentials)
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Token missing subject")
 
-    def get_user_id(self) -> str:
-        """Returns the user_id from the JWT."""
-        payload = self._decode_token()
-        user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Token missing subject")
-        return user_id
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
-    def get_user(self) -> User:
-        """Loads the complete user from the database."""
-        if self._user:
-            return self._user
+def authenticated_admin(user: User = Depends(authenticated_user)) -> User:
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return user
 
-        user_id = self.get_user_id()
-        db = SessionLocal()
-        user = db.query(User).filter(User.id == user_id).first()
-        db.close()
+# --- Permission checks (depending on owner_id and role) -----------------------
 
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+def ensure_is_owner(owner_id: str | int, user: User) -> None:
+    """Nur Owner — Admin darf HIER nicht."""
+    if str(user.id) != str(owner_id):
+        raise HTTPException(status_code=403, detail="Forbidden (owner only)")
 
-        self._user = user
-        return user
+def ensure_is_admin(user: User) -> None:
+    """Nur Admin."""
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden (admin only)")
+
+def ensure_is_owner_or_admin(owner_id: str | int, user: User) -> None:
+    """Owner ODER Admin."""
+    if user.role == "admin":
+        return
+    if str(user.id) != str(owner_id):
+        raise HTTPException(status_code=403, detail="Forbidden (owner or admin)")
+    
+
+# --- 404 Helper (Custom Response) --------------------------------------------
+
+def not_found_response(model, object_id: str | int, *, action: str | None = None, code: str | None = None):
+    if model is None:
+        model_name = "Resource"
+    else:
+        if isinstance(model, type):
+            model_name = model.__name__
+        else:
+            model_name = type(model).__name__
+
+    code_val = code or (f"{action.upper()}_FAILED" if action else "NOT_FOUND")
+
+    if action:
+        message = f"Cannot {action}: {model_name} not found"
+    else:
+        message = f"{model_name} not found"
+
+    return send_status_response(
+        code=code_val,
+        message=message,
+        status=404,
+        detail=f"{model_name} with id {object_id} does not exist.",
+    )
+
+def load_user_from_token(token: str, db: Session) -> User:
+    payload = _decode(token)
+    user_id = payload.get("sub") or payload.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Token missing subject")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user

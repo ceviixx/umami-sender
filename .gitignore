@@ -59,3 +59,7 @@ alembic/versions/*.pyd
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+
+# Development
+docker-compose.yml

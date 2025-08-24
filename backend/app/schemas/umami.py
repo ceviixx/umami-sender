@@ -13,7 +13,7 @@ class UmamiInstanceCreate(BaseModel):
     api_key: Optional[str] = None
     hostname: Optional[str] = None
     username: Optional[str] = None
-    password: Optional[str] = None  # Klartext nur zum Hashen
+    password: Optional[str] = None
 
 class UmamiInstanceOut(BaseModel):
     id: UUID
@@ -21,6 +21,7 @@ class UmamiInstanceOut(BaseModel):
     type: UmamiType
     hostname: Optional[str] = None
     username: Optional[str] = None
+    is_healthy: bool
 
     class Config:
         from_attributes = True

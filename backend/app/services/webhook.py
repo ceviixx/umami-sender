@@ -39,7 +39,7 @@ def build_payload(webhook: WebhookRecipientCreate) -> dict:
     elif webhook.type == "DISCORD":
         return {
             "username": "UmamiSender",
-            "avatar_url": "https://github.com/ceviixx/umami-sender/blob/9b077046e4e35113f70591071d9447150536c6cb/frontend/public/umamisender.png",
+            "avatar_url": "",
             "content": "Test message",
             "embeds": [],
             "attachments": []

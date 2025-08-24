@@ -4,6 +4,7 @@ import { useI18n } from "@/locales/I18nContext";
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import packageJson from '../../package.json'
+import { useSession } from "@/lib/session/SessionContext"; 
 
 import {
   Squares2X2Icon,
@@ -16,23 +17,29 @@ import {
   UserIcon,
   KeyIcon,
   UsersIcon,
-  ListBulletIcon
+  ListBulletIcon,
+  PaintBrushIcon,
 } from '@heroicons/react/20/solid'
 
 type SidebarLink = {
   href?: string
   label: string
   icon?: React.ReactNode
-  /** optional: eigene Matching-Regeln, z.B. '/umami' und /^\/umami\// */
   match?: (string | RegExp)[]
+  
+  _section?: boolean
 }
 
 export default function Sidebar() {
   const pathname = usePathname()
   const { locale } = useI18n()
+  const { user, loading } = useSession();
+  const isAdmin = (user?.role ?? "").toString().toLowerCase() === "admin";
+
+  const compact = (arr: SidebarLink[]) => arr.filter(Boolean)
 
   const menus: Record<'app' | 'account', SidebarLink[]> = {
-    app: [
+    app: compact([
       {
         href: '/',
         label: locale.pages.dashboard,
@@ -69,35 +76,73 @@ export default function Sidebar() {
         icon: <DocumentIcon className="w-5 h-5" />,
         match: ['/templates', /^\/templates\//]
       },
-    ],
-    account: [
-      {
-        href: '/account',
-        label: locale.pages.account,
-        icon: <UserIcon className="w-5 h-5" />,
-        match: [/^\/account$/],
-      },
-      {
-        href: '/account/password',
-        label: locale.pages.changepassword,
-        icon: <KeyIcon className="w-5 h-5" />,
-        match: ['/account/password']
-      },
-      { label: locale.pages.systemSection },
-      {
-        href: '/account/system/logs',
-        label: locale.pages.admin.logs,
-        icon: <ListBulletIcon className="w-5 h-5" />,
-        match: ['/account/system/logs']
-      },
-      { label: locale.pages.adminSection },
-      {
-        href: '/account/admin/users',
-        label: locale.pages.admin.users,
-        icon: <UsersIcon className="w-5 h-5" />,
-        match: ['/account/admin/users', /^\/account\/admin\/users\//]
-      },
-    ],
+    ]),
+    account: (() => {
+      const base: SidebarLink[] = [
+        {
+          href: '/account',
+          label: locale.pages.account,
+          icon: <UserIcon className="w-5 h-5" />,
+          match: [/^\/account$/],
+        },
+        {
+          href: '/account/password',
+          label: locale.pages.changepassword,
+          icon: <KeyIcon className="w-5 h-5" />,
+          match: ['/account/password']
+        },
+      ]
+
+      const systemSection: SidebarLink[] = [
+        { label: locale.pages.systemSection, _section: true },
+        {
+          href: '/account/system/logs',
+          label: locale.pages.admin.logs,
+          icon: <ListBulletIcon className="w-5 h-5" />,
+          match: ['/account/system/logs']
+        },
+      ]
+
+      const adminSection: SidebarLink[] = isAdmin
+        ? [
+            { label: locale.pages.adminSection, _section: true },
+            {
+              href: '/account/admin/users',
+              label: locale.pages.admin.users,
+              icon: <UsersIcon className="w-5 h-5" />,
+              match: ['/account/admin/users', /^\/account\/admin\/users\//]
+            },
+            {
+              href: '/account/admin/branding',
+              label: locale.pages.admin.branding,
+              icon: <PaintBrushIcon className="w-5 h-5" />,
+              match: ['/account/admin/branding']
+            },
+            {
+              href: '/account/admin/templates',
+              label: locale.pages.template_update,
+              icon: <DocumentIcon className="w-5 h-5" />,
+              match: ['/account/admin/templates']
+            },
+          ]
+        : []
+
+      const withSmartSections = (items: SidebarLink[]) => {
+        const out: SidebarLink[] = []
+        for (let i = 0; i < items.length; i++) {
+          const cur = items[i]
+          if (!cur._section) {
+            out.push(cur)
+            continue
+          }
+          const hasFollowingLink = items.slice(i + 1).some(it => !!it.href)
+          if (hasFollowingLink) out.push(cur)
+        }
+        return out
+      }
+
+      return withSmartSections([...base, ...systemSection, ...adminSection])
+    })(),
   }
 
   const currentArea: 'app' | 'account' = pathname.startsWith('/account') ? 'account' : 'app'
@@ -112,7 +157,6 @@ export default function Sidebar() {
           : pattern.test(pathname)
       )
     }
-    // Fallback: href als Basis
     return pathname === link.href || pathname.startsWith(link.href + '/')
   }
 
@@ -136,7 +180,8 @@ export default function Sidebar() {
 
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1">
-          {menuItems.map((link, i) => {
+          {/* Optional: während loading nichts Account‑spezifisches anzeigen, um Flackern zu vermeiden */}
+          {(currentArea !== 'account' || !loading) && menuItems.map((link, i) => {
             if (!link.href) {
               return (
                 <li

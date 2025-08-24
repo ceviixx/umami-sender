@@ -11,8 +11,9 @@ import ContextMenu from '@/components/ContextMenu'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import CardList from "@/components/cardlist/CardList";
-import { showError } from "@/lib/toast";
+import { showError, notification_ids } from "@/lib/toast";
 import { useRouter } from 'next/navigation'
+import Container from "@/components/layout/Container";
 
 export default function MailersPage() {
   const [senders, setSenders] = useState<Sender[]>([])
@@ -38,7 +39,7 @@ export default function MailersPage() {
           setSenders(prev => prev.filter(w => w.id !== deleteId))
         })
         .catch((error) => {
-          showError(error.message)
+          showError({id: notification_ids.mailer, title: locale.messages.title.error, description: error.message})
         })
         .finally(() => {
           setDeleteId(null)
@@ -50,14 +51,18 @@ export default function MailersPage() {
   if (networkError) { return <NetworkError page={locale.pages.jobs} message={networkError} /> }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <Container>
       <PageHeader
         title={locale.pages.mailer}
         href='/mailers/new'
       />
 
       {senders.length === 0 ? (
-        <EmptyState />
+        <EmptyState 
+          variant='chip' 
+          hint="Create your first mailer with the + in the top right." 
+          rows={4}
+        />
       ) : (
         <CardList
           items={senders}
@@ -87,6 +92,6 @@ export default function MailersPage() {
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
-    </div>
+    </Container>
   )
 }
