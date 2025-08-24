@@ -1,25 +1,255 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EMAIL_REPORT_INSIGHTS</title>
-  <style>{{ inline_css | safe }}</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <title>{{ summary.name or 'Insights' }}</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f6f7f9;
+      color: #111827;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial;
+      line-height: 1.6
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden
+    }
+
+    .header {
+      padding: 18px 22px 10px
+    }
+
+    .logo {
+      padding: 10px 0 8px 0
+    }
+
+    .logo img {
+      max-height: 28px;
+      display: block
+    }
+
+    h1 {
+      margin: 6px 0 2px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.2px
+    }
+
+    .period {
+      margin: 0 0 10px;
+      color: #6b7280;
+      font-size: 13px
+    }
+
+    .section {
+      padding: 18px 22px
+    }
+
+    .stitle {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #374151
+    }
+
+    .stitle:before {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 2px;
+      background: #e5e7eb;
+      margin-right: 8px;
+      vertical-align: middle;
+      border-radius: 2px
+    }
+
+    table.data {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    table.data th {
+      padding: 8px 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      text-align: right
+    }
+
+    table.data th:first-child {
+      text-align: left
+    }
+
+    table.data td {
+      padding: 8px 6px;
+      font-size: 13px;
+      color: #111827;
+      text-align: right
+    }
+
+    table.data td:first-child {
+      text-align: left;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+      color: #374151;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 240px
+    }
+
+    table.data tr+tr td {
+      border-top: 1px solid #f1f5f9
+    }
+
+    .footer {
+      max-width: 720px;
+      margin: 10px auto 0;
+      color: #6b7280;
+      font-size: 12px;
+      padding: 8px 2px;
+      text-align: center
+    }
+
+    @media(max-width:640px) {
+      .wrap {
+        padding: 0 0 14px
+      }
+
+      .header {
+        padding: 16px
+      }
+
+      .section {
+        padding: 16px
+      }
+
+      h1 {
+        font-size: 22px
+      }
+
+      table.data td:first-child {
+        max-width: 140px
+      }
+    }
+
+    @media(prefers-color-scheme:dark) {
+      body {
+        background: #0b1220;
+        color: #e5e7eb
+      }
+
+      .card {
+        background: #111827;
+        border-color: #334155
+      }
+
+      .period,
+      .footer {
+        color: #94a3b8
+      }
+
+      .stitle {
+        color: #d1d5db
+      }
+
+      .stitle:before {
+        background: #334155
+      }
+
+      table.data th {
+        color: #dbeafe
+      }
+
+      table.data td {
+        color: #e5e7eb
+      }
+
+      table.data td:first-child {
+        color: #cbd5e1
+      }
+
+      table.data tr+tr td {
+        border-top-color: #233044
+      }
+
+      .footer a {
+        color: #94a3b8 !important
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <img src="{{ summary.embedded_logo }}" alt="Logo" />
-  </div>
+  <table role="presentation" width="100%">
+    <tr>
+      <td>
+        <table role="presentation" class="wrap" width="100%">
+          <tr>
+            <td>
+              <table role="presentation" class="card" width="100%">
+                <tr>
+                  <td class="header">
+                    <div class="logo"><img src="{{ summary.embedded_logo }}" alt="Logo"></div>
+                    <h1>{{ summary.name or 'Insights' }}</h1>
+                    <div class="period">{{ summary.period }}</div>
+                  </td>
+                </tr>
 
-  <h2>We’ve crunched the numbers – here’s your summary.</h2>
-  <p><strong>Report:</strong> {{ summary.name }}</p>
-  <p><strong>Period:</strong> {{ summary.period }}</p>
-
-</div>
-
-<div class="footer">
-  Sent with <a href="https://github.com/ceviixx/umami-sender">UmamiSender</a>
-</div>
+                <!-- Insights table -->
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Top Pages (Insights)</div>
+                    <table role="presentation" class="data">
+                      <tr>
+                        <th>URL</th>
+                        <th>Views</th>
+                        <th>Visitors</th>
+                        <th>Visits</th>
+                        <th>Bounces</th>
+                        <th>Time</th>
+                      </tr>
+                      {% for r in (summary.result or [])[:15] %}
+                      <tr>
+                        <td>{{ r.url }}</td>
+                        <td>{{ r.views }}</td>
+                        <td>{{ r.visitors }}</td>
+                        <td>{{ r.visits }}</td>
+                        <td>{{ r.bounces }}</td>
+                        <td>{{ r.totaltime }}</td>
+                      </tr>
+                      {% else %}
+                      <tr>
+                        <td colspan="6">Keine Insights verfügbar.</td>
+                      </tr>
+                      {% endfor %}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <div class="footer">
+                Sent by
+                <a href="https://github.com/ceviixx/umami-sender"
+                  style="color:#6b7280;text-decoration:none;font-weight:600">
+                  UmamiSender
+                </a>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

@@ -1,79 +1,373 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EMAIL_REPORT_REVENUE</title>
-  <style>{{ inline_css | safe }}</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <title>{{ summary.name or 'Revenue' }}</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f6f7f9;
+      color: #111827;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial;
+      line-height: 1.6
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden
+    }
+
+    .header {
+      padding: 18px 22px 10px
+    }
+
+    .logo {
+      padding: 10px 0 8px 0
+    }
+
+    .logo img {
+      max-height: 28px;
+      display: block
+    }
+
+    h1 {
+      margin: 6px 0 2px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.2px
+    }
+
+    .period {
+      margin: 0 0 10px;
+      color: #6b7280;
+      font-size: 13px
+    }
+
+    .section {
+      padding: 18px 22px
+    }
+
+    .stitle {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #374151
+    }
+
+    .stitle:before {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 2px;
+      background: #e5e7eb;
+      margin-right: 8px;
+      vertical-align: middle;
+      border-radius: 2px
+    }
+
+    .kval {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      margin-bottom: 2px
+    }
+
+    .klabel {
+      font-size: 12px;
+      color: #6b7280
+    }
+
+    .kpi-mobile {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 12px
+    }
+
+    .kbox {
+      padding: 6px 0
+    }
+
+    .kcell {
+      width: 50%;
+      vertical-align: top
+    }
+
+    .kwide {
+      width: 100%;
+      vertical-align: top
+    }
+
+    .kpi-desktop {
+      display: none;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0;
+      margin: 8px 0 4px
+    }
+
+    .kpi-desktop td {
+      width: 20%;
+      padding: 8px 0;
+      vertical-align: top
+    }
+
+    table.data {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    table.data td {
+      padding: 9px 0;
+      font-size: 14px
+    }
+
+    table.data td:first-child {
+      color: #111827
+    }
+
+    table.data td:last-child {
+      text-align: right;
+      font-weight: 700
+    }
+
+    table.data tr+tr td {
+      border-top: 1px solid #f1f5f9
+    }
+
+    .mono {
+      font-family: ui-monospace, Menlo, Consolas, monospace
+    }
+
+    .footer {
+      max-width: 720px;
+      margin: 10px auto 0;
+      color: #6b7280;
+      font-size: 12px;
+      padding: 8px 2px;
+      text-align: center
+    }
+
+    @media(max-width:640px) {
+      .wrap {
+        padding: 0 0 14px
+      }
+
+      .header {
+        padding: 16px
+      }
+
+      .section {
+        padding: 16px
+      }
+
+      h1 {
+        font-size: 22px
+      }
+
+      .kval {
+        font-size: 20px
+      }
+    }
+
+    @media(min-width:700px) {
+      .kpi-desktop {
+        display: table
+      }
+
+      .kpi-mobile {
+        display: none
+      }
+    }
+
+    @media(prefers-color-scheme:dark) {
+      body {
+        background: #0b1220;
+        color: #e5e7eb
+      }
+
+      .card {
+        background: #111827;
+        border-color: #334155
+      }
+
+      .period,
+      .klabel,
+      .footer {
+        color: #94a3b8
+      }
+
+      .stitle {
+        color: #d1d5db
+      }
+
+      .stitle:before {
+        background: #334155
+      }
+
+      table.data tr+tr td {
+        border-top-color: #233044
+      }
+
+      table.data td:first-child {
+        color: #e5e7eb
+      }
+
+      .footer a {
+        color: #94a3b8 !important
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <img src="{{ summary.embedded_logo }}" alt="Logo" />
+  <table role="presentation" width="100%">
+    <tr>
+      <td>
+        <table role="presentation" class="wrap" width="100%">
+          <tr>
+            <td>
+              <table role="presentation" class="card" width="100%">
+                <tr>
+                  <td class="header">
+                    <div class="logo"><img src="{{ summary.embedded_logo }}" alt="Logo"></div>
+                    <h1>{{ summary.name or 'Revenue' }}</h1>
+                    <div class="period">{{ summary.period }}</div>
+                  </td>
+                </tr>
+
+                <!-- KPIs -->
+                {% set res = summary.result or {} %}
+                {% set totals = res.total or {} %}
+                {% if totals %}
+                <tr>
+                  <td class="section" style="padding-top:0">
+                    <table role="presentation" class="kpi-mobile">
+                      <tr class="kbox">
+                        <td class="kcell">
+                          <div class="kval">{{ totals.sum }}</div>
+                          <div class="klabel">Total Sum</div>
+                        </td>
+                        <td class="kcell">
+                          <div class="kval">{{ totals.count }}</div>
+                          <div class="klabel">Transactions</div>
+                        </td>
+                      </tr>
+                      <tr class="kbox">
+                        <td class="kwide" colspan="2">
+                          <div class="kval">{{ totals.unique_count }}</div>
+                          <div class="klabel">Unique Customers</div>
+                        </td>
+                      </tr>
+                    </table>
+                    <table role="presentation" class="kpi-desktop">
+                      <tr>
+                        <td>
+                          <div class="kval">{{ totals.sum }}</div>
+                          <div class="klabel">Total Sum</div>
+                        </td>
+                        <td>
+                          <div class="kval">{{ totals.count }}</div>
+                          <div class="klabel">Transactions</div>
+                        </td>
+                        <td>
+                          <div class="kval">{{ totals.unique_count }}</div>
+                          <div class="klabel">Unique Customers</div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
+
+                <!-- Recent Revenue -->
+                <tr>
+                  <td class="section">
+                    <div class="stitle">Recent Revenue</div>
+                    {% set points = res.chart or [] %}
+                    {% if points %}
+                    <table role="presentation" class="data">
+                      {% for p in points %}
+                      {% if loop.revindex <= 10 %} <tr>
+                        <td class="mono">
+                          {% set ts = p.t|string %}
+                          {{ ts.split('T')[0] }}
+                        </td>
+                        <td>{{ p.y }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </table>
+              {% else %}
+              <div style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••</div>
+              {% endif %}
+            </td>
+          </tr>
+
+          <!-- By Country -->
+          <tr>
+            <td class="section">
+              <div class="stitle">By Country</div>
+              {% set countries = res.country or [] %}
+              {% if countries %}
+              <table role="presentation" class="data">
+                {% for c in countries %}
+                {% if loop.index <= 10 %} <tr>
+                  <td class="mono">{{ c.name }}</td>
+                  <td>{{ c.value }}</td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </table>
+        {% else %}
+        <div style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••</div>
+        {% endif %}
+      </td>
+    </tr>
+
+    <!-- By Currency -->
+    <tr>
+      <td class="section" style="padding-bottom:24px">
+        <div class="stitle">By Currency</div>
+        {% set rows = res.table or [] %}
+        {% if rows %}
+        <table role="presentation" class="data">
+          {% for r in rows %}
+          {% if loop.index <= 10 %} <tr>
+            <td class="mono">{{ r.currency }}</td>
+            <td>Sum {{ r.sum }} · Tx {{ r.count }} · Unique {{ r.unique_count }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </table>
+  {% else %}
+  <div style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••</div>
+  {% endif %}
+  </td>
+  </tr>
+  </table>
+  <div class="footer">
+    Sent by
+    <a href="https://github.com/ceviixx/umami-sender" style="color:#6b7280;text-decoration:none;font-weight:600">
+      UmamiSender
+    </a>
   </div>
-  <h2>We’ve crunched the numbers – here’s your summary.</h2>
-  <p><strong>Report:</strong> {{ summary.name }}</p>
-  <p><strong>Period:</strong> {{ summary.period }}</p>
-
-
-  <h2>Value Overview</h2>
-  <table>
-  <tr>
-      <th>Total</th>
-      <th>Average</th>
-      <th>Transactions</th>
-      <th>Unique Customers</th>
-  </tr>
-  <tr>
-      {% if summary.result %}
-        <td>€{{ (summary.result.total.sum / 1000) | round(2) }}k</td>
-        <td>€{{ (summary.result.total.sum / summary.result.total.count) | round(2) }}</td>
-        <td>{{ summary.result.total.count }}</td>
-        <td>{{ summary.result.total.unique_count }}</td>
-      {% else %}
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-      {% endif %}
+  </td>
   </tr>
   </table>
-
-  <h2>Top Countries</h2>
-  <table>
-  <tr><th>Country</th><th style="width: 100px;">Total</th></tr>
-  {% if summary.result %}
-    {% for entry in summary.result.country %}
-    <tr>
-        <td>{{ entry.name }}</td>
-        <td>{{ entry.value }}</td>
-    </tr>
-    {% endfor %}
-  {% endif %}
+  </td>
+  </tr>
   </table>
-
-
-  <h2>Revenue by Currency</h2>
-  <table>
-  <tr><th>Currency</th><th>Total</th><th>Transactions</th><th>Unique Customers</th></tr>
-  {% if summary.result %}
-    {% for row in summary.result.table %}
-    <tr>
-        <td>{{ row.currency }}</td>
-        <td>{{ row.sum }}</td>
-        <td>{{ row.count }}</td>
-        <td>{{ row.unique_count }}</td>
-    </tr>
-    {% endfor %}
-  {% endif %}
-  </table>
-
-
-
-
-</div>
-<div class="footer">
-  Sent with <a href="https://github.com/ceviixx/umami-sender">UmamiSender</a>
-</div>
 </body>
 </html>

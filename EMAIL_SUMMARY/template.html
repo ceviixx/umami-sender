@@ -1,315 +1,640 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EMAIL_SUMMARY</title>
-  <style>{{ inline_css | safe }}</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <title>{{ summary.name or 'Summary' }}</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f6f7f9;
+      color: #111827;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial;
+      line-height: 1.6
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden
+    }
+
+    .header {
+      padding: 18px 22px 10px
+    }
+
+    .logo {
+      padding: 10px 0 8px 0
+    }
+
+    .logo img {
+      max-height: 28px;
+      display: block
+    }
+
+    h1 {
+      margin: 6px 0 2px;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.2px
+    }
+
+    .period {
+      margin: 0 0 10px;
+      color: #6b7280;
+      font-size: 13px
+    }
+
+    .section {
+      padding: 18px 22px
+    }
+
+    .stitle {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #374151
+    }
+
+    .stitle:before {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 2px;
+      background: #e5e7eb;
+      margin-right: 8px;
+      vertical-align: middle;
+      border-radius: 2px
+    }
+
+    .kval {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      margin-bottom: 2px
+    }
+
+    .klabel {
+      font-size: 12px;
+      color: #6b7280
+    }
+
+    .kpi-mobile {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 12px
+    }
+
+    .kbox {
+      padding: 6px 0
+    }
+
+    .kcell {
+      width: 50%;
+      vertical-align: top
+    }
+
+    .kwide {
+      width: 100%;
+      vertical-align: top
+    }
+
+    .kpi-desktop {
+      display: none;
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0;
+      margin: 8px 0 4px
+    }
+
+    .kpi-desktop td {
+      width: 20%;
+      padding: 8px 0;
+      vertical-align: top
+    }
+
+    table.data {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    table.data td {
+      padding: 9px 0;
+      font-size: 14px
+    }
+
+    table.data td:first-child {
+      color: #111827
+    }
+
+    table.data td:last-child {
+      text-align: right;
+      font-weight: 700
+    }
+
+    table.data tr+tr td {
+      border-top: 1px solid #f1f5f9
+    }
+
+    .mono {
+      font-family: ui-monospace, Menlo, Consolas, monospace
+    }
+
+    .footer {
+      max-width: 720px;
+      margin: 10px auto 0;
+      color: #6b7280;
+      font-size: 12px;
+      padding: 8px 2px;
+      text-align: center
+    }
+
+    @media(max-width:640px) {
+      .wrap {
+        padding: 0 0 14px
+      }
+
+      .header {
+        padding: 16px
+      }
+
+      .section {
+        padding: 16px
+      }
+
+      h1 {
+        font-size: 22px
+      }
+
+      .kval {
+        font-size: 20px
+      }
+    }
+
+    @media(min-width:700px) {
+      .kpi-desktop {
+        display: table
+      }
+
+      .kpi-mobile {
+        display: none
+      }
+    }
+
+    @media(prefers-color-scheme:dark) {
+      body {
+        background: #0b1220;
+        color: #e5e7eb
+      }
+
+      .card {
+        background: #111827;
+        border-color: #334155
+      }
+
+      .period,
+      .klabel,
+      .footer {
+        color: #94a3b8
+      }
+
+      .stitle {
+        color: #d1d5db
+      }
+
+      .stitle:before {
+        background: #334155
+      }
+
+      table.data tr+tr td {
+        border-top-color: #233044
+      }
+
+      table.data td:first-child {
+        color: #e5e7eb
+      }
+
+      .footer a {
+        color: #94a3b8 !important
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="container">
-  <div class="header">
-    <img src="{{ summary.embedded_logo }}" alt="Logo" />
-  </div>
-  <h2>We’ve crunched the numbers – here’s your summary.</h2>
-  <p><strong>Report:</strong> {{ summary.name }}</p>
-  <p><strong>Period:</strong> {{ summary.period }}</p>
-
-  {% if 'stats' in summary %}
-    <h2>Key Metrics</h2>
-    <table>
-      <tr>
-        <th>Views</th>
-        <th>Visits</th>
-        <th>Visitors</th>
-        <th>Bounce rate</th>
-        <th>Visit duration</th>
-      </tr>
-      {% if summary.stats %}
-        <tr>
-          <td>{{ summary.stats.pageviews }}</td>
-          <td>{{ summary.stats.visits }}</td>
-          <td>{{ summary.stats.visitors }}</td>
-          <td>{{ summary.stats.bounces }}</td>
-          <td>{{ summary.stats.totaltime }}</td>
-        </tr>
-      {% endif %}
-    </table>
-  {% endif %}
-
-  {% if 'url' in summary.metrics %}
-    <h2>Top Pages</h2>
-    <table>
-      <tr>
-        <th>Pages</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.url %}
-        {% for entry in summary.metrics.url %}
+  <table role="presentation" width="100%">
+    <tr>
+      <td>
+        <table role="presentation" class="wrap" width="100%">
           <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+            <td>
+              <table role="presentation" class="card" width="100%">
+                <tr>
+                  <td class="header">
+                    <div class="logo"><img src="{{ summary.embedded_logo }}" alt="Logo"></div>
+                    <h1>{{ summary.name or 'Summary' }}</h1>
+                    <div class="period">{{ summary.period }}</div>
+                  </td>
+                </tr>
 
-  {% if 'referrer' in summary.metrics %}
-    <h2>Top Refferers</h2>
-    <table>
-      <tr>
-        <th>Refferers</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.referrer %}
-        {% for entry in summary.metrics.referrer %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <tr>
+                  <td class="section">
+                    <table role="presentation" class="kpi-desktop">
+                      <tr>
+                        <td>
+                          <div class="kval">{{ summary.stats.pageviews }}</div>
+                          <div class="klabel">Pageviews</div>
+                        </td>
+                        <td>
+                          <div class="kval">{{ summary.stats.visits }}</div>
+                          <div class="klabel">Visits</div>
+                        </td>
+                        <td>
+                          <div class="kval">{{ summary.stats.visitors }}</div>
+                          <div class="klabel">Visitors</div>
+                        </td>
+                        <td>
+                          <div class="kval">{{ summary.stats.bounces }}</div>
+                          <div class="klabel">Bounce rate</div>
+                        </td>
+                        <td>
+                          <div class="kval">{{ summary.stats.totaltime }}</div>
+                          <div class="klabel">Avg. time</div>
+                        </td>
+                      </tr>
+                    </table>
 
-  {% if 'channel' in summary.metrics %}
-    <h2>Top Channels</h2>
-    <table>
-      <tr>
-        <th>Channels</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.channel %}
-        {% for entry in summary.metrics.channel %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                    <table role="presentation" class="kpi-mobile">
+                      <tr class="kbox">
+                        <td class="kcell">
+                          <div class="kval">{{ summary.stats.pageviews }}</div>
+                          <div class="klabel">Pageviews</div>
+                        </td>
+                        <td class="kcell">
+                          <div class="kval">{{ summary.stats.visits }}</div>
+                          <div class="klabel">Visits</div>
+                        </td>
+                      </tr>
+                      <tr class="kbox">
+                        <td class="kcell">
+                          <div class="kval">{{ summary.stats.visitors }}</div>
+                          <div class="klabel">Visitors</div>
+                        </td>
+                        <td class="kcell">
+                          <div class="kval">{{ summary.stats.bounces }}</div>
+                          <div class="klabel">Bounce rate</div>
+                        </td>
+                      </tr>
+                      <tr class="kbox">
+                        <td class="kwide" colspan="2">
+                          <div class="kval">{{ summary.stats.totaltime }}</div>
+                          <div class="klabel">Avg. time</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
 
-  {% if 'browser' in summary.metrics %}
-    <h2>Top Browsers</h2>
-    <table>
-      <tr>
-        <th>Browsers</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.browser %}
-        {% for entry in summary.metrics.browser %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Pages -->
+                {% if summary.metrics.url is defined %}
+                <tr>
+                  <td class="section">
+                    <div class="stitle">Top Pages</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.url or [])[:10] %}
+                      <tr>
+                        <td class="mono">{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'os' in summary.metrics %}
-    <h2>Top Operating systems</h2>
-    <table>
-      <tr>
-        <th>Operating systems</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.os %}
-        {% for entry in summary.metrics.os %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Referrers -->
+                {% if summary.metrics.referrer is defined %}
+                <tr>
+                  <td class="section">
+                    <div class="stitle">Top Referrers</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.referrer or [])[:10] %}
+                      <tr>
+                        <td>{{ it.x or '—' }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'device' in summary.metrics %}
-    <h2>Top Devices</h2>
-    <table>
-      <tr>
-        <th>Devices</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.device %}
-        {% for entry in summary.metrics.device %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Channels -->
+                {% if summary.metrics.channel is defined %}
+                <tr>
+                  <td class="section">
+                    <div class="stitle">Channels</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.channel or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'country' in summary.metrics %}
-    <h2>Top Countries</h2>
-    <table>
-      <tr>
-        <th>Countries</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.country %}
-        {% for entry in summary.metrics.country %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Browsers -->
+                {% if summary.metrics.browser is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Browsers</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.browser or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'region' in summary.metrics %}
-    <h2>Top Regions</h2>
-    <table>
-      <tr>
-        <th>Regions</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.region %}
-        {% for entry in summary.metrics.region %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- OS -->
+                {% if summary.metrics.os is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Operating system</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.os or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'city' in summary.metrics %}
-    <h2>Top Cities</h2>
-    <table>
-      <tr>
-        <th>Cities</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.city %}
-        {% for entry in summary.metrics.city %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Device -->
+                {% if summary.metrics.device is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Devices</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.device or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'language' in summary.metrics %}
-    <h2>Top Languages</h2>
-    <table>
-      <tr>
-        <th>Languages</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.language %}
-        {% for entry in summary.metrics.language %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Countries -->
+                {% if summary.metrics.country is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Countries</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.country or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'screen' in summary.metrics %}
-    <h2>Top Screens</h2>
-    <table>
-      <tr>
-        <th>Screens</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.screen %}
-        {% for entry in summary.metrics.screen %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Regions -->
+                {% if summary.metrics.region is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Regions</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.region or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'event' in summary.metrics %}
-    <h2>Top Events</h2>
-    <table>
-      <tr>
-        <th>Events</th>
-        <th style="width: 100px;">Actions</th>
-      </tr>
-      {% if summary.metrics.event %}
-        {% for entry in summary.metrics.event %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Cities -->
+                {% if summary.metrics.city is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Cities</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.city or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'query' in summary.metrics %}
-    <h2>Top Query parameters</h2>
-    <table>
-      <tr>
-        <th>Query</th>
-        <th style="width: 100px;">Views</th>
-      </tr>
-      {% if summary.metrics.query %}
-        {% for entry in summary.metrics.query %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Languages -->
+                {% if summary.metrics.language is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Languages</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.language or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'host' in summary.metrics %}
-    <h2>Top Hosts</h2>
-    <table>
-      <tr>
-        <th>Hosts</th>
-        <th style="width: 100px;">Visitors</th>
-      </tr>
-      {% if summary.metrics.host %}
-        {% for entry in summary.metrics.host %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
+                <!-- Screens -->
+                {% if summary.metrics.screen is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Screens</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.screen or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-  {% if 'tag' in summary.metrics %}
-    <h2>Top Tags</h2>
-    <table>
-      <tr>
-        <th>Tags</th>
-        <th style="width: 100px;">Views</th>
-      </tr>
-      {% if summary.metrics.tag %}
-        {% for entry in summary.metrics.tag %}
-          <tr>
-            <td>{{ entry.x }}</td>
-            <td>{{ entry.y }}</td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </table>
-  {% endif %}
-</div>
+                <!-- Events -->
+                {% if summary.metrics.event is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Events</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.event or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
 
-<div class="footer">
-  Sent with <a href="https://github.com/ceviixx/umami-sender">UmamiSender</a>
-</div>
+                <!-- Query parameters -->
+                {% if summary.metrics.query is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Query parameters</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.query or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
+
+                <!-- Hosts -->
+                {% if summary.metrics.host is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Hosts</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.host or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
+
+                <!-- Tags -->
+                {% if summary.metrics.tag is defined %}
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">Tags</div>
+                    <table role="presentation" class="data">
+                      {% for it in (summary.metrics.tag or [])[:8] %}
+                      <tr>
+                        <td>{{ it.x }}</td>
+                        <td>{{ it.y }}</td>
+                      </tr>
+                      {% else %}<tr>
+                        <td colspan="2"
+                          style="text-align:center;color:#9ca3af;font-size:18px;letter-spacing:4px;padding:12px 0">•••
+                        </td>
+                      </tr>{% endfor %}
+                    </table>
+                  </td>
+                </tr>
+                {% endif %}
+
+
+              </table>
+              <div class="footer">
+                Sent by
+                <a href="https://github.com/ceviixx/umami-sender"
+                  style="color:#6b7280;text-decoration:none;font-weight:600">
+                  UmamiSender
+                </a>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
+
 </html>

@@ -1,44 +1,247 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EMAIL_REPORT_JOURNEY</title>
-  <style>{{ inline_css | safe }}</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <title>{{ summary.name or 'Journey' }}</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f6f7f9;
+      color: #111827;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial;
+      line-height: 1.6
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      overflow: hidden
+    }
+
+    .header {
+      padding: 18px 22px 10px
+    }
+
+    .logo {
+      padding: 10px 0 8px 0
+    }
+
+    .logo img {
+      max-height: 28px;
+      display: block
+    }
+
+    h1 {
+      margin: 6px 0 2px;
+      font-size: 24px;
+      font-weight: 800
+    }
+
+    .period {
+      margin: 0 0 10px;
+      color: #6b7280;
+      font-size: 13px
+    }
+
+    .section {
+      padding: 18px 22px
+    }
+
+    .stitle {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #374151
+    }
+
+    .stitle:before {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 2px;
+      background: #e5e7eb;
+      margin-right: 8px;
+      vertical-align: middle;
+      border-radius: 2px
+    }
+
+    .row {
+      padding: 10px 0;
+      border-top: 1px solid #f1f5f9
+    }
+
+    .row:first-child {
+      border-top: 0
+    }
+
+    .count {
+      float: right;
+      font-weight: 700
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 4px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      font: 12px/1.2 ui-monospace, Menlo, Consolas, monospace;
+      color: #374151;
+      vertical-align: middle
+    }
+
+    .sep {
+      display: inline-block;
+      margin: 0 6px;
+      color: #9ca3af;
+      vertical-align: middle
+    }
+
+    .nodata {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 18px;
+      letter-spacing: 4px;
+      padding: 12px 0
+    }
+
+    .footer {
+      max-width: 720px;
+      margin: 10px auto 0;
+      color: #6b7280;
+      font-size: 12px;
+      padding: 8px 2px;
+      text-align: center
+    }
+
+    @media(max-width:640px) {
+      .wrap {
+        padding: 0 0 14px
+      }
+
+      .header {
+        padding: 16px
+      }
+
+      .section {
+        padding: 16px
+      }
+
+      h1 {
+        font-size: 22px
+      }
+    }
+
+    @media(prefers-color-scheme:dark) {
+      body {
+        background: #0b1220;
+        color: #e5e7eb
+      }
+
+      .card {
+        background: #111827;
+        border-color: #334155
+      }
+
+      .period,
+      .footer {
+        color: #94a3b8
+      }
+
+      .stitle {
+        color: #d1d5db
+      }
+
+      .stitle:before {
+        background: #334155
+      }
+
+      .row {
+        border-top-color: #233044
+      }
+
+      .chip {
+        border-color: #334155;
+        color: #e5e7eb
+      }
+
+      .sep {
+        color: #64748b
+      }
+
+      .footer a {
+        color: #94a3b8 !important
+      }
+    }
+  </style>
 </head>
 <body>
-
-<div class="container">
-  <div class="header">
-    <img src="{{ summary.embedded_logo }}" alt="Logo" />
-  </div>
-
-  <h2>We’ve crunched the numbers – here’s your summary.</h2>
-  <p><strong>Report:</strong> {{ summary.name }}</p>
-  <p><strong>Period:</strong> {{ summary.period }}</p>
-
-  <table>
-  <tr>
-      <th>Path</th>
-      <th style="width: 100px;">Count</th>
-  </tr>
-  {% for journey in summary.result %}
-  <tr>
+  <table role="presentation" width="100%">
+    <tr>
       <td>
-      {% for item in journey["items"] if item %}
-          {{ item }}{% if not loop.last %} → {% endif %}
-      {% endfor %}
+        <table role="presentation" class="wrap" width="100%">
+          <tr>
+            <td>
+              <table role="presentation" class="card" width="100%">
+                <tr>
+                  <td class="header">
+                    <div class="logo"><img src="{{ summary.embedded_logo }}" alt="Logo"></div>
+                    <h1>{{ summary.name or 'Journey' }}</h1>
+                    <div class="period">{{ summary.period }}</div>
+                  </td>
+                </tr>
+
+                <!-- Journeys -->
+                <tr>
+                  <td class="section" style="padding-bottom:24px">
+                    <div class="stitle">User Journeys</div>
+
+                    {% set rows = summary.result or [] %}
+                    {% if rows %}
+                    {% for r in rows %}
+                    <div class="row">
+                      <span class="count">{{ r.count }}</span>
+                      {% set steps = [] %}
+                      {% for s in r['items'] %}
+                      {% if s %}{% set _ = steps.append(s) %}{% endif %}
+                      {% endfor %}
+                      {% if steps %}
+                      {% for s in steps %}
+                      {% if not loop.first %}<span class="sep">→</span>{% endif %}
+                      <span class="chip">{{ s }}</span>
+                      {% endfor %}
+                      {% else %}
+                      <span class="chip">/</span>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="nodata">•••</div>
+                    {% endif %}
+                  </td>
+                </tr>
+              </table>
+              <div class="footer">
+                Sent by
+                <a href="https://github.com/ceviixx/umami-sender"
+                  style="color:#6b7280;text-decoration:none;font-weight:600">
+                  UmamiSender
+                </a>
+              </div>
+            </td>
+          </tr>
+        </table>
       </td>
-      <td>{{ journey.count }}</td>
-  </tr>
-  {% endfor %}
+    </tr>
   </table>
-
-</div>
-
-<div class="footer">
-  Sent with <a href="https://github.com/ceviixx/umami-sender">UmamiSender</a>
-</div>
-
 </body>
 </html>
