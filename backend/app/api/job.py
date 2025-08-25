@@ -91,7 +91,7 @@ def update_mailer_job(
 
     if not job: return not_found_response(Job, id)
     
-    ensure_is_owner(job.id, user)
+    ensure_is_owner(job.user_id, user)
     
     job.is_active = not job.is_active
     db.commit()

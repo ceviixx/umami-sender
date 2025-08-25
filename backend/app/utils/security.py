@@ -47,17 +47,14 @@ def authenticated_admin(user: User = Depends(authenticated_user)) -> User:
 # --- Permission checks (depending on owner_id and role) -----------------------
 
 def ensure_is_owner(owner_id: str | int, user: User) -> None:
-    """Nur Owner — Admin darf HIER nicht."""
     if str(user.id) != str(owner_id):
         raise HTTPException(status_code=403, detail="Forbidden (owner only)")
 
 def ensure_is_admin(user: User) -> None:
-    """Nur Admin."""
     if user.role != "admin":
         raise HTTPException(status_code=403, detail="Forbidden (admin only)")
 
 def ensure_is_owner_or_admin(owner_id: str | int, user: User) -> None:
-    """Owner ODER Admin."""
     if user.role == "admin":
         return
     if str(user.id) != str(owner_id):
