@@ -272,6 +272,7 @@
     "preview_refreshed": "Vorschau aktualisiert"
   },
   "common": {
+    "updateAvailable": "Update verfügbar",
     "active": "Aktiv",
     "inactive": "Inaktiv",
     "healthy": "Erreichbar",
