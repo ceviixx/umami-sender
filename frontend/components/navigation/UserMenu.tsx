@@ -7,31 +7,12 @@ import { UserCircleIcon, UserIcon, ArrowRightOnRectangleIcon } from '@heroicons/
 import clsx from 'clsx'
 import { useSession } from "@/lib/session/SessionContext";
 
-import { useGithubLatestRelease } from '@/lib/update/useGithubLatestRelease';
-import { getCurrentVersion } from '@/lib/update/version';
-import { normalizeTag, isNewer } from '@/lib/update/helpers';
-import UpdateMenuCard from '@/components/updates/UpdateMenuCard';
-
 export default function UserMenu() {
   const router = useRouter()
   const { locale } = useI18n()
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const { user, loading } = useSession()
-
-
-  const { release, loading: updateLoading } = useGithubLatestRelease('ceviixx', 'umami-sender');
-  const current = getCurrentVersion();
-  const latest  = normalizeTag(release?.tag);
-  const needsUpdate = useMemo(() => {
-    if (!latest || !current || current === 'unknown') return false;
-    return isNewer(latest, current);
-  }, [latest, current]);
-  const dismissed = latest ? localStorage.getItem(`dismissed-update:${latest}`) === '1' : false;
-  const showBadge = !updateLoading && needsUpdate && !dismissed;
-
-
-
 
   const handleLogout = () => {
     localStorage.clear()
@@ -61,16 +42,11 @@ export default function UserMenu() {
         aria-label={locale.buttons.account}
         className={clsx(
           'relative inline-flex h-6 w-6 items-center justify-center rounded-full',
-          showBadge
-            ? 'text-blue-600 dark:text-blue-400'
-            : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
+          'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
         )}
       >
         <UserCircleIcon className="h-6 w-6" />
-        {showBadge && (
-          <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-gray-900" />
-        )}
       </button>
 
       {open && (
@@ -90,9 +66,6 @@ export default function UserMenu() {
           </div>
 
           <div className="my-1 h-px bg-gray-100 dark:bg-gray-700" />
-
-          <UpdateMenuCard owner="ceviixx" repo="umami-sender" title={locale.common.updateAvailable} />
-
 
           <button
             onClick={handleProfile}

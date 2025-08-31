@@ -23,6 +23,7 @@
     }
   },
   "buttons": {
+    "details": "Details",
     "reset": "Zurücksetzen",
     "execute_now": "Job ausführen",
     "try_again": "Erneut versuchen",
@@ -213,17 +214,6 @@
     "job_content_type": {
       "summary": "Zusammenfassung",
       "report": "Bericht"
-    },
-    "sender_report_template_type": {
-      "EMAIL_SUMMARY": "Statistik-Zusammenfassung",
-      "EMAIL_REPORT_INSIGHTS": "Einblicke",
-      "EMAIL_REPORT_ATTRIBUTION": "Attribution",
-      "EMAIL_REPORT_FUNNEL": "Trichter",
-      "EMAIL_REPORT_GOALS": "Ziele",
-      "EMAIL_REPORT_JOURNEY": "Reise",
-      "EMAIL_REPORT_RETENTION": "Bindung",
-      "EMAIL_REPORT_REVENUE": "Umsatz",
-      "EMAIL_REPORT_UTM": "UTM"
     }
   },
   "messages": {
