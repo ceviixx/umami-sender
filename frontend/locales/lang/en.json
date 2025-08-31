@@ -23,6 +23,7 @@
     }
   },
   "buttons": {
+    "details": "Details",
     "reset": "Reset",
     "execute_now": "Execute job",
     "try_again": "Try again",
@@ -213,17 +214,6 @@
     "job_content_type": {
       "summary": "Summary",
       "report": "Report"
-    },
-    "sender_report_template_type": {
-      "EMAIL_SUMMARY": "Statistic Summary",
-      "EMAIL_REPORT_INSIGHTS": "Insights",
-      "EMAIL_REPORT_ATTRIBUTION": "Attribution",
-      "EMAIL_REPORT_FUNNEL": "Funnel",
-      "EMAIL_REPORT_GOALS": "Goals",
-      "EMAIL_REPORT_JOURNEY": "Journey",
-      "EMAIL_REPORT_RETENTION": "Retention",
-      "EMAIL_REPORT_REVENUE": "Revenue",
-      "EMAIL_REPORT_UTM": "UTM"
     }
   },
   "messages": {
@@ -272,6 +262,7 @@
     "preview_refreshed": "Preview refreshed"
   },
   "common": {
+    "updateAvailable": "Update available",
     "active": "Active",
     "inactive": "Inactive",
     "healthy": "Healthy",

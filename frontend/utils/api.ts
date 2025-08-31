@@ -1,5 +1,3 @@
-// utils/api.ts
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/api';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

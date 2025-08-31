@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useI18n } from '@/locales/I18nContext'
 import { UserCircleIcon, UserIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
@@ -15,7 +15,7 @@ export default function UserMenu() {
   const { user, loading } = useSession()
 
   const handleLogout = () => {
-    localStorage.clear() // nur falls du LocalStorage nutzt
+    localStorage.clear()
     router.push('/login')
   }
 
@@ -41,7 +41,7 @@ export default function UserMenu() {
         aria-expanded={open}
         aria-label={locale.buttons.account}
         className={clsx(
-          'inline-flex h-6 w-6 items-center justify-center rounded-full',
+          'relative inline-flex h-6 w-6 items-center justify-center rounded-full',
           'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50'
         )}

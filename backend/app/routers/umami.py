@@ -304,7 +304,7 @@ def delete_instance(
 
     if not instance: return not_found_response(Umami, id)
 
-    ensure_is_owner(instance.id, user)
+    ensure_is_owner(instance.user_id, user)
 
     db.delete(instance)
     db.commit()
@@ -352,7 +352,7 @@ def get_reports_for_website_id(
 
     if not instance: return not_found_response(Umami, id)
     
-    ensure_is_owner(instance.id, user)
+    ensure_is_owner(instance.user_id, user)
 
     if instance.type == UmamiType.cloud:
         base_url = os.getenv("CLOUD_HOSTNAME", "https://api.umami.is/v1")

@@ -15,6 +15,7 @@ import { SessionProvider } from '@/lib/session/SessionContext';
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import UpdateInfoToast from "@/components/updates/UpdateInfoToast";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [navOpen, setNavOpen] = useState(false)
@@ -81,6 +82,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   </div>
                 </header>
 
+                <UpdateInfoToast />
+
                 <div className="flex flex-1 pt-14">
                   <aside
                     className="hidden md:flex md:fixed md:top-14 md:left-0 md:w-64 md:h-[calc(100dvh-3.5rem)]
@@ -90,7 +93,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   >
                     <Sidebar />
                   </aside>
-
                   <div
                     className={`md:hidden fixed inset-0 z-50 ${navOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
                     aria-hidden={!navOpen}
