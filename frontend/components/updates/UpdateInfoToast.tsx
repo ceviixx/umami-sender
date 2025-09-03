@@ -11,14 +11,14 @@ type Props = {
   owner?: string;
   repo?: string;
   idPrefix?: string;
-  markAsSeenOnShow?: boolean;
 };
+
+const STORAGE_PREFIX = "dismissed-update:";
 
 export default function UpdateInfoToast({
   owner = "ceviixx",
   repo = "umami-sender",
   idPrefix = "update",
-  markAsSeenOnShow = true, // on first show set varible to not show again 
 }: Props) {
   const { locale } = useI18n();
   const { release, loading } = useGithubLatestRelease(owner, repo);
@@ -31,7 +31,7 @@ export default function UpdateInfoToast({
     return isNewer(latest, current);
   }, [latest, current]);
 
-  const storageKey = latest ? `dismissed-update:${latest}` : "";
+  const storageKey = latest ? `${STORAGE_PREFIX}${latest}` : "";
 
   const [ready, setReady] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -43,7 +43,8 @@ export default function UpdateInfoToast({
       return;
     }
     try {
-      const val = typeof window !== "undefined" ? localStorage.getItem(storageKey) : null;
+      const val =
+        typeof window !== "undefined" ? window.localStorage.getItem(storageKey) : null;
       setDismissed(val === "1");
     } catch {
       setDismissed(false);
@@ -53,10 +54,7 @@ export default function UpdateInfoToast({
   }, [storageKey]);
 
   useEffect(() => {
-    if (loading) return;
-    if (!ready) return;
-    if (!needsUpdate || dismissed) return;
-    if (!latest) return;
+    if (loading || !ready || !needsUpdate || dismissed || !latest) return;
 
     const href = release?.html_url || `https://github.com/${owner}/${repo}/releases`;
     const id = `${idPrefix}:${latest}`;
@@ -69,33 +67,13 @@ export default function UpdateInfoToast({
       href,
       onDismiss: () => {
         try {
-          if (storageKey) localStorage.setItem(storageKey, "1");
-        } catch {}
+          if (storageKey) window.localStorage.setItem(storageKey, "1");
+        } catch { }
         setDismissed(true);
       },
     });
 
-    if (markAsSeenOnShow) {
-      try {
-        if (storageKey) localStorage.setItem(storageKey, "1");
-      } catch {}
-      setDismissed(true);
-    }
-  }, [
-    loading,
-    ready,
-    needsUpdate,
-    dismissed,
-    latest,
-    release,
-    owner,
-    repo,
-    idPrefix,
-    locale,
-    storageKey,
-    current,
-    markAsSeenOnShow,
-  ]);
+  }, [loading, ready, needsUpdate, dismissed, latest, release, owner, repo, idPrefix, locale, storageKey, current]);
 
   return null;
 }

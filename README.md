@@ -5,7 +5,7 @@
 <h1 align="center">UmamiSender</h1>
 
 <p align="center">
-  <i>Automated reports for Umami – via email or webhook, right from your dashboard.</i>
+  <i>Open-source automated reports for Umami Analytics – via email or webhook, Cloud & Self-Hosted.</i>
 </p>
 
 <p align="center">
@@ -21,10 +21,19 @@
 
 ## ✨ What is UmamiSender?
 
-**UmamiSender** is an open-source tool to automatically send scheduled reports from [Umami Analytics](https://umami.is) via email or webhook (e.g. Slack, Discord).
-Perfect for hobby projects, small teams, client work, or personal dashboards.
+**UmamiSender** is an **open-source reporting tool for [Umami Analytics](https://umami.is)**.  
+It automatically generates and sends **website analytics reports** via **Email (SMTP)** or **Webhooks** (Slack, Discord, Teams, …).  
 
-> Works with both **Umami Cloud** and **Self-Hosted Umami**.
+Works with both **Umami Cloud** and **Self-Hosted Umami** – perfect for **agencies, teams, and personal projects** who want to share **website stats, traffic, goals, referrers, and top pages** without logging into the dashboard.
+
+---
+
+## 🌍 Use Cases
+
+- Agencies sending **weekly website reports** to clients  
+- Teams sharing **Umami Analytics data** automatically in **Slack/Discord**  
+- Personal projects needing quick **email summaries** of traffic, goals & referrers  
+- Self-hosted setups where **Umami dashboards** aren’t always accessible  
 
 ---
 
@@ -38,21 +47,21 @@ Perfect for hobby projects, small teams, client work, or personal dashboards.
 
 ## 💎 Why I built it
 
-* I wanted my Umami stats without logging in every time.
-* It's fun to automate stuff and learn new tech along the way.
-* Maybe it’s useful for other people too – especially if you run multiple sites or share stats with a team. 🙂
+* I wanted my Umami stats without logging in every time.  
+* Automating reports saves time and makes analytics **shareable with teams & clients**.  
+* Maybe it’s useful for other people too – especially if you run multiple sites or share stats with a team. 🙂  
 
 ---
 
 ## 🧩 Features
 
-* 📈 Automated reporting from Umami
-* 📬 Delivery via **email** or **webhook**
-* 🧰 Manage **multiple Umami instances** (Cloud & Self-Hosted)
-* 🗓 Scheduling: **daily, weekly, or monthly**
-* 👥 **Multiple recipients** per job
-* 🌍 **Multilingual interface** (i18n-ready)
-* 🖼 Built-in **HTML email template** & preview
+* 📈 **Automated website analytics reports** from Umami (Cloud & Self-Hosted)  
+* 📬 Delivery via **Email (SMTP)** or **Webhook** (Slack, Discord, Teams, …)  
+* 🧰 Manage **multiple Umami instances**  
+* 🗓 Scheduling: **daily, weekly, or monthly**  
+* 👥 **Multiple recipients** per job  
+* 🌍 **Multilingual interface** (i18n-ready)  
+* 🖼 Built-in **HTML email templates** with charts, top pages & referrers  
 
 ---
 
@@ -69,8 +78,6 @@ Password: sender
 
 You will be prompted to change your password immediately (and can also change the username later).
 
----
-
 ### Requirements
 
 * [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
@@ -78,33 +85,24 @@ You will be prompted to change your password immediately (and can also change th
 
 ### Start with GHCR images (recommended)
 
-For the easiest setup, download the docker-compose and nginx config directly:
+Start **UmamiSender** in minutes with **Docker** – works with both **Umami Cloud** and **Self-Hosted Umami Analytics**:
 
 ```bash
-mkdir -p nginx && \
-curl -o docker-compose.yml https://raw.githubusercontent.com/ceviixx/umami-sender/main/docker-compose.ghcr.yml \
-     -o nginx/nginx.conf https://raw.githubusercontent.com/ceviixx/umami-sender/main/nginx/nginx.conf
+mkdir -p nginx && curl -o docker-compose.yml https://raw.githubusercontent.com/ceviixx/umami-sender/main/docker-compose.ghcr.yml      -o nginx/nginx.conf https://raw.githubusercontent.com/ceviixx/umami-sender/main/nginx/nginx.conf
 
 # Start the stack
 docker compose up -d
 ```
 
 Then open:
-- UI: http://localhost
-- API: http://localhost/api
+- UI: http://localhost  
+- API: http://localhost/api  
 
 ### Start with local build (for development)
-
-First, clone the repository:
 
 ```bash
 git clone https://github.com/ceviixx/umami-sender.git
 cd umami-sender
-```
-
-Then build and start the stack:
-
-```bash
 docker compose -f docker-compose.build.yml up --build -d
 ```
 
@@ -123,44 +121,38 @@ nginx/     # Reverse proxy for unified access
 
 ## ⚙️ Environment Variables
 
-UmamiSender supports optional audit logs (because I love logs) for API requests, workers, and the beat scheduler.  
-
 | Variable               | Applies to      | Default | Description                                                                 |
 | :--------------------- | :-------------- | :------ | :-------------------------------------------------------------------------- |
-| `AUDIT_API_ENABLED`    | backend         | `true`  | Enables API request logging. For the REST API this is **enabled by default**. |
-| `AUDIT_WORKER_ENABLED` | worker, beat    | `false` | Enables worker/beat audit logging. Every run will be logged, which can quickly produce a large amount of data. Disabled by default – activate via Compose if needed. |
+| `AUDIT_API_ENABLED`    | backend         | `true`  | Enables API request logging (enabled by default). |
+| `AUDIT_WORKER_ENABLED` | worker, beat    | `false` | Enables worker/beat audit logging. May produce lots of logs. Disabled by default. |
 
 > 🗄️ **Retention Policy:**  
-> • **System logs** are automatically deleted after **30 days**.  
-> • **User audit logs** are automatically deleted after **90 days**.  
-> A daily cleanup job removes entries older than the respective retention period.
+> • **System logs** auto-deleted after **30 days**  
+> • **User audit logs** auto-deleted after **90 days**  
 
 ---
 
 ## 🧭 How it works
 
-1. **Add an Umami instance**
+1. **Add an Umami instance**  
+   - Cloud: provide your Umami **API key**  
+   - Self-Hosted: provide **hostname + credentials** (a bearer token is stored for reuse)  
 
-   * Cloud: provide your Umami **API key**
-   * Self-Hosted: provide **hostname + credentials** (a bearer token is stored for reuse)
+2. **Add recipients**  
+   - Email sender(s) and/or **webhooks** (Slack, Discord, …)  
 
-2. **Add recipients**
+3. **Create a report job**  
+   - Choose website, frequency (daily/weekly/monthly), recipients  
 
-   * Email sender(s) and/or **webhooks** (Slack, Discord, …)
-
-3. **Create a report job**
-
-   * Choose website, frequency (daily/weekly/monthly), recipients
-
-4. **Done** – UmamiSender will deliver reports on schedule.
+4. **Done** – UmamiSender will deliver reports on schedule.  
 
 ---
 
 ## 🧪 Try it locally (dev hints)
 
-* Use the provided Compose files to spin up the full stack.
-* Most configuration is handled in the **web UI** (instances, senders, webhooks, jobs).
-* SMTP settings and webhook URLs are entered when creating senders/webhooks.
+* Use the provided Compose files to spin up the full stack.  
+* Most configuration is handled in the **web UI** (instances, senders, webhooks, jobs).  
+* SMTP settings and webhook URLs are entered when creating senders/webhooks.  
 
 ---
 
@@ -170,9 +162,9 @@ Pull requests, suggestions, and bug reports are very welcome!
 
 **Nice starter ideas:**
 
-* 🎨 Customizable templates for emails and popular webhook platforms
-* 🔔 More webhook destinations (Microsoft Teams, Mattermost, …)
-* 🌐 Additional languages for the UI
+* 🎨 Customizable templates for emails and popular webhook platforms  
+* 🔔 More webhook destinations (Microsoft Teams, Mattermost, …)  
+* 🌐 Additional languages for the UI  
 
 ---
 
