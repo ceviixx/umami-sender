@@ -27,7 +27,18 @@ def generate_report_summary(db: Session, job: Job) -> dict:
         raise Exception("No summary data returned.")
 
     summary["name"] = job.name
-    summary["embedded_logo"] = resolve_logo_data_url(db)
+    # Logo-Konfiguration holen
+    logo_cfg = _get_logo_config(db)
+    if logo_cfg and logo_cfg.get("path") and os.path.isfile(logo_cfg["path"]):
+        summary["logo_path"] = logo_cfg["path"]
+        summary["logo_mime"] = logo_cfg.get("mime", "image/png")
+    else:
+        # Fallback: Default-Logo als Datei
+        default_logo_path = os.path.join(os.path.dirname(__file__), "default_logo.png")
+        summary["logo_path"] = default_logo_path
+        summary["logo_mime"] = "image/png"
+    # Für das HTML-Template: Platzhalter für die CID
+    summary["embed_logo_cid"] = "cid:logo_cid"
 
     return summary
 
