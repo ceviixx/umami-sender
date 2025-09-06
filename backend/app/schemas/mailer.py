@@ -37,6 +37,8 @@ class MailerJobUpdate(BaseModel):
     umami_id: UUID
     website_id: str
     report_type: str = "summary"
+    summary_items: List[str] = []
+    report_id: Optional[str]
     frequency: Frequency
     day: Optional[int]
     email_recipients: List[str] = []
