@@ -9,6 +9,7 @@ from app.api import users
 from app.api import logs
 from app.api import settings_logo
 from app.api import settings_template_source
+from app.api import dashboard
 from app.routers import umami
 from app.routers import auth
 
@@ -49,6 +50,7 @@ app.include_router(job.router)
 app.include_router(webhooks.router)
 app.include_router(template.router)
 app.include_router(logs.router)
+app.include_router(dashboard.router)
 
 app.include_router(settings_logo.router)
 app.include_router(settings_template_source.router)

@@ -36,9 +36,9 @@ def send_email(sender: Sender, to: list[str], subject: str, body: str, html: str
     for recipient in to:
         msg = MIMEMultipart("related")
         alt = MIMEMultipart("alternative")
-        alt.attach(MIMEText(body, "plain"))
+        alt.attach(MIMEText(body, "plain", "utf-8"))
         if html:
-            alt.attach(MIMEText(html, "html"))
+            alt.attach(MIMEText(html, "html", "utf-8"))
         msg.attach(alt)
 
         msg["Subject"] = subject

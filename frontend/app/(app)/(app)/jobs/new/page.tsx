@@ -282,6 +282,7 @@ export default function JobNewPage() {
             required
             autoComplete="off"
             inputMode="text"
+            description={locale.forms.help.job_name}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

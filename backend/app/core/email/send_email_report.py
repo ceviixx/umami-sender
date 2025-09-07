@@ -33,13 +33,12 @@ def send_email_report(db: Session, job: Job, summary: dict):
         "job": job,
     })
     html_body = process_api_response(response=html_body, db=db)
-
-    text_body = "No plain text available"
+    text_body = "This email contains an HTML layout. Please enable HTML view in your email client."
 
     send_email(
         sender=sender,
         to=job.email_recipients,
-        subject=f"Umami Report – {job.name}",
+        subject=f"{job.name}",
         body=text_body,
         html=html_body,
         logo_path=summary.get("logo_path"),

@@ -1,125 +1,59 @@
 'use client'
 
 import { useI18n } from "@/locales/I18nContext";
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import PageHeader from '@/components/navigation/PageHeader'
 import LoadingSpinner from "@/components/LoadingSpinner";
 import NetworkError from "@/components/NetworkError";
 import JobChart from '@/components/JobChart';
-import {
-  fetchStats,
-  fetchStatsLogs,
-} from '@/lib/api/stats'
-import {
-  fetchJobs
-} from '@/lib/api/jobs'
-import {
-  fetchLogs
-} from '@/lib/api/logs'
-import {
-  fetchUmamis
-} from '@/lib/api/umami'
+import { fetchDashboard } from '@/lib/api/dashboard'
 import {
   BriefcaseIcon, ChartBarIcon, PaperAirplaneIcon, PuzzlePieceIcon,
   ExclamationTriangleIcon, ClockIcon, ArrowTrendingDownIcon, CpuChipIcon,
   ArchiveBoxIcon
 } from '@heroicons/react/20/solid'
 import Container from "@/components/layout/Container";
+import type { DashboardResponse } from '@/lib/api/dashboard'
 
-type Stats = { senders: number | string; umami: number | string; jobs: number | string; webhooks: number | string }
-type LogPoint = { date: string; success: number; failed: number; warning: number }
-type RangeKey = '7d' | '30d' | '90d'
-
-import { MailerJob, JobLog, UmamiInstance } from '@/types'
-import { computeNextExecution, formatNextExecutionLocalized } from '@/utils/scheduling';
 
 export default function DashboardPage() {
   const { locale } = useI18n()
-  const [stats, setStats] = useState<Stats | null>(null)
-  const [logStats, setLogStats] = useState<LogPoint[]>([])
+  const [dashboard, setDashboard] = useState<DashboardResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [networkError, setHasNetworkError] = useState<string | null>(null)
-  const [range, setRange] = useState<RangeKey>('7d')
-
-  const [recentRuns, setRecentRuns] = useState<JobLog[]>([])
-  const [jobs, setJobs] = useState<MailerJob[]>([])
-  const [instances, setInstances] = useState<UmamiInstance[]>([])
-  const [problemJobs, setProblemJobs] = useState<JobLog[]>([])
-
-
-
-
-
-
-
-
-function daysFromRange(range: RangeKey) {
-  switch (range) {
-    case '7d': return 7
-    case '30d': return 30
-    case '90d': return 90
-  }
-}
-
-function sortByDateAsc<T extends { date: string }>(arr: T[]): T[] {
-  return [...arr].sort((a, b) => +new Date(a.date) - +new Date(b.date))
-}
-
-const filteredChartData = useMemo(() => {
-  const days = daysFromRange(range)
-  const cutoff = new Date()
-  cutoff.setHours(0, 0, 0, 0)
-  cutoff.setDate(cutoff.getDate() - days + 1)
-
-  const filtered = logStats.filter(p => new Date(p.date) >= cutoff)
-  return sortByDateAsc(filtered)
-}, [logStats, range])
+  const [range, setRange] = useState<'7d' | '30d' | '90d'>('7d')
 
   useEffect(() => {
-    const ac = new AbortController()
-      ; (async () => {
-        try {
-          setLoading(true)
-          setHasNetworkError(null)
-          const [s, logs, jobs, recentRuns, instances] = await Promise.all([
-            fetchStats(),
-            fetchStatsLogs(),
-            fetchJobs(),
-            fetchLogs(),
-            fetchUmamis(),
-          ])
-          setStats(s)
-          setLogStats(Array.isArray(logs) ? logs : [])
-          setJobs(jobs)
-          setRecentRuns(recentRuns)
-          setInstances(instances)
-
-          setProblemJobs(recentRuns)
-        } catch (e: any) {
-          if (e?.name !== 'AbortError') setHasNetworkError(e?.message || 'Network error')
-        } finally {
-          setLoading(false)
-        }
-      })()
-    return () => ac.abort()
+    (async () => {
+      try {
+        setLoading(true)
+        setHasNetworkError(null)
+        const data = await fetchDashboard()
+        setDashboard(data)
+      } catch (e: any) {
+        setHasNetworkError(e?.message || 'Network error')
+      } finally {
+        setLoading(false)
+      }
+    })()
   }, [])
 
   if (loading) return <LoadingSpinner title={locale.pages.dashboard} />
   if (networkError) return <NetworkError page={locale.pages.dashboard} message={networkError} />
+  if (!dashboard) return null;
 
-  const now = new Date()
-  const last7 = logStats.filter(p => new Date(p.date) >= new Date(now.getTime() - 7 * 24 * 3600e3))
-  const last7Failed = last7.reduce((s, p) => s + (p.failed || 0), 0)
-  const last7Success = last7.reduce((s, p) => s + (p.success || 0), 0)
-  const last7Skipped = last7.reduce((s, p) => s + (p.warning || 0), 0)
-  const last7Total = last7Failed + last7Success + last7Skipped
-  const successRate = last7Total ? Math.round((last7Success / last7Total) * 100) : null
+  // Stats aus dashboard.stats
+  const stats = dashboard.stats;
+  // Runs, Jobs, ProblemJobs, Instances aus dashboard
+  const recentRuns = dashboard.last_runs || [];
+  const instances = dashboard.instances || [];
+  const problemJobs = dashboard.problem_jobs || [];
+  const nextRuns = dashboard.next_runs || [];
 
-
-  const recentProblems = problemJobs.filter(
-    j => j.status !== 'success' && Date.parse(j.started_at) >= Date.now() - 7*24*60*60*1000
-  );
+  // Alert: failed/success aus stats
+  const last7Failed = stats?.failed_last_7_days ?? 0;
+  const successRate = stats?.success_rate_last_7_days ?? 0;
 
   return (
     <Container>
@@ -145,10 +79,11 @@ const filteredChartData = useMemo(() => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <KpiTile label={locale.pages.umami} value={stats?.umami} icon={<ChartBarIcon className="w-5 h-5" />} href="umami" />
         <KpiTile label={locale.pages.jobs} value={stats?.jobs} icon={<BriefcaseIcon className="w-5 h-5" />} href="jobs" />
-        <KpiTile label={locale.pages.mailer} value={stats?.senders} icon={<PaperAirplaneIcon className="w-5 h-5" />} href="mailers" />
-        <KpiTile label={locale.pages.webhook} value={stats?.webhooks} icon={<PuzzlePieceIcon className="w-5 h-5" />} href="webhooks" />
+        <KpiTile label={locale.pages.mailer} value={stats?.mailer} icon={<PaperAirplaneIcon className="w-5 h-5" />} href="mailers" />
+        <KpiTile label={locale.pages.webhook} value={stats?.webhook} icon={<PuzzlePieceIcon className="w-5 h-5" />} href="webhooks" />
       </div>
 
+      {/* JobChart kann nur angezeigt werden, wenn dashboard.logs vorhanden ist */}
       <section className="mt-8 rounded-2xl border border-gray-200/70 dark:border-gray-800/60 bg-white/70 dark:bg-gray-900/40 shadow-sm">
         <div className="flex items-center justify-between p-3 sm:p-4">
           <h2 className="text-sm font-semibold">{locale.dashboard.job_activity}</h2>
@@ -156,8 +91,8 @@ const filteredChartData = useMemo(() => {
         </div>
         <div className="rounded-b-2xl border-t border-gray-200/60 dark:border-gray-800/60 bg-white/60 dark:bg-gray-900/30 p-3 sm:p-4">
           <JobChart
-            key={`${range}-${filteredChartData.length}-${filteredChartData[0]?.date}-${filteredChartData.at(-1)?.date}`}
-            jobData={filteredChartData}
+            key={range}
+            jobData={dashboard.activity || []}
             range={range}
           />
         </div>
@@ -168,11 +103,11 @@ const filteredChartData = useMemo(() => {
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
             {padTo(recentRuns, 3).map((r, idx) =>
               r ? (
-                <li key={r.log_id} className="py-3 flex items-center justify-between">
+                <li key={r.name + r.start} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
-                    <div className="text-sm font-medium truncate">{r.job_name}</div>
+                    <div className="text-sm font-medium truncate">{r.name}</div>
                     <div className="text-xs opacity-70 flex gap-2">
-                      <span>{new Date(r.started_at).toLocaleString()}</span>
+                      <span>{r.start ? new Date(r.start).toLocaleString() : ''}</span>
                       <span>•</span>
                       <span>{r.duration_ms} ms</span>
                     </div>
@@ -188,26 +123,17 @@ const filteredChartData = useMemo(() => {
 
         <Card title={locale.dashboard.next_runs} icon={<ClockIcon className="w-4 h-4" />}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
-            {padTo(jobs.filter(j => j.is_active), 3).map((j, idx) =>
+            {padTo(nextRuns, 3).map((j, idx) =>
               j ? (
-                <li key={j.id} className="py-3 flex items-center justify-between">
+                <li key={j.name + j.next_run} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{j.name}</div>
                     <div className="text-xs opacity-70">
-                      {formatNextExecutionLocalized(computeNextExecution(j), {
-                        locale: locale.lang_code,
-                        frequency: j.frequency,
-                        texts: {
-                          today: locale.common.today,
-                          tomorrow: locale.common.tomorrow,
-                          nextMonth: locale.common.nextMonthHint,
-                          inMonth: (m) => locale.common.inMonth?.replace('%MONTH%', m) ?? `(${m})`,
-                        }
-                      })}
+                      {j.next_run ? new Date(j.next_run).toLocaleString() : ''}
                     </div>
                   </div>
                   <span className="text-[10px] px-2 py-1 bg-gray-50 text-gray-700 ring-gray-200/70 dark:bg-gray-900/30 dark:text-gray-300 dark:ring-gray-800/50">
-                    {locale.enums.frequency[j.frequency]}
+                    {locale.enums.frequency[j.type as "daily"]}
                   </span>
                 </li>
               ) : (
@@ -219,15 +145,15 @@ const filteredChartData = useMemo(() => {
 
         <Card title={locale.dashboard.problem_jobs} icon={<ArrowTrendingDownIcon className="w-4 h-4" />}>
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
-          
-            {padTo(recentProblems.filter(j => j.status != 'success').filter(j => j.started_at ), 3).map((p, idx) =>
+            {padTo(problemJobs, 3).map((p, idx) =>
               p ? (
-                <li key={p.log_id} className="py-3 flex items-center justify-between">
+                <li key={p.id} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
-                    <div className="text-sm font-medium truncate">{p.job_name}</div>
-                    <JobLogErrorInline log={p} />
+                    <div className="text-sm font-medium truncate">{p.name}</div>
+                    <div className="text-xs opacity-70 truncate">{p.errors}</div>
                   </div>
-                  <Link href={`/jobs/${p.job_id}/logs`} className="text-xs underline">Details</Link>
+                  {/* Details-Link ggf. anpassen, falls p.id = job_id */}
+                  <Link href={`/jobs/${p.id}/logs`} className="text-xs underline">Details</Link>
                 </li>
               ) : (
                 <SkeletonListRow key={`skeleton-${idx}`} />
@@ -237,11 +163,10 @@ const filteredChartData = useMemo(() => {
         </Card>
 
         <Card title={locale.dashboard.instance_status} icon={<CpuChipIcon className="w-4 h-4" />}>
-
           <ul className="divide-y divide-gray-200/70 dark:divide-gray-800/60">
             {padTo(instances, 3).map((i, idx) =>
               i ? (
-                <li key={i.id ?? idx} className="py-3 flex items-center justify-between">
+                <li key={i.name + idx} className="py-3 flex items-center justify-between">
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{i.name}</div>
                     <div className="text-xs opacity-70">
@@ -262,21 +187,7 @@ const filteredChartData = useMemo(() => {
   )
 }
 
-type Props = { log: JobLog };
-function JobLogErrorInline({ log }: Props) {
-  const errors = Array.from(
-    new Set( // Duplikate vermeiden
-      (log.details || [])
-        .map(d => d.error?.trim())
-        .filter((e): e is string => !!e)
-        .map(e => e.replace(/\s+/g, " ")) // Normalisieren
-    )
-  ).join(", ");
 
-  return (
-    <div className="text-xs opacity-70 truncate">{errors}</div>
-  );
-}
 
 function padTo<T>(items: T[], count: number) {
   const limited = items.slice(0, count);
@@ -331,11 +242,12 @@ function StatusPill({ status }: { status: 'success' | 'failed' | 'skipped' | 'wa
   return <span className={`text-[10px] px-2 py-1 rounded ring-1 ring-inset ${map[status]}`}>{status}</span>
 }
 
-function RangePicker({ value, onChange }: { value: RangeKey; onChange: (v: RangeKey) => void }) {
+
+function RangePicker({ value, onChange }: { value: '7d' | '30d' | '90d'; onChange: (v: '7d' | '30d' | '90d') => void }) {
   return (
     <div className="inline-flex rounded-xl border border-gray-200/70 dark:border-gray-800/60 overflow-hidden" role="tablist" aria-label="Chart range">
-      {(['7d', '30d', '90d'] as RangeKey[]).map(k => (
-        <button key={k} role="tab" aria-selected={value === k} onClick={() => onChange(k)}
+      {(['7d', '30d', '90d']).map(k => (
+        <button key={k} role="tab" aria-selected={value === k} onClick={() => onChange(k as '7d' | '30d' | '90d')}
           className={[
             "px-3 py-1.5 text-xs font-medium transition",
             value === k ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900" : "hover:bg-gray-100 dark:hover:bg-gray-800"

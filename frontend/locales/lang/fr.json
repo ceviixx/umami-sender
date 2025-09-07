@@ -156,7 +156,8 @@
       "webhookName": "",
       "webhookUrl": "",
       "hint_general": "",
-      "hint_config": ""
+      "hint_config": "",
+      "job_name": ""
     }
   },
   "enums": {
