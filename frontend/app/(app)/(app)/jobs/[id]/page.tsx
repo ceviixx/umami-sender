@@ -340,7 +340,7 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="flex w-full gap-4">
             <SelectBox
               label={locale.forms.labels.frequency}
               value={form.frequency}

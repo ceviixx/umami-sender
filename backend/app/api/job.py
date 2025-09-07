@@ -115,7 +115,7 @@ def run_job(
     ensure_is_owner(job.user_id, user)
     
     now = datetime.utcnow()
-    process_jobs(db=db, jobs=[job], today=now, force_send=True)
+    process_jobs(db=db, jobs=[job], today=now, force_send=True, triggered_by="user")
 
     return send_status_response(
         code="JOB_QUEUED",

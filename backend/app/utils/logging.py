@@ -34,9 +34,10 @@ def add_log_detail(log: JobLog, *, channel: str, target_id: Optional[str], statu
     elif status == "skipped":
         log.count_skipped += 1
 
+from typing import Generator
 @contextmanager
-def job_log_context(db: Session, *, job_id) -> JobLog:
-    log = JobLog(job_id=job_id, started_at=datetime.utcnow(), status="running", details=[])
+def job_log_context(db: Session, *, job_id, triggered_by: str = None) -> Generator[JobLog, None, None]:
+    log = JobLog(job_id=job_id, started_at=datetime.utcnow(), status="running", details=[], triggered_by=triggered_by)
     db.add(log)
     db.flush()  # ID verfügbar
 

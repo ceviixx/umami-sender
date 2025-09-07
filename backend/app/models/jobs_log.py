@@ -24,3 +24,4 @@ class JobLog(Base):
     count_success = Column(Integer, nullable=False, default=0)
     count_failed = Column(Integer, nullable=False, default=0)
     count_skipped = Column(Integer, nullable=False, default=0)
+    triggered_by = Column(String, nullable=True)

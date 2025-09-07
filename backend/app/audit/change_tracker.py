@@ -65,7 +65,7 @@ def record_change(op: str, obj, changes: dict):
         "op": op,
         "type": obj.__tablename__,
         "id": _pk(obj),
-        "__obj": obj,
+        # "__obj": obj,  # entfernt, um DetachedInstanceError zu vermeiden
         "changes": changes,
     })
 
