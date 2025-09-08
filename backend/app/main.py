@@ -17,7 +17,7 @@ from app.routers import auth
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.responses import send_status_response
 
-app = FastAPI(root_path='/api')
+app = FastAPI(title="UmamiSender API", root_path='/api', version='1.0.0')
 
 from sqlalchemy.orm import sessionmaker
 from app.database import engine
