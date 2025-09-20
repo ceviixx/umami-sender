@@ -184,12 +184,14 @@ def process_jobs(
     jobs: list,
     today: date,
     *,
-    force_send: bool = False
+    force_send: bool = False,
+    triggered_by: str = None
 ) -> None:
     start_of_day = datetime(today.year, today.month, today.day)
 
     for job in jobs:
-        with job_log_context(db, job_id=job.id) as log:
+        tb = triggered_by if triggered_by else ("system" if not force_send else "user")
+        with job_log_context(db, job_id=job.id, triggered_by=tb) as log:
             webhook_channels = []
             if job.webhook_recipients:
                 webhook_objects = db.query(WebhookRecipient).filter(
@@ -202,6 +204,7 @@ def process_jobs(
                     JobLog.job_id == job.id,
                     JobLog.finished_at >= start_of_day,
                     JobLog.status.in_(["success", "warning"]),
+                    JobLog.triggered_by == "system"
                 ).first()
 
                 unsent_webhooks = []
@@ -245,7 +248,8 @@ def process_jobs(
                 else:
                     todays_logs = db.query(JobLog).filter(
                         JobLog.job_id == job.id,
-                        JobLog.finished_at >= start_of_day
+                        JobLog.finished_at >= start_of_day,
+                        JobLog.triggered_by == "system"
                     ).all()
                     already_sent_email_today = any(
                         any(

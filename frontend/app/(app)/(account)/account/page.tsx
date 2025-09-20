@@ -12,6 +12,7 @@ import SelectBox from '@/components/inputs/SelectBox'
 import FormButtons from '@/components/FormButtons'
 import { showError, showSuccess, notification_ids } from '@/lib/toast'
 import Container from '@/components/layout/Container'
+import { useSession } from '@/lib/session/SessionContext'
 
 type Account = {
   username: string
@@ -25,6 +26,8 @@ export default function AccountPage() {
   const availableLanguages = Object.keys(translations) as (keyof typeof translations)[]
   const [form, setForm] = useState<Account | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const { user, setUser } = useSession()
+  const [successPending, setSuccessPending] = useState(false)
 
   useEffect(() => {
     const loadAccount = async () => {
@@ -58,13 +61,27 @@ export default function AccountPage() {
         language: form.language,
       })
       setLang(form.language)
-      showSuccess({id: notification_ids.account, title: locale.messages.title.success, description: 'Account updated successfully'})
+      if (typeof setUser === 'function' && user) {
+        setUser({ ...user, username: form.username })
+      }
+      setSuccessPending(true)
     } catch (error: any) {
       showError({id: notification_ids.account, title: locale.messages.title.error, description: error.message})
     } finally {
       setSubmitting(false)
     }
   }
+
+  useEffect(() => {
+    if (successPending) {
+      showSuccess({
+        id: notification_ids.account,
+        title: locale.messages.title.success,
+        description: 'Account updated successfully'
+      })
+      setSuccessPending(false)
+    }
+  }, [lang, locale, successPending])
 
   if (!form) return null
 

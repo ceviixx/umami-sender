@@ -118,6 +118,22 @@ def get_public_logo(
   sha256 = cfg.get("sha256")
 
   if not path or not os.path.isfile(path):
+    # Default-Logo als Fallback
+    default_logo_path = os.path.join(os.path.dirname(__file__), "../core/default_logo.png")
+    if os.path.isfile(default_logo_path):
+      with open(default_logo_path, "rb") as f:
+        data = f.read()
+      etag = 'W/"default-logo"'
+      if request.headers.get("If-None-Match") == etag:
+        return Response(status_code=304)
+      headers = {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=60",
+        "ETag": etag,
+        "Last-Modified": _http_date(0),
+      }
+      return Response(content=data, headers=headers, media_type="image/png")
+    # Fallback auf SVG, falls Default-Logo fehlt
     etag = 'W/"placeholder"'
     if request.headers.get("If-None-Match") == etag:
       return Response(status_code=304)

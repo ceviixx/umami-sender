@@ -156,7 +156,8 @@
       "webhookName": "Interner Name zur Identifikation.",
       "webhookUrl": "Vollständige Ziel-URL, die POST-Payloads empfängt.",
       "hint_general": "Bitte zuerst die allgemeinen Felder ausfüllen.",
-      "hint_config": "Bitte zuerst die Konfiguration abschließen."
+      "hint_config": "Bitte zuerst die Konfiguration abschließen.",
+      "job_name": "Der Titel wird als Betreff der E-Mail verwendet."
     }
   },
   "enums": {

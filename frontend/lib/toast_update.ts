@@ -16,23 +16,22 @@ export function showUpdateAvailableToast({
   current,
   latest,
   href,
+  duration = 0,
   onDismiss,
 }: ShowUpdateToastParams) {
-  return toast.show(
-    {
-      id,
-      title,
-      description: `${current} → ${latest}`,
-      type: "info",
-      duration: 100000,
-      dismissible: true,
-      action: {
-        label: "Details",
-        onClick: () => {
-          window.open(href, "_blank", "noopener,noreferrer");
-          onDismiss?.();
-        },
+  return toast.show({
+    id,
+    title,
+    description: `${current} → ${latest}`,
+    type: "info",
+    duration,
+    dismissible: true,
+    onDismiss,
+    action: {
+      label: "Details",
+      onClick: () => {
+        window.open(href, "_blank", "noopener,noreferrer");
       },
-    }
-  );
+    },
+  });
 }

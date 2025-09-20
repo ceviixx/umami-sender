@@ -10,7 +10,9 @@ def test_smtp_connection(data: SenderBase):
             if data.use_tls:
                 server.starttls()
 
-        server.login(data.smtp_username, data.smtp_password)
+        if getattr(data, "use_auth", False) and data.smtp_username and data.smtp_password:
+            server.login(data.smtp_username, data.smtp_password)
+
         server.quit()
         return True
     except Exception as e:

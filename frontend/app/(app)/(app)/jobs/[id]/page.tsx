@@ -319,6 +319,7 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
             required
             autoComplete="off"
             inputMode="text"
+            description={locale.forms.help.job_name}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -340,7 +341,7 @@ export default function JobEditPage({ params }: { params: { id: string } }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="flex w-full gap-4">
             <SelectBox
               label={locale.forms.labels.frequency}
               value={form.frequency}

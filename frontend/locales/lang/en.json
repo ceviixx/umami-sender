@@ -156,7 +156,8 @@
       "webhookName": "Internal name for identification.",
       "webhookUrl": "Full target URL that receives POST payloads.",
       "hint_general": "Please fill in the general fields first.",
-      "hint_config": "Please complete the configuration first."
+      "hint_config": "Please complete the configuration first.",
+      "job_name": "The title will be used as the email subject."
     }
   },
   "enums": {
